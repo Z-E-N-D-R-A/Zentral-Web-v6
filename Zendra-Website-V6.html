@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Zendra Website V1</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+      /* Add the banner styles here */
+      #banner {
+        display: flex;
+        justify-content: space-between;
+        font-family: arial;
+        padding: 10px;
+        position: relative; /* Add this line for positioning */
+      }
+
+      .visitor-count {
+        font-weight: bold;
+        font-size: 20px;
+        font-family: arial;
+        position: absolute; /* Add this line for positioning */
+        top: 5px; /* Add this line for positioning */
+        right: 5px; /* Add this line for positioning */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Include the banner -->
+    <div id="banner">
+      <div class="visitor-count"></div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="youtube.html">YouTube</a></li>
+          <li><a href="support.html" class="active">Help and Support</a></li>
+        </ul>
+      </nav>
+    </div>
+    
+    <!-- Add the page content -->
+    <div class="container">
+      <div class="left">
+        <h1>Welcome to my website!!!</h1>
+        <p>Hey, I am Zendra クレイジー! I am a YouTuber and Mobile Gamer. Make sure to check out my social media below!</p>
+<br><br>
+        <h2>Social Media</h2>
+        <ul class="social-media">
+          <li><button class="red" onclick="window.location.href='https://www.youtube.com/@zendra_brawl'">YouTube</button></li>
+          <li><button class="white" onclick="window.location.href='http://www.tiktok.com/@zendra_brawl'">TikTok</button></li>
+          <li><button class="dark-blue" onclick="window.location.href='https://discord.gg/VbUFdhEjNq'">Discord</button></li>
+          <li><button class="light-blue" onclick="window.location.href='https://twitter.com/zendra_brawl'">Twitter</button></li>
+          <li><button class="purple" onclick="window.location.href='https://www.instagram.com/zendra_brawl/'">Instagram</button></li>
+          <li><button class="orange" onclick="window.location.href='https://www.twitch.tv/zendra_brawl'">Twitch</button></li>
+          <li><button class="pink" onclick="window.location.href='https://www.reddit.com/user/zendra_gaming'">Reddit</button></li>
+        </ul>
+      </div>
+
+      <!-- Add the image -->
+      <div class="right">
+        <img src="https://cdn.discordapp.com/attachments/1289007499155996673/1289436402605621379/Zendra_Logo_1_Without_Background.png?ex=67f1fc3a&is=67f0aaba&hm=202e3f5c19dc23ba02e23225682c963dd853f098c6450dab9af05a5a5ff54803&" alt="Zendra クレイジー">
+      </div>
+    </div>
+    
+    <script>
+      // Add the visitor count JavaScript code here
+      var visitorCountEls = document.querySelectorAll('.visitor-count');
+
+      // Get the visitor count from local storage or set it to 0
+      var visitorCount = localStorage.getItem('visitorCount') || 0;
+
+      // Update the visitor count element
+      visitorCountEls.forEach(function(visitorCountEl) {
+        visitorCountEl.innerHTML = visitorCount;
+      });
+
+      // Increment the visitor count when visiting the home page
+      if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+        visitorCount++;
+        localStorage.setItem('visitorCount', visitorCount);
+        visitorCountEls.forEach(function(visitorCountEl) {
+          visitorCountEl.innerHTML = visitorCount;
+        });
+      }
+    </script>
+  </body>
+</html>
