@@ -117,6 +117,9 @@ const backdrop = document.getElementById("sheet-backdrop");
 let currentMobileMsg = null;
 let longPressTimeout = null;
 let currentLongPressMsg = null;
+let sheetStartY = 0;
+let sheetCurrentY = 0;
+let sheetDragging = false;
 
 let regroupTimer = null;
 let userIsAtBottom = true;
@@ -1051,6 +1054,39 @@ function attachLongPress(msgEl) {
   msgEl.addEventListener("mouseleave", cancel);
 }
 
+function enableSheetDrag() {
+  const sheet = document.getElementById("mobile-action-sheet");
+  const backdrop = document.getElementById("sheet-backdrop");
+
+  sheet.addEventListener("touchstart", e => {
+    sheetDragging = true;
+    sheetStartY = e.touches[0].clientY;
+    sheet.style.transition = "none";
+  });
+
+  sheet.addEventListener("touchmove", e => {
+    if (!sheetDragging) return;
+    sheetCurrentY = e.touches[0].clientY - sheetStartY;
+
+    if (sheetCurrentY > 0) {
+      sheet.style.transform = `translateY(${sheetCurrentY}px)`;
+      backdrop.style.opacity = Math.max(0, 1 - sheetCurrentY / 300);
+    }
+  });
+
+  sheet.addEventListener("touchend", () => {
+    sheetDragging = false;
+    sheet.style.transition = "";
+
+    if (sheetCurrentY > 120) {
+      closeMobileSheet();
+    } else {
+      sheet.style.transform = "translateY(0)";
+      backdrop.style.opacity = 1;
+    }
+  });
+}
+
 function openMobileSheet(msgEl) {
   currentMobileMsg = msgEl;
 
@@ -1088,6 +1124,10 @@ document.querySelectorAll(".sheet-option").forEach(opt => {
 
 document.querySelector(".sheet-cancel").addEventListener("click", () => {
   closeMobileSheet();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  enableSheetDrag();
 });
 
 function handleMobileAction(action, msgEl) {
@@ -1140,11 +1180,8 @@ function enableSwipeToReply(msgEl) {
   msgEl.addEventListener("touchmove", e => {
     if (!swiping) return;
     const deltaX = e.touches[0].clientX - startX;
-
-    // user swiped right >35px
     if (deltaX > 35) {
       swiping = false;
-      startReply(msgEl);
     }
   });
 
