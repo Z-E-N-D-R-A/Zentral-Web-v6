@@ -1031,20 +1031,27 @@ if (newMsgIndicator) {
   };
 }
 
+document.addEventListener("touchstart", e => {
+  if (e.target.closest(".msg")) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
 function attachLongPress(msgEl) {
   if (!msgEl) return;
 
   let pressTimer;
 
   const start = (e) => {
+    e.preventDefault(); // prevents text selection
     pressTimer = setTimeout(() => {
       openMobileSheet(msgEl);
-    }, 500);
+    }, 420);
   };
 
   const cancel = () => clearTimeout(pressTimer);
 
-  msgEl.addEventListener("touchstart", start);
+  msgEl.addEventListener("touchstart", start, { passive: false });
   msgEl.addEventListener("touchend", cancel);
   msgEl.addEventListener("touchmove", cancel);
   msgEl.addEventListener("touchcancel", cancel);
@@ -1066,11 +1073,12 @@ function enableSheetDrag() {
 
   sheet.addEventListener("touchmove", e => {
     if (!sheetDragging) return;
+
     sheetCurrentY = e.touches[0].clientY - sheetStartY;
 
     if (sheetCurrentY > 0) {
       sheet.style.transform = `translateY(${sheetCurrentY}px)`;
-      backdrop.style.opacity = Math.max(0, 1 - sheetCurrentY / 300);
+      backdrop.style.opacity = Math.max(0, 1 - sheetCurrentY / 250);
     }
   });
 
@@ -1090,10 +1098,19 @@ function enableSheetDrag() {
 function openMobileSheet(msgEl) {
   currentMobileMsg = msgEl;
 
+  const id = msgEl.dataset.id;
+  const msgData = messages[id];
+  const isMe = msgData.clientId === clientId;
+
+  // show/hide correct buttons
+  document.querySelector('[data-action="edit"]').style.display = isMe ? "block" : "none";
+  document.querySelector('[data-action="delete"]').style.display = isMe ? "block" : "none";
+
   const sheet = document.getElementById("mobile-action-sheet");
   const backdrop = document.getElementById("sheet-backdrop");
 
   sheet.classList.add("open");
+  sheet.style.transform = "translateY(0)";
   backdrop.classList.add("show");
 }
 
@@ -1103,15 +1120,14 @@ function closeMobileSheet() {
 
   sheet.classList.remove("open");
   backdrop.classList.remove("show");
+  sheet.style.transform = "";
 
   currentMobileMsg = null;
 }
 
 backdrop.addEventListener("click", closeMobileSheet);
 
-document.getElementById("sheet-backdrop").addEventListener("click", () => {
-  closeMobileSheet();
-});
+document.getElementById("sheet-backdrop").addEventListener("click", closeMobileSheet);
 
 document.querySelectorAll(".sheet-option").forEach(opt => {
   opt.addEventListener("click", () => {
@@ -1122,13 +1138,8 @@ document.querySelectorAll(".sheet-option").forEach(opt => {
   });
 });
 
-document.querySelector(".sheet-cancel").addEventListener("click", () => {
-  closeMobileSheet();
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  enableSheetDrag();
-});
+document.querySelector(".sheet-cancel").addEventListener("click", closeMobileSheet);
+document.addEventListener("DOMContentLoaded", enableSheetDrag);
 
 function handleMobileAction(action, msgEl) {
   const id = msgEl.dataset.id;
@@ -1137,35 +1148,27 @@ function handleMobileAction(action, msgEl) {
 
   switch (action) {
     case "reply":
-      console.log("Reply clicked for", id);
       startReply(msgEl);
-      closeMobileSheet();
       break;
 
     case "edit":
-      if (isMe) {
-        beginEditMessage(id);
-      }
-      closeMobileSheet();
+      if (isMe) beginEditMessage(id);
       break;
 
     case "react":
       startReact(msgEl);
-      closeMobileSheet();
       break;
 
     case "delete":
-      if (isMe) {
-        messagesRef.child(id).remove().catch(console.error);
-      }
-      closeMobileSheet();
+      if (isMe) messagesRef.child(id).remove().catch(console.error);
       break;
 
     case "report":
       console.log("Reported:", id);
-      closeMobileSheet();
       break;
   }
+
+  closeMobileSheet();
 }
 
 function enableSwipeToReply(msgEl) {
@@ -1179,9 +1182,12 @@ function enableSwipeToReply(msgEl) {
 
   msgEl.addEventListener("touchmove", e => {
     if (!swiping) return;
+
     const deltaX = e.touches[0].clientX - startX;
-    if (deltaX > 35) {
+
+    if (deltaX > 40) {
       swiping = false;
+      startReply(msgEl);
     }
   });
 
