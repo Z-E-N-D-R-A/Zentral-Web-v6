@@ -67,6 +67,10 @@ header {
     transition: background 0.4s ease, backdrop-filter 0.4s ease;
 }
 
+#messagesViewport {
+  padding-top: 70px;
+}
+
 header.scrolled {
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(12px);
@@ -466,7 +470,7 @@ section.content h2 {
     font-size: 1.3em;
 }
 
-.hidden {
+.hiddenTrans {
     opacity: 0;
     transform: translateY(50px);
     transition: all 1.2s ease;
@@ -1143,8 +1147,8 @@ section.content h2 {
 }
 
 /* ---------- OTHERS PAGE ---------- */
-/* === Action Section === */
-.action-section {
+/* === Activity Section === */
+.others-section {
     background: linear-gradient(0deg, #0d0d0d, #7303c0, #ff9fe4);
     text-align: center;
     padding: 120px 20px 100px;
@@ -1159,7 +1163,7 @@ section.content h2 {
     display: flex;
 }
 
-.action-cards-container {
+.others-cards-container {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -1169,7 +1173,7 @@ section.content h2 {
     max-width: 1000px;
 }
 
-.action-card {
+.others-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
@@ -1184,31 +1188,31 @@ section.content h2 {
     box-sizing: border-box;
 }
 
-.action-card:hover {
+.others-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
 }
 
-.action-card i {
+.others-card i {
     font-size: 50px;
     color: #ff7a00;
     margin-bottom: 15px;
 }
 
-.action-card h2 {
+.others-card h2 {
     font-size: 20px;
     margin-bottom: 10px;
     color: #fff;
 }
 
-.action-card p {
+.others-card p {
     font-size: 14px;
     color: #ccc;
     margin-bottom: 20px;
     flex-grow: 1;
 }
 
-.action-btn {
+.others-btn {
     display: inline-block;
     border: 2px solid #fff;
     color: #fff;
@@ -1219,7 +1223,7 @@ section.content h2 {
     transition: all 0.3s ease;
 }
 
-.action-btn:hover {
+.others-btn:hover {
     background: #fff;
     color: #000;
 }
