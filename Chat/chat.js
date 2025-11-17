@@ -83,15 +83,10 @@ let displayName = localStorage.getItem("z_name") || "";
 /* =============== DOM HOOKS (defensive) =============== */
 const promptEl = document.getElementById("prompt") || null;
 const promptName = document.getElementById("promptName") || null;
-
 const joinBtn = document.getElementById("joinBtn") || null;
 
-let messageInput =
-  document.getElementById("message") ||
-  document.getElementById("messageInput") ||
-  document.querySelector(".input-bar input") ||
-  null;
-
+let messageInput = document.getElementById("message") || document.getElementById("messageInput") || document.querySelector(".input-bar input") || null;
+const inputEl = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn") || null;
 
 const messagesEl = document.getElementById("messages");
@@ -114,15 +109,25 @@ const isMobile = window.matchMedia("(max-width: 900px)").matches;
 const sheet = document.getElementById("mobile-action-sheet");
 const backdrop = document.getElementById("sheet-backdrop");
 
+const deletedMessages = new Set();
+
 let currentMobileMsg = null;
 let longPressTimeout = null;
 let currentLongPressMsg = null;
+
 let sheetStartY = 0;
 let sheetCurrentY = 0;
 let sheetDragging = false;
 
+let suppressNewIndicator = false;
 let regroupTimer = null;
 let userIsAtBottom = true;
+
+  const typingRef = firebase.database().ref("typing");
+  typingRef.on("value", snap => {
+    const data = snap.val() || {};
+    updateTypingIndicator(data);
+  });
 
 const colors = ["#ffae00", "#f700ff", "#00b7ff", "#00ffb3", "#fbff00"];
 
@@ -151,6 +156,10 @@ function hideNewMsgIndicator() {
 }
 
 /* ================= UTILITIES: escape, timeAgo, date label ================= */
+function formatMessageText(text) {
+  return escapeHtml(text).replace(/\n/g, "<br>");
+}
+
 function escapeHtml(s) {
   return String(s || "")
     .replaceAll("&", "&amp;")
@@ -190,8 +199,7 @@ function formatDateLabel(ts) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
-/* Insert date separator BEFORE a given DOM element (for prepend) */
-function insertDateSeparatorBefore(el, ts) {
+function insertDateSeparatorPrepend(el, ts) {
   const label = formatDateLabel(ts);
   const prev = el.previousElementSibling;
   if (prev && prev.classList.contains("date-separator") && prev.dataset.label === label) return;
@@ -202,16 +210,41 @@ function insertDateSeparatorBefore(el, ts) {
   messagesEl.insertBefore(sep, el);
 }
 
-/* Insert date separator AT THE END (for append) */
-function insertDateSeparatorAtEnd(ts) {
+function insertDateSeparatorAppend(ts) {
   const label = formatDateLabel(ts);
-  const last = messagesEl.lastElementChild;
-  if (last && last.classList && last.classList.contains("date-separator") && last.dataset.label === label) return;
+
+  const existing = messagesEl.querySelector(
+    `.date-separator[data-label="${label}"]`
+  );
+  if (existing) return existing;
+
   const sep = document.createElement("div");
   sep.className = "date-separator";
   sep.dataset.label = label;
   sep.innerHTML = `<span class="date-line">${label}</span>`;
+
+  const children = [...messagesEl.children];
+
+  for (let child of children) {
+    if (!child.dataset.id) continue;
+
+    const msg = messages[child.dataset.id];
+    if (!msg) continue;
+
+    const childDayStart = new Date(msg.time);
+    childDayStart.setHours(0, 0, 0, 0);
+
+    const myDayStart = new Date(ts);
+    myDayStart.setHours(0, 0, 0, 0);
+
+    if (childDayStart > myDayStart) {
+      messagesEl.insertBefore(sep, child);
+      return sep;
+    }
+  }
+
   messagesEl.appendChild(sep);
+  return sep;
 }
 
 /* ================= GROUP LOGIC ================= */
@@ -234,9 +267,16 @@ function hideTime(el) {
   if (t) t.classList.add("hidden");
 }
 function showTime(el) {
-  if (!el) return;
   const t = el.querySelector(".time");
   if (t) t.classList.remove("hidden");
+}
+function hideSideDot(el) {
+  const d = el.querySelector(".side-dot");
+  if (d) d.classList.add("hidden");
+}
+function showSideDot(el) {
+  const d = el.querySelector(".side-dot");
+  if (d) d.classList.remove("hidden");
 }
 
 /* ================= RENDER HELPERS ================= */
@@ -250,12 +290,13 @@ function createMessageElement(data) {
 
   el.innerHTML = `
     <div class="meta">
-      <span class="name-dot" style="background:${color || "#888"}"></span>
-      <strong style="margin-left:8px">${escapeHtml(name || "Guest")}</strong>
+      <strong>${escapeHtml(name || "Guest")}</strong>
     </div>
 
+    <div class="side-dot" style="background:${color || "#888"}"></div>
+
     <div class="bubble">
-      ${escapeHtml(text)}
+      ${formatMessageText(text)}
       ${edited ? "<span class='edited'>(edited)</span>" : ""}
     </div>
 
@@ -288,11 +329,33 @@ function createMessageElement(data) {
       </button>
     </div>`;
 
+  requestAnimationFrame(() => {
+    const bubble = el.querySelector(".bubble");
+    adjustBubbleAlignment(bubble);
+  });
+
   attachLongPress(el);
   enableSwipeToReply(el);
   attachActionHandlers(el, id, data);
   requestAnimationFrame(() => positionActions(el));
+  requestAnimationFrame(() => positionIcons(el));
   return el;
+}
+
+function adjustBubbleAlignment(bubbleEl) {
+  if (!bubbleEl) return;
+  try {
+    const range = document.createRange();
+    range.selectNodeContents(bubbleEl);
+    const rects = range.getClientRects();
+    const lines = rects.length || 1;
+
+    bubbleEl.style.textAlign = lines === 1 ? "center" : "left";
+    if (typeof range.detach === "function") range.detach();
+  } catch (err) {
+    bubbleEl.style.textAlign = "left";
+    console.warn("adjustBubbleAlignment failed:", err);
+  }
 }
 
 /* appendMessage: add to end of list, handle grouping and date separators */
@@ -313,16 +376,16 @@ function appendMessage(data) {
   })();
 
   if (!lastReal) {
-    insertDateSeparatorAtEnd(data.time);
+    insertDateSeparatorAppend(data.time);
   } else {
     const lastId = lastReal.dataset?.id;
     if (lastId) {
       const lastData = messages[lastId];
       const lastLabel = formatDateLabel(lastData.time);
       const thisLabel = formatDateLabel(data.time);
-      if (lastLabel !== thisLabel) insertDateSeparatorAtEnd(data.time);
+      if (lastLabel !== thisLabel) insertDateSeparatorAppend(data.time);
     } else {
-      insertDateSeparatorAtEnd(data.time);
+      insertDateSeparatorAppend(data.time);
     }
   }
 
@@ -340,8 +403,10 @@ function appendMessage(data) {
     if (isSameGroup(prevData, data)) {
       hideMeta(prev);
       hideTime(prev);
+      hideSideDot(prev);
       hideMeta(el);
       showTime(el);
+      showSideDot(el);
       el.classList.add("grouped");
     } else {
       showMeta(el);
@@ -349,22 +414,26 @@ function appendMessage(data) {
 
       if (nextIsSameGroup) {
         hideTime(el);
+        hideSideDot(el);
       } else {
         showTime(el);
+        showSideDot(el);
       }
       el.classList.add("first-in-group");
     }
   } else {
     showMeta(el);
     showTime(el);
+    showSideDot(el);
     el.classList.add("first-in-group");
   }
 
-  messagesEl.appendChild(el);
+  insertMessage(el, data.time);
   domCache[id] = el;
   attachActionHandlers(el, id, data);
 
   const isMe = data.clientId === clientId;
+  if (suppressNewIndicator) { return el; }
   if (isMe && messagesViewport) {
     hideNewMsgIndicator();
     messagesViewport.scrollTop = messagesViewport.scrollHeight;
@@ -375,7 +444,6 @@ function appendMessage(data) {
       showNewMsgIndicator();
     }
   }
-  return el;
 }
 
 /* update DOM element for existing msg */
@@ -401,8 +469,10 @@ function updateMessageElement(data) {
       timeEl.textContent = timeAgo(data.time);
     }
   }
+  adjustBubbleAlignment(bubble);
 
   positionActions(el);
+  positionIcons(el);
 }
 
 /* prependMessage — insert older messages at top (used by load older) */
@@ -423,10 +493,10 @@ function prependMessage(data) {
     if (firstId) {
       const firstData = messages[firstId];
       if (formatDateLabel(firstData.time) !== formatDateLabel(data.time)) {
-        insertDateSeparatorBefore(firstReal, data.time);
+        insertDateSeparatorPrepend(firstReal, data.time);
       }
     } else {
-      insertDateSeparatorBefore(firstReal, data.time);
+      insertDateSeparatorPrepend(firstReal, data.time);
     }
   } else {
     insertDateSeparatorAtEnd(data.time);
@@ -447,8 +517,10 @@ function prependMessage(data) {
     if (isSameGroup(data, nextData)) {
       showMeta(el);
       hideTime(el);
+      hideSideDot(el);
       hideMeta(next);
       hideTime(next);
+      hideSideDot(next);
       el.classList.add("first-in-group");
       next.classList.add("grouped");
     } else {
@@ -457,8 +529,10 @@ function prependMessage(data) {
       const sameGroup = isSameGroup(data, nextData);
       if (sameGroup) {
         hideTime(el);
+        hideSideDot(el);
       } else {
         showTime(el);
+        showSideDot(el);
       }
     }
   }
@@ -466,8 +540,29 @@ function prependMessage(data) {
     el.classList.add("first-in-group");
     showMeta(el);
     showTime(el);
+    showSideDot(el);
   }
   return el;
+}
+
+function insertMessage(msgEl, timestamp) {
+  const children = [...messagesEl.children];
+  for (let child of children) {
+    if (child.classList.contains("date-separator")) continue;
+
+    const childId = child.dataset.id;
+    if (!childId) continue;
+
+    const childData = messages[childId];
+    if (!childData) continue;
+
+    if (childData.time > timestamp) {
+      messagesEl.insertBefore(msgEl, child);
+      return;
+    }
+  }
+
+  messagesEl.appendChild(msgEl);
 }
 
 function attachActionHandlers(el, id, data) {
@@ -520,17 +615,16 @@ function attachActionHandlers(el, id, data) {
 
   menuBtn.onclick = (e) => {
     e.stopPropagation();
+    const isOpen = menu.classList.contains("open");
+    closeAllMenus({ except: menu });
 
-    // 🔥 CLOSE ALL OTHER MENUS FIRST
-    closeAllMenus();
-
-    // Toggle this one
-    menu.classList.toggle("open");
-
-    if (menu.classList.contains("open")) {
+    if (!isOpen) {
+      menu.classList.add("open");
       positionMenu();
+    } else {
+      menu.classList.remove("open");
     }
-  };
+  }
 
   replyBtn.onclick = () => {
     closeMenu(menu);
@@ -569,9 +663,12 @@ function closeMenu(menu) {
   if (menu) menu.classList.remove("open");
 }
 
-function closeAllMenus() {
-  document.querySelectorAll(".action-menu.open")
-    .forEach(m => m.classList.remove("open"));
+function closeAllMenus(options = {}) {
+  const except = options.except || null;
+
+  document.querySelectorAll(".action-menu.open").forEach((m) => {
+    if (m !== except) m.classList.remove("open");
+  });
 }
 
 document.addEventListener("click", (e) => {
@@ -781,6 +878,7 @@ function sendMessage() {
 
   const newRef = messagesRef.push();
   newMsg.id = newRef.key;
+  sendTypingStatus(false);
 
   newRef
     .set(newMsg)
@@ -796,6 +894,10 @@ function sendMessage() {
 messagesRef.orderByKey().limitToLast(150).on("child_added", snap => {
   const msg = snap.val();
   const id = snap.key;
+
+  if (domCache[id]) return;
+  if (deletedMessages.has(id)) return;
+
   if (!oldestLoadedKey) oldestLoadedKey = id;
   messages[id] = { ...msg, id };
   appendMessage(messages[id]);
@@ -812,11 +914,14 @@ messagesRef.on("child_changed", snap => {
   if (domCache[id]) {
     updateMessageElement(messages[id]);
     positionActions(domCache[id]);
+    positionIcons(domCache[id]);
   }
 });
 
 messagesRef.on("child_removed", snap => {
   const id = snap.key;
+  deletedMessages.add(id);
+
   const el = domCache[id];
   if (!el) return;
 
@@ -853,6 +958,7 @@ function regroupMessages() {
     if (!sameAsPrev) {
       cur.classList.add("first-in-group");
       showMeta(cur);
+      hideSideDot(cur);
       hideTime(cur);
     } else {
       cur.classList.add("grouped");
@@ -862,10 +968,19 @@ function regroupMessages() {
     if (!sameAsNext) {
       cur.classList.add("last-in-group");
       showTime(cur);
+      showSideDot(cur);
     } else {
       hideTime(cur);
+      hideSideDot(cur);
     }
   }
+
+  requestAnimationFrame(() => {
+    for (let msg of all) {
+      positionActions(msg);
+      positionIcons(msg);
+    }
+  });
 }
 
 /* ================= PRESENCE / RECOVERY ================= */
@@ -957,10 +1072,6 @@ function join(name, restoredInfo = null) {
   showRecoveryCodeUI(code);
 }
 
-firebase.auth().onAuthStateChanged(u => {
-  console.log("Auth state changed:", u);
-});
-
 async function restoreWithCode(code) {
   code = (code || "").trim().toUpperCase();
   if (!code) return alert("Enter recovery code.");
@@ -995,7 +1106,6 @@ async function restoreWithCode(code) {
   });
 }
 
-/* UI events (defensive) */
 joinBtn && (joinBtn.onclick = () => {
   const n = promptName.value || displayName || "Guest";
   join(n);
@@ -1007,11 +1117,13 @@ if (restoreBtn) {
     restoreWithCode(c);
   };
 }
+
 if (recoveryInput) {
   recoveryInput.onkeydown = e => {
     if (e.key === "Enter") restoreWithCode(recoveryInput.value);
   };
 }
+
 if (copyRecoveryBtn) {
   copyRecoveryBtn.onclick = () => {
     if (recoveryCodeText) navigator.clipboard.writeText(recoveryCodeText.textContent || "");
@@ -1019,11 +1131,38 @@ if (copyRecoveryBtn) {
 }
 
 if (sendBtn) sendBtn.onclick = () => sendMessage();
-if (messageInput) {
-  messageInput.onkeydown = e => {
-    if (e.key === "Enter") sendMessage();
-  };
-}
+inputEl.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    if (e.shiftKey) {
+      e.stopPropagation();
+      return;
+    }
+
+    e.preventDefault();
+    sendMessage();
+  }
+
+  let typingTimeout = null;
+
+  function sendTypingStatus(isTyping) {
+    const ref = firebase.database().ref("typing/" + clientId);
+    ref.set({
+      name: displayName,
+      typing: isTyping,
+      ts: Date.now()
+    });
+  }
+
+  messageInput.addEventListener("input", () => {
+    sendTypingStatus(true);
+
+    clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(() => {
+      sendTypingStatus(false);
+    }, 1500);
+  });
+});
 if (newMsgIndicator) {
   newMsgIndicator.onclick = () => {
     hideNewMsgIndicator();
@@ -1043,7 +1182,8 @@ function attachLongPress(msgEl) {
   let pressTimer;
 
   const start = (e) => {
-    e.preventDefault(); // prevents text selection
+    if (!(window.innerWidth <= 900)) return;
+    e.preventDefault();
     pressTimer = setTimeout(() => {
       openMobileSheet(msgEl);
     }, 420);
@@ -1102,7 +1242,6 @@ function openMobileSheet(msgEl) {
   const msgData = messages[id];
   const isMe = msgData.clientId === clientId;
 
-  // show/hide correct buttons
   document.querySelector('[data-action="edit"]').style.display = isMe ? "block" : "none";
   document.querySelector('[data-action="delete"]').style.display = isMe ? "block" : "none";
 
@@ -1196,6 +1335,19 @@ function enableSwipeToReply(msgEl) {
   });
 }
 
+function positionIcons(msgEl) {
+  const bubble = msgEl.querySelector(".bubble");
+  const sideDot = msgEl.querySelector(".side-dot");
+  if (!bubble || !sideDot) return;
+
+  const bubbleRect = bubble.getBoundingClientRect();
+  const msgRect = msgEl.getBoundingClientRect();
+  const centerY = bubbleRect.top + bubbleRect.height / 2 - msgRect.top;
+
+  sideDot.style.top = centerY + "px";
+  sideDot.style.transform = "translateY(-50%)";
+}
+
 function positionActions(msgEl) {
   const bubble = msgEl.querySelector(".bubble");
   const actions = msgEl.querySelector(".actions");
@@ -1218,9 +1370,64 @@ function positionActions(msgEl) {
   }
 }
 
+function updateTypingIndicator(allTyping) {
+  const el = document.getElementById("typingIndicator");
+
+  const typingUsers = Object.values(allTyping)
+    .filter(u => u.typing && u.ts > Date.now() - 4000)
+    .filter(u => u.name !== displayName);
+
+  if (typingUsers.length === 0) {
+    el.classList.remove("show");
+    return;
+  }
+
+  let text = "";
+  if (typingUsers.length === 1) 
+    text = `${typingUsers[0].name} is typing`;
+  else 
+    text = `${typingUsers.length} people are typing`;
+
+  el.innerHTML =
+    `<span>${text}</span>
+     <div class="typing-dots"><span></span><span></span><span></span></div>`;
+
+  el.classList.add("show");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.querySelector(".sidebar");
+  const toggleBtn = document.querySelector(".sidebar-toggle");
+  const backdrop = document.getElementById("sidebar-backdrop");
+
+  function isMobile() {
+    return window.matchMedia("(max-width: 900px)").matches;
+  }
+
+  toggleBtn.addEventListener("click", () => {
+    if (isMobile()) {
+      const isOpen = sidebar.classList.toggle("open");
+      backdrop.classList.toggle("show", isOpen);
+    } else {
+      sidebar.classList.toggle("collapsed");
+    }
+  });
+
+  backdrop.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    backdrop.classList.remove("show");
+  });
+});
+
+function updateAllBubbleAlignments() {
+  document.querySelectorAll(".bubble").forEach(b => adjustBubbleAlignment(b));
+}
+
 window.addEventListener("resize", updateAllActionPositions);
 function updateAllActionPositions() {
+  requestAnimationFrame(updateAllBubbleAlignments);
   document.querySelectorAll(".msg").forEach(positionActions);
+  document.querySelectorAll(".msg").forEach(positionIcons);
 }
 
 setInterval(() => {
