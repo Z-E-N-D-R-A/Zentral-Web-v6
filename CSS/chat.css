@@ -313,17 +313,25 @@ body {
 .reaction-picker {
   position: fixed;
   z-index: 9999;
-  display: flex;
-  gap: 6px;
+  display: none;           /* start hidden (controlled via JS) */
+  gap: 8px;
   background: #222;
   padding: 8px 10px;
   border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.45);
   opacity: 0;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  transform: translateY(6px) scale(0.98);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  align-items: center;
+  pointer-events: none;
+  white-space: nowrap;     /* keep emojis centered */
+  width: max-content;      /* prevent width collapse on mobile */
 }
 
 .reaction-picker.show {
   opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
 }
 
 .reaction-picker .react {
