@@ -1373,6 +1373,7 @@ function renderReactions(msgEl, data) {
 
     const badge = document.createElement("div");
     badge.className = "reaction-badge" + (isMine ? " mine" : "");
+    badge.dataset.emoji = emoji;
     badge.innerHTML = `${emoji} <span>${users.length}</span>`;
 
     badge.onclick = () => toggleReaction(msgEl, emoji);
@@ -1399,6 +1400,28 @@ document.addEventListener("click", (e) => {
     return;
   }
   hideReactionPicker();
+});
+
+document.addEventListener("click", (e) => {
+  const badge = e.target.closest(".reaction-badge");
+  if (!badge) return;
+
+  const msgEl = badge.closest(".msg");
+  const emoji = badge.dataset.emoji;
+  if (!msgEl || !emoji) return;
+
+  toggleReaction(msgEl, emoji);
+});
+
+document.addEventListener("touchstart", (e) => {
+  const badge = e.target.closest(".reaction-badge");
+  if (!badge) return;
+
+  const msgEl = badge.closest(".msg");
+  const emoji = badge.dataset.emoji;
+  if (!msgEl || !emoji) return;
+
+  toggleReaction(msgEl, emoji);
 });
 
 if (picker) {
