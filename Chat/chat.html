@@ -46,7 +46,6 @@
     <button id="toggleSidebar" class="sidebar-toggle">
       <div class="fa-solid fas fa-grip-horizontal"></div>
     </button>
-  
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-inner">
         <h2>Online Users</h2>
@@ -58,11 +57,9 @@
 
     <main class="chat-area">
       <div id="newMsgIndicator" class="new-msg-indicator hidden">New messages</div>
-    
       <div class="messages-scroll">
         <button id="loadOlderBtn" class="load-more">Load older messages</button>
         <div id="loadingOlder" class="loading-indicator">Loading…</div>
-    
         <div id="messages"></div>
       </div>
     
@@ -71,6 +68,15 @@
           <span></span><span></span><span></span>
         </div>
       </div>
+    
+      <div id="reply-bar" class="hidden">
+        <div class="reply-preview">
+          <strong id="reply-name"></strong>
+          <span id="reply-text"></span>
+        </div>
+        <button id="cancel-reply">×</button>
+      </div>
+    
       <div class="input-bar">
         <textarea id="messageInput" contenteditable="true" placeholder="Type a message…"></textarea>
         <button id="sendBtn">Send</button>
@@ -118,6 +124,15 @@
         <small style="color:#ccc; margin-left:8px;">Save this code to restore your identity later.</small>
       </div>
     </div>
+  </div>
+
+  <div id="reaction-picker" class="reaction-picker hidden">
+    <span class="react">👍</span>
+    <span class="react">❤️</span>
+    <span class="react">😂</span>
+    <span class="react">😮</span>
+    <span class="react">😢</span>
+    <span class="react">😡</span>
   </div>
 
   <script src="chat.js"></script>
@@ -180,5 +195,4 @@
     });
   </script>
   </body>
-  
-  </html>
+</html>
