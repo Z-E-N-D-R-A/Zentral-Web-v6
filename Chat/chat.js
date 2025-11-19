@@ -1406,24 +1406,25 @@ function showReactionTooltip(badge, msgData, emoji) {
   const usersObj = msgData.reactions?.[emoji];
   if (!usersObj) return;
 
-  const usernames = Object.keys(usersObj).map(uid =>
-    (typeof allUsers === "object" && allUsers?.[uid]?.name) || "Unknown User"
-  );
+  const usernames = Object.keys(usersObj)
+    .map(uid => allUsers?.[uid]?.name || "Unknown User");
 
   tooltip.textContent = usernames.join(", ");
 
-  const rect = badge.getBoundingClientRect();
+  // position — above the message bubble (not the badge)
+  const msgEl = findMsgElForBadge(badge);
+  const rect = msgEl.getBoundingClientRect();
+
   tooltip.classList.remove("hidden");
+  tooltip.style.maxWidth = "200px";
 
   const tipRect = tooltip.getBoundingClientRect();
-  let top = rect.top - tipRect.height - 6;
-  let left = rect.left + rect.width / 2 - tipRect.width / 2;
 
-  left = Math.max(6, Math.min(left, window.innerWidth - tipRect.width - 6));
-  top = Math.max(6, top);
+  const top = rect.top - tipRect.height - 8;
+  const left = rect.left + (rect.width / 2) - (tipRect.width / 2);
 
-  tooltip.style.left = `${left}px`;
-  tooltip.style.top = `${top}px`;
+  tooltip.style.top = Math.max(6, top) + "px";
+  tooltip.style.left = Math.max(6, Math.min(left, window.innerWidth - tipRect.width - 6)) + "px";
 
   requestAnimationFrame(() => tooltip.classList.add("show"));
 }
@@ -1465,6 +1466,9 @@ document.addEventListener("mouseout", (e) => {
   }
 });
 
+let longPressTriggered = false;
+
+// LONG PRESS (show tooltip)
 document.addEventListener("touchstart", (e) => {
   if (window.innerWidth > 900) return; // mobile only
 
@@ -1477,19 +1481,37 @@ document.addEventListener("touchstart", (e) => {
   const emoji = badge.dataset.emoji;
   const msgData = messages[msgEl.dataset.id];
 
+  longPressTriggered = false;
+
   tooltipPressTimer = setTimeout(() => {
+    longPressTriggered = true;
     showReactionTooltip(badge, msgData, emoji);
-  }, 450); // long press duration
+  }, 450); // long-press threshold
 }, { passive: true });
 
 document.addEventListener("touchend", () => {
   clearTimeout(tooltipPressTimer);
-  hideReactionTooltip();
-});
-document.addEventListener("touchcancel", () => {
-  clearTimeout(tooltipPressTimer);
-  hideReactionTooltip();
-});
+}, { passive: true });
+
+document.addEventListener("touchmove", () => {
+  clearTimeout(tooltipPressTimer); // cancel if finger moves
+}, { passive: true });
+
+
+// TAP (toggle reaction)
+// Only triggers if long press did NOT happen
+document.addEventListener("touchend", (e) => {
+  if (window.innerWidth > 900) return; // mobile only
+  if (longPressTriggered) return; // avoid toggling after long press
+
+  const badge = e.target.closest(".reaction-badge");
+  if (!badge) return;
+
+  const msgEl = findMsgElForBadge(badge);
+  if (!msgEl) return;
+
+  toggleReaction(msgEl, badge.dataset.emoji);
+}, { passive: true });
 
 document.addEventListener("click", (e) => {
   if (!picker) return;
