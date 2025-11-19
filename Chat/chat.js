@@ -124,12 +124,6 @@ let regroupTimer = null;
 let userIsAtBottom = true;
 let replyToId = null;
 
-let hideReactionTooltips = () => {
-  document.querySelectorAll(".reaction-tooltip").forEach(tip => {
-    tip.remove(); // or tip.style.display = "none"
-  });
-};
-
 const typingRef = firebase.database().ref("typing");
 typingRef.on("value", snap => {
   const data = snap.val() || {};
@@ -1562,7 +1556,7 @@ document.addEventListener("click", (e) => {
 // Hide reaction tooltip on scroll (mobile only)
 window.addEventListener("scroll", () => {
   if (window.innerWidth <= 900) {
-    hideReactionTooltips();
+    hideReactionTooltip();
   }
 }, { passive: true });
 
