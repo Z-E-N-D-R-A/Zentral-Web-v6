@@ -1559,8 +1559,11 @@ document.addEventListener("click", (e) => {
   hideReactionPicker();
 });
 
-window.addEventListener("touchmove", () => {
-  if (window.innerWidth <= 900) hideReactionTooltips();
+// Hide reaction tooltip on scroll (mobile only)
+window.addEventListener("scroll", () => {
+  if (window.innerWidth <= 900) {
+    hideReactionTooltips();
+  }
 }, { passive: true });
 
 if (picker) {
