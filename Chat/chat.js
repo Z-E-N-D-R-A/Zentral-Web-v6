@@ -282,7 +282,7 @@ function createMessageElement(data) {
   renderReactions(el, data);
   attachActionHandlers(el, id, data);
 
-  longPressHandler(el);
+  attachLongPress(el);
   enableSwipeToReply(el);
 
   requestAnimationFrame(() => positionActions(el));
@@ -1039,51 +1039,32 @@ function chatSideBar() {
   });
 }
 
-function longPressHandler(msgEl) {
+function attachLongPress(msgEl) {
   if (!msgEl) return;
+  let pressTimer;
 
-  let pressTimer = null;
-  let isScrolling = false;
-
-  const LONG_PRESS_DURATION = 420;
-
-  const startPress = (e) => {
-    // Ignore if user starts on a reaction badge (reaction has its own long-press)
+  const start = (e) => {
+    // ⛔ NEW: prevent conflict with reaction badges
     if (e.target.closest(".reaction-badge")) return;
 
-    // Only apply long-press on mobile
-    if (window.innerWidth > 900) return;
-
-    // Prevent browser long-press defaults (text selection, copy popup)
+    if (!(window.innerWidth <= 900)) return;
     e.preventDefault();
-    isScrolling = false;
 
     pressTimer = setTimeout(() => {
-      if (!isScrolling) {
-        openMobileSheet(msgEl);
-      }
-    }, LONG_PRESS_DURATION);
+      openMobileSheet(msgEl);
+    }, 420);
   };
 
-  const cancelPress = () => {
-    clearTimeout(pressTimer);
-  };
+  const cancel = () => clearTimeout(pressTimer);
 
-  // Combined listener sets for both mouse + touch
-  msgEl.addEventListener("touchstart", startPress, { passive: false });
-  msgEl.addEventListener("touchend", cancelPress);
-  msgEl.addEventListener("touchmove", () => {
-    isScrolling = true;
-    cancelPress();
-  });
-  msgEl.addEventListener("touchcancel", cancelPress);
-
-  msgEl.addEventListener("mousedown", (e) => {
-    if (window.innerWidth <= 900) return; // Only mobile long-press
-    startPress(e);
-  });
-  msgEl.addEventListener("mouseup", cancelPress);
-  msgEl.addEventListener("mouseleave", cancelPress);
+  msgEl.addEventListener("touchstart", start, { passive: false });
+  msgEl.addEventListener("touchend", cancel);
+  msgEl.addEventListener("touchmove", cancel);
+  msgEl.addEventListener("touchcancel", cancel);
+  
+  msgEl.addEventListener("mousedown", start);
+  msgEl.addEventListener("mouseup", cancel);
+  msgEl.addEventListener("mouseleave", cancel);
 }
 
 /* function enableSheetDrag() {
@@ -1147,8 +1128,6 @@ document.addEventListener("DOMContentLoaded", chatSideBar);
     e.preventDefault();
   }
 }, { passive: false }); */
-
-document.querySelectorAll(".msg").forEach(msg => { longPressHandler(msg); });
 
 window.addEventListener("resize", updateAllActionPositions);
 function updateAllActionPositions() {
