@@ -282,7 +282,7 @@ function createMessageElement(data) {
   renderReactions(el, data);
   attachActionHandlers(el, id, data);
 
-  attachUnifiedLongPressHandlers(el);
+  longPressHandler(el);
   enableSwipeToReply(el);
 
   requestAnimationFrame(() => positionActions(el));
@@ -1039,7 +1039,7 @@ function chatSideBar() {
   });
 }
 
-function attachUnifiedLongPressHandlers(msgEl) {
+function longPressHandler(msgEl) {
   if (!msgEl) return;
 
   let pressTimer = null;
@@ -1148,9 +1148,17 @@ document.addEventListener("DOMContentLoaded", chatSideBar);
   }
 }, { passive: false }); */
 
-document.querySelectorAll(".msg").forEach(msg => {
-  attachUnifiedLongPressHandlers(msg);
-});
+document.querySelectorAll(".msg").forEach(msg => { longPressHandler(msg); });
+
+// Hide tooltip when scrolling on mobile
+window.addEventListener("scroll", () => {
+  if (window.innerWidth > 900) return; // mobile only
+
+  document.querySelectorAll(".reaction-tooltip").forEach(tip => {
+    tip.style.opacity = "0";
+    tip.style.pointerEvents = "none";
+  });
+}, { passive: true });
 
 window.addEventListener("resize", updateAllActionPositions);
 function updateAllActionPositions() {
@@ -1486,6 +1494,84 @@ document.addEventListener("click", (e) => {
 
   toggleReaction(msgEl, badge.dataset.emoji);
 });
+
+document.addEventListener("mouseover", (e) => {
+  if (window.innerWidth <= 900) return;
+
+  const badge = e.target.closest(".reaction-badge");
+  if (!badge) {
+    hideReactionTooltip();
+    return;
+  }
+
+  const emoji = badge.dataset.emoji;
+  const msgEl = findMsgElForBadge(badge);
+  if (!msgEl) return;
+
+  const msgData = messages[msgEl.dataset.id];
+  if (!msgData) return;
+
+  clearTimeout(tooltipTimer);
+  tooltipTimer = setTimeout(() => { showReactionTooltip(badge, msgData, emoji); }, 250);
+});
+
+document.addEventListener("mouseout", (e) => {
+  if (!e.relatedTarget || !tooltip.contains(e.relatedTarget)) {
+    hideReactionTooltip();
+  }
+});
+
+document.addEventListener("touchstart", (e) => {
+  if (window.innerWidth > 900) return; // mobile only
+
+  const badge = e.target.closest(".reaction-badge");
+  if (!badge) return;
+
+  pressStartBadge = badge;
+  longPressTriggered = false;
+
+  const msgEl = findMsgElForBadge(badge);
+  if (!msgEl) return;
+
+  const emoji = badge.dataset.emoji;
+  const msgData = messages[msgEl.dataset.id];
+
+  // start long-press detection
+  pressTimer = setTimeout(() => {
+    longPressTriggered = true;
+    showReactionTooltip(badge, msgData, emoji);
+  }, 450); // long-press duration
+}, { passive: true });
+
+document.addEventListener("touchmove", () => {
+  clearTimeout(pressTimer);
+}, { passive: true });
+
+document.addEventListener("touchend", (e) => {
+  if (window.innerWidth > 900) return; // mobile only
+
+  clearTimeout(pressTimer);
+
+  const badge = e.target.closest(".reaction-badge");
+  if (!badge || badge !== pressStartBadge) return;
+
+  // If long-press already triggered → DO NOT toggle reaction
+  if (longPressTriggered) return;
+
+  // Normal tap (short press) → toggle reaction
+  const msgEl = findMsgElForBadge(badge);
+  if (!msgEl) return;
+
+  toggleReaction(msgEl, badge.dataset.emoji);
+}, { passive: true });
+
+document.addEventListener("touchend", () => {
+  clearTimeout(tooltipPressTimer);
+}, { passive: true });
+
+document.addEventListener("touchmove", () => {
+  clearTimeout(tooltipPressTimer);
+}, { passive: true });
 
 document.addEventListener("click", (e) => {
   if (!picker) return;
