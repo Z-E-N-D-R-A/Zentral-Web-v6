@@ -124,6 +124,12 @@ let regroupTimer = null;
 let userIsAtBottom = true;
 let replyToId = null;
 
+let hideReactionTooltips = () => {
+  document.querySelectorAll(".reaction-tooltip").forEach(tip => {
+    tip.remove(); // or tip.style.display = "none"
+  });
+};
+
 const typingRef = firebase.database().ref("typing");
 typingRef.on("value", snap => {
   const data = snap.val() || {};
@@ -1562,6 +1568,10 @@ document.addEventListener("click", (e) => {
   }
   hideReactionPicker();
 });
+
+window.addEventListener("touchmove", () => {
+  if (window.innerWidth <= 900) hideReactionTooltips();
+}, { passive: true });
 
 if (picker) {
   picker.querySelectorAll(".react").forEach(el => {
