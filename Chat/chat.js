@@ -1285,15 +1285,9 @@ function closeMobileSheet() {
   const sheet = document.getElementById("mobile-action-sheet");
 
   sheet.classList.remove("open");
-  sheet.style.transform = "";
   actionBackdrop.classList.remove("show");
-  actionBackdrop.style.pointerEvents = "none";
 
   currentMobileMsg = null;
-  
-  setTimeout(() => {
-    actionBackdrop.style.pointerEvents = "";
-  }, 300);
 }
 
 document.querySelectorAll(".sheet-option").forEach(opt => {
