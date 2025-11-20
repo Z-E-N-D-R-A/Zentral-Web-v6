@@ -1526,9 +1526,6 @@ function enableSwipeToReply(msgEl) {
     if (!swiping) return;
 
     const deltaX = e.touches[0].clientX - startX;
-    if (Math.abs(deltaX) < 80) {
-      msgEl.style.transform = `translateX(${deltaX}px)`;
-    }
 
     if (!isMine && deltaX > 40) {
       swiping = false;
@@ -1543,12 +1540,7 @@ function enableSwipeToReply(msgEl) {
     }
   });
 
-  msgEl.addEventListener("touchend", () => {
-    msgEl.style.transform = "";
-    msgEl.style.transition = "transform 0.15s ease";
-    setTimeout(() => msgEl.style.transition = "", 150);
-    swiping = false;
-  });
+  msgEl.addEventListener("touchend", () => { swiping = false; });
 }
 
 document.addEventListener("DOMContentLoaded", chatSideBar);
