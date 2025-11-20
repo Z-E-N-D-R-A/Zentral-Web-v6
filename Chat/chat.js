@@ -1419,6 +1419,7 @@ if (picker) {
 /* ================= EVENT HANDLERS ================= */
 let GLOBAL_LAST_POINTER_TARGET = null;
 
+const HEADER_HEIGHT = 65;
 if (window.visualViewport) {
   const inputBar = document.querySelector(".input-bar");
   const chatWrapper = document.querySelector(".chat-wrapper");
@@ -1430,13 +1431,15 @@ if (window.visualViewport) {
     const keyboardHeight = fullHeight - viewportHeight;
 
     if (keyboardHeight > 150) {
-      // Keyboard is OPEN
+      // Keyboard OPEN
       inputBar.style.transform = `translateY(-${keyboardHeight}px)`;
-      chatWrapper.style.height = `${viewportHeight}px`;
+
+      // Chat wrapper shrinks but respects header height
+      chatWrapper.style.height = `calc(${viewportHeight}px - ${HEADER_HEIGHT}px)`;
     } else {
-      // Keyboard is CLOSED
+      // Keyboard CLOSED
       inputBar.style.transform = "translateY(0)";
-      chatWrapper.style.height = calc("100dvh" - "65px");
+      chatWrapper.style.height = `calc(100dvh - ${HEADER_HEIGHT}px)`;
     }
   });
 }
