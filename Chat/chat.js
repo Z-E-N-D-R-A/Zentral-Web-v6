@@ -34,14 +34,13 @@ html, body {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.02));
   border-radius: 12px;
   padding: 12px;
-  overflow: hidden;
+  overflow: auto;
   position: relative;
   grid-column: 1 / span 1;
   min-height: 0;
   overflow-y: auto;
   min-width: 0;
   transition: width 0.3s ease;
-  height: 100%;
 }
 
 .btn {
@@ -229,7 +228,6 @@ html, body {
   flex: 1;
   overflow-y: auto;
   padding: 14px;
-  padding-bottom: 10px;
   position: relative;
 }
 
@@ -489,10 +487,6 @@ html, body {
   background: #1c1c1c;
   border-top: 1px solid #333;
   border-radius: 10px;
-  position: sticky;
-  bottom: 0;
-  z-index: 50;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .input-bar textarea {
