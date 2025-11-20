@@ -75,7 +75,7 @@ const joinBtn = document.getElementById("joinBtn") || null;
 
 let messageInput = document.getElementById("message") || document.getElementById("messageInput") || document.querySelector(".input-bar input") || null;
 
-const inputEl = document.getElementById("messageInput");
+// const inputEl = document.getElementById("messageInput");
 const messagesEl = document.getElementById("messages");
 const messagesViewport = messagesEl.parentElement;
 const sendBtn = document.getElementById("sendBtn") || null;
@@ -100,6 +100,7 @@ const sidebarBackdrop = document.getElementById("sidebar-backdrop");
 
 let allUsers = {};
 const deletedMessages = new Set();
+let badgePress = { timer: null, startedAt: 0, badge: null, long: false };
 const picker = document.getElementById("reaction-picker");
 const tooltip = document.getElementById("reaction-tooltip");
 
@@ -109,6 +110,7 @@ let pickerTarget = null;
 let longPressTriggered = false;
 let pressTimer = null;
 let pressStartBadge = null;
+let lastScrollTime = 0;
 
 let currentMobileMsg = null;
 let longPressTimeout = null;
@@ -687,7 +689,7 @@ function updateTypingIndicator(allTyping) {
   el.classList.add("show");
 }
 
-inputEl.addEventListener("input", () => {
+messageInput.addEventListener("input", () => {
   sendTypingStatus(true);
   clearTimeout(typingTimeout);
   typingTimeout = setTimeout(() => {
@@ -695,12 +697,8 @@ inputEl.addEventListener("input", () => {
   }, 1500);
 });
 
-inputEl.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    if (e.shiftKey) {
-      e.stopPropagation();
-      return;
-    }
+messageInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     sendMessage();
   }
@@ -1169,15 +1167,10 @@ function attachActionHandlers(el, id, data) {
   menuBtn.onclick = (e) => {
     e.stopPropagation();
     const isOpen = menu.classList.contains("open");
-    closeAllMenus({ except: menu });
-
-    if (!isOpen) {
-      menu.classList.add("open");
-      positionMenu();
-    } else {
-      menu.classList.remove("open");
-    }
-  }
+    closeAllMenus({ except: isOpen ? null : menu });
+    menu.classList.toggle("open");
+    if (menu.classList.contains("open")) positionMenu();
+  };
 
   replyBtn.onclick = () => {
     startReply(el);
@@ -1217,10 +1210,10 @@ function closeMenu(menu) {
   if (menu) menu.classList.remove("open");
 }
 
-function closeAllMenus(options = {}) {
-  const except = options.except || null;
-  document.querySelectorAll(".action-menu.open").forEach((m) => {
-    if (m !== except) m.classList.remove("open");
+function closeAllMenus({ except = null } = {}) {
+  document.querySelectorAll(".action-menu.open").forEach(m => {
+    if (m === except) return;
+    m.classList.remove("open");
   });
 }
 
@@ -1466,9 +1459,6 @@ document.addEventListener("mouseout", (e) => {
   }
 });
 
-// inside module scope
-let badgePress = { timer: null, startedAt: 0, badge: null, long: false };
-
 document.addEventListener('pointerdown', (ev) => {
   const badge = ev.target.closest('.reaction-badge');
   if (!badge || window.innerWidth > 900) return;
@@ -1486,7 +1476,6 @@ document.addEventListener('pointerup', (ev) => {
   clearTimeout(badgePress.timer);
   if (!badge || badge !== badgePress.badge) return;
   if (!badgePress.long) {
-    // short tap
     const msgEl = findMsgElForBadge(badge);
     if (msgEl) toggleReaction(msgEl, badge.dataset.emoji);
   }
@@ -1504,8 +1493,8 @@ document.addEventListener('pointerup', (ev) => {
   hideReactionPicker();
 }); */
 
-window.addEventListener("scroll", () => {
-  hasScrolledSinceTouch = true;
+window.addEventListener('scroll', () => {
+  lastScrollTime = Date.now();
   hideReactionTooltip();
 }, { passive: true });
 
