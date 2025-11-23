@@ -1419,35 +1419,6 @@ if (picker) {
 /* ================= EVENT HANDLERS ================= */
 let GLOBAL_LAST_POINTER_TARGET = null;
 
-const HEADER = 65;
-const INPUT = 55;
-
-const chatWrapper = document.querySelector("#chat-wrapper");
-const inputBar = document.querySelector("#input-bar");
-
-if (window.visualViewport) {
-  visualViewport.addEventListener("resize", () => {
-    const vh = visualViewport.height;
-    const full = window.innerHeight;
-
-    const keyboard = full - vh;
-
-    if (keyboard > 100) {
-      // keyboard opened
-      inputBar.style.transform = `translateY(-${keyboard}px)`;
-
-      chatWrapper.style.height =
-        `calc(${vh}px - ${HEADER}px - ${INPUT}px)`;
-
-    } else {
-      // keyboard closed
-      inputBar.style.transform = "translateY(0)";
-      chatWrapper.style.height =
-        `calc(100dvh - ${HEADER}px - ${INPUT}px)`;
-    }
-  });
-}
-
 if (messagesViewport) {
   messagesViewport.addEventListener("scroll", () => {
     const nearBottom = messagesViewport.scrollTop + messagesViewport.clientHeight >= messagesViewport.scrollHeight - 30;
