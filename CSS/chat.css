@@ -11,22 +11,18 @@
 *{box-sizing:border-box}
 html, body {
   margin: 0;
-  padding: 0;
   background: linear-gradient(180deg, #05060a, #0f1115);
   font-family: Inter, system-ui, Arial;
   color: #e6e6e6;
   overflow: hidden;
-  touch-action: none;
 }
 
 .chat-wrapper {
   display: flex;
   width: 100%;
-  height: calc(100dvh - 65px - 55px);
+  height: calc(100dvh - 65px);
   margin-top: 65px;
   overflow: hidden;
-  position: relative;
-  flex-shrink: 1;
 }
 
 .chat-area {
@@ -60,17 +56,6 @@ html, body {
 .btn:hover {
   background: var(--accent);
   color: #111
-}
-
-#app {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 @keyframes slideIn {
@@ -247,9 +232,6 @@ html, body {
   padding-bottom: 10px;
   position: relative;
   min-height: 0;
-  height: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 #messages {
@@ -503,21 +485,20 @@ html, body {
 
 /* ---------- INPUT BAR ---------- */
 .input-bar {
-  height: 55px;
-  flex-shrink: 0;
-  background: #222;
   display: flex;
-  align-items: center;
-  padding: 0 10px;
+  padding: 12px;
+  background: #1c1c1c;
+  border-top: 1px solid #333;
+  border-radius: 10px;
   position: relative;
+  bottom: 0;
   z-index: 10;
-  transition: transform 0.25s ease; /* smooth lift */
+  transition: transform 0.20s ease;
 }
 
 .input-bar textarea {
   flex: 1;
   padding: 10px;
-  width: 100%;
   background: #333;
   border: none;
   color: white;
