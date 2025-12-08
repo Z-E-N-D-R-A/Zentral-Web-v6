@@ -93,7 +93,7 @@ const newMsgIndicator = document.getElementById("newMsgIndicator") || null;
 const whoEl = document.getElementById("who") || null;
 const onlineCountEl = document.getElementById("onlineCount") || null;
 
-const isMobile = window.matchMedia("(max-width: 900px)").matches;
+// const isMobile = window.matchMedia("(max-width: 900px)").matches;
 
 const sheet = document.getElementById("mobile-action-sheet");
 const actionBackdrop = document.getElementById("sheet-backdrop");
@@ -129,6 +129,10 @@ typingRef.on("value", snap => {
   const data = snap.val() || {};
   updateTypingIndicator(data);
 });
+
+function isMobile() {
+  return window.matchMedia("(max-width: 900px)").matches;
+}
 
 let badgePress = { timer: null, startedAt: 0, badge: null, long: false };
 const colors = ["#ffae00", "#f700ff", "#00b7ff", "#00ffb3", "#fbff00"];
@@ -1466,21 +1470,42 @@ function updateAllActionPositions() {
 }
 
 function chatSideBar() {
-  const sidebar = document.querySelector(".sidebar");
-  const toggleBtn = document.querySelector(".sidebar-toggle");
+  const sidebar = document.getElementById("sidebar") || document.querySelector(".sidebar");
+  const toggleBtn = document.getElementById("toggleSidebar") || document.querySelector(".sidebar-toggle");
+  const sidebarBackdrop = document.getElementById("sidebar-backdrop");
+
+  if (!sidebar || !toggleBtn) {
+    console.warn("chatSideBar: sidebar or toggle button not found");
+    return;
+  }
 
   toggleBtn.addEventListener("click", () => {
     if (isMobile()) {
       const isOpen = sidebar.classList.toggle("open");
-      sidebarBackdrop.classList.toggle("show", isOpen);
+      if (sidebarBackdrop) sidebarBackdrop.classList.toggle("show", isOpen);
     } else {
       sidebar.classList.toggle("collapsed");
+      sidebar.classList.remove("open");
+      if (sidebarBackdrop) sidebarBackdrop.classList.remove("show");
     }
   });
 
-  sidebarBackdrop.addEventListener("click", () => {
-    sidebar.classList.remove("open");
-    sidebarBackdrop.classList.remove("show");
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+      sidebarBackdrop.classList.remove("show");
+    });
+  }
+
+  window.addEventListener("resize", () => {
+    if (!isMobile()) {
+      sidebar.classList.remove("open");
+      if (sidebarBackdrop) sidebarBackdrop.classList.remove("show");
+    }
+
+    if (isMobile()) {
+      sidebar.classList.remove("collapsed");
+    }
   });
 }
 
@@ -1563,6 +1588,25 @@ document.addEventListener("click", (ev) => {
     if (typeof closeAllMenus === "function") closeAllMenus();
 }, true);
 
+document.addEventListener("DOMContentLoaded", () => {
+  const settingsModal = document.getElementById("settingsModal");
+  const settingsBtn = document.getElementById("sidebarSettingsBtn");
+  const closeSettings = document.getElementById("closeSettings");
+
+  settingsBtn.addEventListener("click", () => {
+    settingsModal.classList.remove("hidden");
+  });
+
+  closeSettings.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+  });
+
+  settingsModal.addEventListener("click", (e) => {
+    if (e.target === settingsModal) settingsModal.classList.add("hidden");
+  });
+
+});
+
 window.addEventListener('resize', () => {
   if (resizeTimer) cancelAnimationFrame(resizeTimer);
   resizeTimer = requestAnimationFrame(() => updateAllActionPositions());
@@ -1570,6 +1614,10 @@ window.addEventListener('resize', () => {
 
 /* ================= PRESENCE / RECOVERY ================= */
 let myPresenceRef = null;
+let savedRecovery = null;
+try {
+  savedRecovery = JSON.parse(localStorage.getItem("z_recovery"));
+} catch (e) {}
 
 joinBtn && (joinBtn.onclick = () => {
   const n = promptName.value || displayName || "Guest";
@@ -1608,9 +1656,28 @@ function join(name, restoredInfo = null) {
     });
   });
 
-  const code = generateRecoveryCode(8);
-  const payload = { clientId, name: displayName, color: myColor, ts: Date.now() };
-  saveRecoveryRecord(code, payload);
+  let recoveryCode, recoveryPayload;
+
+  if (restoredInfo && restoredInfo.clientId) {
+    recoveryCode = savedRecovery?.code;
+    recoveryPayload = savedRecovery?.payload;
+  } else if (savedRecovery) {
+    recoveryCode = savedRecovery.code;
+    recoveryPayload = savedRecovery.payload;
+  } else {
+    recoveryCode = generateRecoveryCode(8);
+    recoveryPayload = {
+      clientId,
+      name: displayName,
+      color: myColor,
+      ts: Date.now()
+    };
+    saveRecoveryRecord(recoveryCode, recoveryPayload);
+    localStorage.setItem("z_recovery", JSON.stringify({
+      code: recoveryCode,
+      payload: recoveryPayload
+    }));
+  }
 }
 
 function initPresence(color, name) {
