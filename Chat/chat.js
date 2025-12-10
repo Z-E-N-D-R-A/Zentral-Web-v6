@@ -1853,7 +1853,6 @@ function initPresence() {
 
     return myPresenceRef
       .set({ accountId, ts: Date.now() })
-      .then(() => { startPeriodicPresence(); })
       .catch(err => { console.error("[PRESENCE] presence set error:", err);
         throw err;
       });
@@ -1861,16 +1860,6 @@ function initPresence() {
     console.error("[PRESENCE] initPresence exception:", err);
     throw err;
   }
-}
-
-function startPeriodicPresence() {
-  if (!myPresenceRef) return;
-
-  setInterval(() => {
-    myPresenceRef.update({ ts: Date.now() }).catch(err => {
-      console.error("[PRESENCE] Periodic update failed:", err);
-    });
-  }, 30000);
 }
 
 function generateRecoveryCode(len = 8) {
