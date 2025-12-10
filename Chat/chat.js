@@ -80,13 +80,12 @@ firebase.auth().onAuthStateChanged(u => {
 });
 
 /* =============== LOCAL CLIENT DATA =============== */
+let displayName = localStorage.getItem("z_name") || "";
 let clientId = localStorage.getItem("z_clientId");
 if (!clientId) {
   clientId = Math.random().toString(36).slice(2);
   localStorage.setItem("z_clientId", clientId);
 }
-
-let displayName = localStorage.getItem("z_name") || "";
 
 /* =============== DOM HOOKS =============== */
 const promptEl = document.getElementById("prompt") || null;
@@ -547,14 +546,14 @@ function sendMessage() {
   u.transaction(data => {
     if (!data) return data;
 
-    if (!data.level) data.level = { exp: 0, messageCount: 0 };
+    if (!data.experience) data.experience = { level: 1, zxp: 0, messageCount: 0 };
 
-    data.level.messageCount = (data.level.messageCount || 0) + 1;
-    data.level.exp = (data.level.exp || 0) + 5;
+    data.experience.messageCount = (data.experience.messageCount || 0) + 1;
+    data.experience.zxp = (data.experience.zxp || 0) + 5;
 
-    if (data.level.exp >= 100) {
-      data.level.exp = 0;
-      data.level.level = (data.level.level || 1) + 1;
+    if (data.experience.zxp >= 100) {
+      data.experience.zxp = 0;
+      data.experience.level = (data.experience.level || 1) + 1;
     }
 
     return data;
@@ -780,7 +779,7 @@ document.getElementById("cancel-reply").onclick = () => {
   }
 
   updateLoadOlderVisibility();
-  console.log("Initial load complete:", items.length, "messages");
+  console.log("[LOAD] Initial load complete:", items.length, "messages");
 
   messagesRef.limitToLast(1).on("child_added", snap => {
     const msg = snap.val();
@@ -1762,8 +1761,9 @@ async function join(name, restoredInfo = null) {
         chatTheme: "light",
         profileIcon: "default",
 
-        level: {
-          exp: 0,
+        experience: {
+          level: 1,
+          zxp: 0,
           messageCount: 0
         },
 
@@ -1784,11 +1784,12 @@ async function join(name, restoredInfo = null) {
       await userRef.set(payload);
       await firebase.database().ref("recoveryIndex").child(code).set(accountId);
       localStorage.setItem("z_recovery", JSON.stringify({ code, payload }));
+      location.reload();
     } else {
       console.warn("[JOIN] expected restoredInfo but user package is missing; restoredInfo:", restoredInfo);
     }
   } else {
-    console.log("[JOIN] user package:", snap.val());
+    console.log("[JOIN] user:", snap.val());
   }
 
   await usersRef.child(accountId).update({ lastActive: Date.now() });
@@ -1832,7 +1833,6 @@ async function restoreWithCode(code) {
     localStorage.setItem("z_name", displayName);
 
     const restoredInfo = {
-      color: data.color || colors[Math.floor(Math.random() * colors.length)],
       username: data.username
     };
 
@@ -1846,20 +1846,43 @@ async function restoreWithCode(code) {
   }
 }
 
-function initPresence() {
+async function initPresence() {
   try {
-    myPresenceRef = presenceRef.push();
-    myPresenceRef.onDisconnect().remove();
+    const presenceSnap = await presenceRef.once("value");
+    const list = presenceSnap.val() || {};
+    let existingKey = null;
 
-    return myPresenceRef
-      .set({ accountId, ts: Date.now() })
-      .catch(err => { console.error("[PRESENCE] presence set error:", err);
-        throw err;
-      });
+    for (const key in list) {
+      if (list[key].accountId === accountId) {
+        existingKey = key;
+        break;
+      }
+    }
+
+    if (existingKey) {
+      console.log("[PRESENCE] Reusing existing presence:", existingKey);
+      myPresenceRef = presenceRef.child(existingKey);
+    } else {
+      console.log("[PRESENCE] Creating new presence");
+      myPresenceRef = presenceRef.push();
+    }
+
+    myPresenceRef.onDisconnect().remove();
+    return myPresenceRef.set({ accountId, ts: Date.now() }).catch(err => { console.error("[PRESENCE] set error:", err); throw err; });
   } catch (err) {
     console.error("[PRESENCE] initPresence exception:", err);
     throw err;
   }
+}
+
+function recheckPresenceConnection() {
+  firebase.database().ref(".info/connected").once("value").then(snap => {
+    if (snap.val() === true) {
+      initPresence();
+    } else {
+      console.log("[PRESENCE] Not connected → waiting for Firebase reconnect");
+    }
+  });
 }
 
 function generateRecoveryCode(len = 8) {
@@ -1886,6 +1909,16 @@ if (recoveryInput) {
     if (e.key === "Enter") restoreWithCode(recoveryInput.value);
   };
 }
+
+window.addEventListener("focus", () => {
+  recheckPresenceConnection();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    recheckPresenceConnection();
+  }
+});
 
 setInterval(() => {
   const timeEls = Array.from(document.querySelectorAll(".time"));
