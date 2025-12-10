@@ -899,3 +899,31 @@ input, textarea, button, select {
   opacity: 1;
   pointer-events: all;
 }
+
+.presence-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 0px;
+}
+
+.presence-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.presence-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #ddd;
+  flex-shrink: 0;
+}
+
+.presence-name {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--sidebar-text, #fff);
+}
