@@ -1657,6 +1657,10 @@ function enableSwipeToReply(msgEl) {
   let swiping = false;
   const isMine = msgEl.classList.contains("me");
 
+  // Make swipe LESS sensitive (increase threshold)
+  const TRIGGER_DISTANCE = 120;     // was 60
+  const MAX_DRAG = 80;              // still allows a bit of movement
+
   msgEl.addEventListener("touchstart", e => {
     startX = e.touches[0].clientX;
     swiping = true;
@@ -1664,18 +1668,26 @@ function enableSwipeToReply(msgEl) {
 
   msgEl.addEventListener("touchmove", e => {
     if (!swiping) return;
+
     const deltaX = e.touches[0].clientX - startX;
-    if (Math.abs(deltaX) < 80) {
+
+    // --- BLOCK opposite direction completely ---
+    if (isMine && deltaX > 0) return;      // mine → can't swipe right
+    if (!isMine && deltaX < 0) return;     // others → can't swipe left
+
+    // --- Allow slight drag (visual feedback) ---
+    if (Math.abs(deltaX) < MAX_DRAG) {
       msgEl.style.transform = `translateX(${deltaX}px)`;
     }
 
-    if (!isMine && deltaX > 60) {
+    // --- Trigger swipe-to-reply ---
+    if (!isMine && deltaX > TRIGGER_DISTANCE) {
       swiping = false;
       triggerReplySwipe(msgEl, deltaX);
       return;
     }
 
-    if (isMine && deltaX < -60) {
+    if (isMine && deltaX < -TRIGGER_DISTANCE) {
       swiping = false;
       triggerReplySwipe(msgEl, deltaX);
       return;
@@ -1685,7 +1697,7 @@ function enableSwipeToReply(msgEl) {
   msgEl.addEventListener("touchend", () => {
     msgEl.style.transform = "";
     msgEl.style.transition = "transform 0.15s ease";
-    setTimeout(() => msgEl.style.transition = "", 150);
+    setTimeout(() => (msgEl.style.transition = ""), 150);
     swiping = false;
   });
 }
