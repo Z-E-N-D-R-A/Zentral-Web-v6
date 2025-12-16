@@ -1904,13 +1904,18 @@ function openReactionPicker(msgEl) {
 function renderReactions(msgEl, data) {
   const container = msgEl.querySelector(".reaction-badges");
   if (!container) return;
-  
+
   container.innerHTML = "";
   if (!data?.reactions) return;
 
   Object.keys(data.reactions).forEach(emoji => {
-    const users = Object.keys(data.reactions[emoji]);
-    const isMine = data.reactions[emoji][accountId];
+    const usersObj = data.reactions[emoji];
+    if (!usersObj) return;
+
+    const users = Object.keys(usersObj);
+    if (!users.length) return;
+
+    const isMine = !!usersObj[accountId];
 
     const badge = document.createElement("div");
     badge.className = "reaction-badge" + (isMine ? " mine" : "");
@@ -1993,13 +1998,17 @@ function findMsgElForBadge(badge) {
 }
 
 document.addEventListener("click", (e) => {
+  if (window.innerWidth <= 900) return;
+
   const badge = e.target.closest(".reaction-badge");
   if (!badge) return;
+
   e.stopPropagation();
   suppressNextActionMenu = true;
 
   const msgEl = findMsgElForBadge(badge);
   if (!msgEl) return;
+
   toggleReaction(msgEl, badge.dataset.emoji);
 });
 
