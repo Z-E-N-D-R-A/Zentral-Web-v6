@@ -10,13 +10,181 @@ const firebaseConfig = {
   databaseURL: "https://zentral-chat-b7ca0-default-rtdb.firebaseio.com"
 };
 
+const LEVEL_BADGES = {
+  5:  "Rookie",
+  10: "Expert",
+  25: "Veteran",
+  50: "Elite",
+  100: "Champion"
+};
+
+const THEME_LIST = [
+  { id: "light", label: "Light", img: "Light.png" },
+  { id: "dark", label: "Dark", img: "Dark.png" },
+  { id: "ocean", label: "Ocean", img: "Ocean.png" },
+  { id: "futuristic", label: "Futuristic", img: "Futuristic.png" },
+  { id: "space", label: "Space", img: "Space.png" },
+  { id: "cyberpunk", label: "Cyberpunk", img: "Cyberpunk.png" },
+  { id: "vintage", label: "Vintage", img: "Vintage.png" },
+  { id: "forest", label: "Forest", img: "Forest.png" },
+  { id: "earth", label: "Earth", img: "Earth.png" }
+];
+
+const THEMES = {
+  light: {
+    bg: "linear-gradient(135deg, #ececec, #d5d5d5)",
+    text1: "#202020",
+    text2: "#2d2d2d",
+    text3: "#9d9d9d",
+    sidebar: "#c9c9c9",
+    input: "#bababa",
+    inputArea: "#cecece",
+    sendButton: "#e9e9e9",
+    sendButtonHover: "#ffffff",
+    sendButtonShadow: "rgba(203, 203, 203, 0.45)",
+    actionMenu: "#ffffff",
+    bubbleMe: "linear-gradient(135deg, #ffffff, #adadad)",
+    bubbleOther: "rgba(255,255,255,0.06)"
+  },
+
+  dark: {
+    bg: "linear-gradient(135deg, #0d0d0e, #0a0a0a)",
+    text1: "#e6e6e6",
+    text2: "#aaa",
+    text3: "#333",
+    sidebar: "#1e1e1e",
+    input: "#1c1c1c",
+    inputArea: "#333",
+    sendButton: "#585757",
+    sendButtonHover: "#666666",
+    sendButtonShadow: "rgba(112, 116, 123, 0.45)",
+    actionMenu: "#1c1c1c",
+    bubbleMe: "linear-gradient(135deg, #494949, #1a1a1a)",
+    bubbleOther: "rgba(255,255,255,0.06)"
+  },
+
+  ocean: {
+    bg: "linear-gradient(135deg, #000428, #004e92)",
+    text1: "#abe0ff",
+    text2: "#3f8de0",
+    text3: "#3a6a9e",
+    sidebar: "#0e1555",
+    input: "#0d1860",
+    inputArea: "#2f2e73",
+    sendButton: "#155ecc",
+    sendButtonHover: "#1f70ee",
+    sendButtonShadow: "rgba(21, 94, 204, 0.45)",
+    actionMenu: "#112264",
+    bubbleMe: "linear-gradient(135deg, #1cb5e0, #0c6cf2)",
+    bubbleOther: "rgba(43, 43, 214, 0.38)"
+  },
+
+  futuristic: {
+    bg: "linear-gradient(135deg, #1f2833, #0b0c10)",
+    text1: "#66fcf1",
+    text2: "#aaa",
+    text3: "#333",
+    sidebar: "#1e1e1e",
+    input: "#243836",
+    inputArea: "#081918",
+    sendButton: "#007d75",
+    sendButtonHover: "#3ab6ae",
+    sendButtonShadow: "rgba(25, 181, 192, 0.45)",
+    actionMenu: "#001e26",
+    bubbleMe: "linear-gradient(135deg, #3bbfbb, #004844)",
+    bubbleOther: "rgba(255,255,255,0.06)"
+  },
+
+  space: {
+    bg: "linear-gradient(135deg, #431f73, #1e2e71)",
+    text1: "#e6e6e6",
+    text2: "#e89dff",
+    text3: "#a784ae",
+    sidebar: "#2f3777",
+    input: "#311e4b",
+    inputArea: "#3e2855",
+    sendButton: "#8900f2",
+    sendButtonHover: "#b100e8",
+    sendButtonShadow: "rgba(215, 84, 255, 0.45)",
+    actionMenu: "#371441",
+    bubbleMe: "linear-gradient(135deg, #031334, #1d40aa)",
+    bubbleOther: "rgba(255,255,255,0.06)"
+  },
+
+  cyberpunk: {
+    bg: "linear-gradient(135deg, #880e5d, #6e7e06)",
+    text1: "#00ffd0",
+    text2: "#ffff00",
+    text3: "#ff00c3",
+    sidebar: "#1e1e1e",
+    input: "#1c1c1c",
+    inputArea: "#333",
+    sendButton: "#e60ca4",
+    sendButtonHover: "#ff00b3",
+    sendButtonShadow: "rgba(204, 99, 165, 0.45)",
+    actionMenu: "#851f57",
+    bubbleMe: "linear-gradient(135deg, #079e28ff, #850d87)",
+    bubbleOther: "rgba(255, 0, 195, 0.35)"
+  },
+
+  vintage: {
+    bg: "linear-gradient(135deg, #90aead, #874f41)",
+    text1: "#ffd392",
+    text2: "#fbe9d0",
+    text3: "#c3ac89",
+    sidebar: "#244855",
+    input: "#244855",
+    inputArea: "#41515f",
+    sendButton: "#e64833",
+    sendButtonHover: "#ff2a0e",
+    sendButtonShadow: "rgba(172, 78, 32, 0.45)",
+    actionMenu: "#17374f",
+    bubbleMe: "linear-gradient(135deg, #874f41, #db983b)",
+    bubbleOther: "rgba(190, 156, 77, 0.5)"
+  },
+
+  forest: {
+    bg: "linear-gradient(135deg, #022708, #0a381f)",
+    text1: "#ffe6d4",
+    text2: "#fdbd8e",
+    text3: "#b96c35",
+    sidebar: "#071d0b",
+    input: "#103f15",
+    inputArea: "#28553a",
+    sendButton: "#25b561",
+    sendButtonHover: "#15ea6e",
+    sendButtonShadow: "#2ecc71",
+    actionMenu: "#3a180a",
+    bubbleMe: "linear-gradient(135deg, #2ecc71, #27ae60)",
+    bubbleOther: "rgba(128, 170, 88, 0.5)"
+  },
+
+  earth: {
+    bg: "linear-gradient(135deg, #5f9053, #217da7)",
+    text1: "#9ad6ff",
+    text2: "#e6e6e6",
+    text3: "#f7f9fb",
+    sidebar: "#2c5a76",
+    input: "#013c19",
+    inputArea: "#285532",
+    sendButton: "#1e73a1",
+    sendButtonHover: "#0099ff",
+    sendButtonShadow: "rgba(45, 197, 239, 0.45)",
+    actionMenu: "#2d5168",
+    bubbleMe: "linear-gradient(135deg, #206341, #00823a)",
+    bubbleOther: "rgba(20, 136, 61, 0.2)"
+  }
+};
+
 firebase.initializeApp(firebaseConfig);
 const domCache = {};
 const messages = {};
+const pendingReplies = {};
 const db = firebase.database();
 const messagesRef = db.ref("messages");
 const presenceRef = db.ref("presence");
 const usersRef = db.ref("users");
+const levelEventsRef = db.ref("levelEvents");
 
 let user = null;
 let authReady = false;
@@ -76,6 +244,7 @@ firebase.auth().onAuthStateChanged(u => {
     pendingJoin = { name: displayName, restoredInfo: null };
   }
 
+  initThemeSelector();
   tryProcessQueue();
 });
 
@@ -89,8 +258,9 @@ if (!clientId) {
 
 /* =============== DOM HOOKS =============== */
 const promptEl = document.getElementById("prompt") || null;
-const promptName = document.getElementById("promptName") || null;
-const joinBtn = document.getElementById("joinBtn") || null;
+const promptName = document.getElementById("prompt-name") || null;
+const joinBtn = document.getElementById("prompt-join") || null;
+const promptErrorEl = document.getElementById("prompt-error");
 
 let messageInput = document.getElementById("message") || document.getElementById("messageInput") || document.querySelector(".input-bar input") || null;
 
@@ -98,16 +268,16 @@ const messagesEl = document.getElementById("messages");
 const messagesViewport = messagesEl.parentElement;
 const sendBtn = document.getElementById("sendBtn") || null;
 
-const recoveryInput = document.getElementById("recoveryInput") || null;
-const restoreBtn = document.getElementById("restoreBtn") || null;
+const recoveryInput = document.getElementById("recovery-code") || null;
+const restoreBtn = document.getElementById("recovery-button") || null;
+const recoveryErrorEl = document.getElementById("recovery-error");
 
 const loadOlderBtn = document.getElementById("loadOlderBtn");
 const spinner = document.getElementById("spinner") || document.getElementById("loadingOlder") || null;
 const newMsgIndicator = document.getElementById("newMsgIndicator") || null;
 
-const whoEl = document.getElementById("who") || null;
+const presenceEl = document.getElementById("presence") || null;
 const onlineCountEl = document.getElementById("onlineCount") || null;
-
 
 const sheet = document.getElementById("mobile-action-sheet");
 const actionBackdrop = document.getElementById("sheet-backdrop");
@@ -116,6 +286,17 @@ const sidebarBackdrop = document.getElementById("sidebar-backdrop");
 const picker = document.getElementById("reaction-picker");
 const tooltip = document.getElementById("reaction-tooltip");
 const badgeTooltip = document.getElementById("badge-tooltip");
+
+const themeSelect = document.getElementById("theme-carousel");
+const themeTrack = document.getElementById("themeTrack");
+const themePrev = document.getElementById("themePrev");
+const themeNext = document.getElementById("themeNext");
+
+const settingsModal = document.getElementById("settingsModal");
+const settingsBtn = document.getElementById("sidebarSettingsBtn");
+const closeSettings = document.getElementById("closeSettings");
+const equippedBadgeEl = document.getElementById("equippedBadge");
+const pendingReplyHydration = [];
 
 let replyToId = null;
 let pickerTarget = null;
@@ -132,6 +313,10 @@ let userIsAtBottom = true;
 let hasScrolledSinceTouch = false;
 let suppressNextActionMenu = false;
 let pressStartBadge = null;
+let settingsUpdate = false;
+let isInitialLoading = true;
+
+let badgePress = { timer: null, startedAt: 0, badge: null, long: false };
 
 let allUsers = {};
 firebase.database().ref("users").on("value", snap => {
@@ -148,12 +333,16 @@ function isMobile() {
   return window.matchMedia("(max-width: 900px)").matches;
 }
 
-let badgePress = { timer: null, startedAt: 0, badge: null, long: false };
-const colors = ["#ffae00", "#f700ff", "#00b7ff", "#00ffb3", "#fbff00"];
-
-/* ================= UTILITIES: escape, timeAgo, date label ================= */
+/* ================= UTILITIES ================= */
 function formatMessageText(text) {
   return escapeHtml(text).replace(/\n/g, "<br>");
+}
+
+function formatBadgeName(name) {
+  return name
+    .split("_")
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ") + " Badge";
 }
 
 function escapeHtml(s) {
@@ -195,8 +384,32 @@ function formatDateLabel(ts) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
-function formatBadgeName(name) {
-  return name.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()) + " Badge";
+function createLevelSeparator({ uid, level, time }) {
+  const el = document.createElement("div");
+  el.className = "level-separator";
+  el.dataset.timestamp = time;
+
+  const username = allUsers[uid]?.username || "Unknown User";
+  const badgeName = LEVEL_BADGES[level] || null;
+
+  const main = document.createElement("div");
+  main.className = "level-text";
+  main.textContent = `Congratulations! ${username} reached Level ${level} 🎉`;
+  el.appendChild(main);
+
+  if (badgeName) {
+    const badge = document.createElement("div");
+    badge.className = "level-badge-text";
+    badge.textContent = `🏅 New Badge Unlocked: ${badgeName} Badge`;
+    el.appendChild(badge);
+  }
+
+  return el;
+}
+
+function insertLevelSeparator(event) {
+  const el = createLevelSeparator(event);
+  insertMessage(el, event.time);
 }
 
 function createDateSeparator(label) {
@@ -246,6 +459,16 @@ function ensureDateSeparatorBefore(msgEl, timestamp) {
   }
 }
 
+function messageLevel(level) {
+  if (level <= 0) return Infinity;
+  const y = 0.5 * level * level + 8.5 * level - 4;
+  return Math.max(1, Math.ceil(y));
+}
+
+function zxpLevel(level) {
+  return messageLevel(level) * 5;
+}
+
 /* ================= RENDER HELPERS ================= */
 function createMessageElement(data) {
   const { id, name, text, time, senderId, edited } = data;
@@ -262,16 +485,21 @@ function createMessageElement(data) {
       <div class="badges"></div>
     </div>
     
-    <img src="../Assets/${data.icon}.png" class="profile-icon" />
+    <img src="../Assets/Icons/${data.icon}.png" class="profile-icon" />
 
     <div class="bubble">
-      ${renderReplyPreview(data)}
-      ${formatMessageText(text)}
-      ${edited ? "<span class='edited'>(edited)</span>" : ""}
+      <div class="bubble-content">
+        ${data.replyToId ? `<div class="reply-bubble loading"></div>` : ""}
+        ${formatMessageText(text)}
+        </div>
+      </div>
     </div>
 
     <div class="reaction-badges"></div>
-    <div class="time">${timeAgo(time)}</div>
+    <div class="info-row">
+      <div class="time" data-timestamp="${time}">${timeAgo(time)}</div>
+      <div class="edit">${edited ? "(edited)" : ""}</div>
+    </div>
 
     <div class="actions">
       <div class="action-btn reply-btn" title="Reply">
@@ -307,7 +535,7 @@ function createMessageElement(data) {
       if (state === true) {
         const img = document.createElement("img");
         img.className = "badge-icon";
-        img.src = `../Assets/${badgeName}.png`;
+        img.src = `../Assets/Badges/${badgeName}.png`;
         img.dataset.badge = badgeName;
         badgeContainer.appendChild(img);
       }
@@ -321,15 +549,13 @@ function createMessageElement(data) {
     meta.appendChild(meta.querySelector(".badges"));
   }
 
-  renderReactions(el, data);
   attachActionHandlers(el, id, data);
 
-  attachLongPress(el);
-  enableSwipeToReply(el);
-
-  requestAnimationFrame(() => { adjustBubbleAlignment(el.querySelector(".bubble")) });
-  requestAnimationFrame(() => positionActions(el));
-  requestAnimationFrame(() => positionIcons(el));
+  if (!isInitialLoading) {
+    renderReactions(el, data);
+    attachLongPress(el);
+    enableSwipeToReply(el);
+  }
 
   return el;
 }
@@ -337,34 +563,46 @@ function createMessageElement(data) {
 function updateMessageElement(data) {
   const id = data.id;
   messages[id] = data;
+
   const el = domCache[id];
   if (!el) return;
 
-  const bubble = el.querySelector(".bubble");
-  if (bubble) {
-    const replyHtml = renderReplyPreview(data);
+  const content = el.querySelector(".bubble-content");
+  if (!content) return;
 
-    let textHtml = escapeHtml(data.text);
-    if (data.edited) {
-      textHtml += " <span class='edited'>(edited)</span>";
-    }
-    bubble.innerHTML = replyHtml + textHtml;
+  const replyBubble = content.querySelector(".reply-bubble");
+  content.innerHTML = "";
 
-    activateReplyJump(el);
-    renderReactions(el, data);
+  if (replyBubble) {
+    content.appendChild(replyBubble);
   }
+
+  content.insertAdjacentHTML("beforeend", formatMessageText(data.text));
+
+  hydrateReplyBubble(data);
+  renderReactions(el, data);
 
   const timeEl = el.querySelector(".time");
-  if (timeEl) {
+  if (timeEl && !timeEl.classList.contains("hidden")) {
     timeEl.dataset.timestamp = data.time;
-    if (!timeEl.classList.contains("hidden")) {
-      timeEl.textContent = timeAgo(data.time);
+    timeEl.textContent = timeAgo(data.time);
+  }
+
+  const editEl = el.querySelector(".edit");
+  if (editEl) {
+    if (data.edited) {
+      editEl.textContent = "(edited)";
+      editEl.classList.remove("hidden");
+    } else {
+      editEl.textContent = "";
+      editEl.classList.add("hidden");
     }
   }
 
-  adjustBubbleAlignment(bubble);
-  positionActions(el);
-  positionIcons(el);
+  requestAnimationFrame(() => {
+    positionActions(el);
+    positionIcons(el);
+  });
 }
 
 function appendMessage(data) {
@@ -378,36 +616,19 @@ function appendMessage(data) {
   }
 
   const el = createMessageElement(data);
-  activateReplyJump(el);
-  refreshAllReplyPreviews();
-  renderReactions(el, data);
-  const prev = (() => {
-    let x = messagesEl.lastElementChild;
-    while (x && x.classList.contains("date-separator")) x = x.previousElementSibling;
-    return x;
-  })();
+  domCache[id] = el;
 
   insertMessage(el, data.time);
   ensureDateSeparatorBefore(el, data.time);
-  regroupMessages();
 
-  activateReplyJump(el);
-  refreshAllReplyPreviews();
-  domCache[id] = el;
-  attachActionHandlers(el, id, data);
+  hydrateReplyBubble(data);
+  renderReactions(el, data);
 
-  const isMe = data.senderId === accountId;
-  // if (suppressNewIndicator) { return el; }
-  if (isMe && messagesViewport) {
-    hideNewMsgIndicator();
-    messagesViewport.scrollTop = messagesViewport.scrollHeight;
-  } else if (messagesViewport) {
-    if (userIsAtBottom) {
-      messagesViewport.scrollTop = messagesViewport.scrollHeight;
-    } else {
-      showNewMsgIndicator();
-    }
+  if (!isInitialLoading) {
+    regroupAround(el);
   }
+  
+  attachActionHandlers(el, id, data);
 }
 
 function prependMessage(data) {
@@ -494,7 +715,7 @@ function sendMessage() {
 
   const newRef = messagesRef.push();
   newMsg.id = newRef.key;
-  
+
   replyToId = null;
   document.getElementById("reply-bar").classList.add("hidden");
   sendTypingStatus(false);
@@ -506,14 +727,31 @@ function sendMessage() {
   u.transaction(data => {
     if (!data) return data;
 
-    if (!data.experience) data.experience = { level: 1, zxp: 0, messageCount: 0 };
+    if (!data.experience) {
+      data.experience = { level: 1, zxp: 0, messageCount: 0 };
+    }
 
-    data.experience.messageCount = (data.experience.messageCount || 0) + 1;
-    data.experience.zxp = (data.experience.zxp || 0) + 5;
+    data.experience.messageCount++;
+    data.experience.zxp += 5;
 
-    if (data.experience.zxp >= 100) {
-      data.experience.zxp = 0;
-      data.experience.level = (data.experience.level || 1) + 1;
+    const currentLevel = data.experience.level || 1;
+    const requiredZxp = zxpLevel(currentLevel);
+
+    if (data.experience.zxp >= requiredZxp) {
+      const newLevel = currentLevel + 1;
+      data.experience.zxp -= requiredZxp;
+      data.experience.level = newLevel;
+
+      levelEventsRef.push({
+        uid: accountId,
+        level: newLevel,
+        time: Date.now()
+      });
+
+      const badgeToUnlock = LEVEL_BADGES[newLevel];
+      if (badgeToUnlock && data.badges[badgeToUnlock] !== true) {
+        data.badges[badgeToUnlock] = false;
+      }
     }
 
     return data;
@@ -574,18 +812,6 @@ function cancelEdit() {
   if (cancelBtn) cancelBtn.remove();
 }
 
-function triggerReplySwipe(msgEl, deltaX) {
-  msgEl.style.transition = "transform 0.25s ease";
-  msgEl.style.transform = `translateX(${deltaX > 0 ? 35 : -35}px)`;
-
-  setTimeout(() => {
-    msgEl.style.transform = "";
-    msgEl.style.transition = "";
-  }, 250);
-
-  startReply(msgEl);
-}
-
 function startReply(msgEl) {
   const id = msgEl.dataset.id;
   const msg = messages[id];
@@ -599,7 +825,19 @@ function startReply(msgEl) {
   messageInput.focus();
 }
 
-function renderReplyPreview(msg) {
+function triggerReplySwipe(msgEl, deltaX) {
+  msgEl.style.transition = "transform 0.25s ease";
+  msgEl.style.transform = `translateX(${deltaX > 0 ? 35 : -35}px)`;
+
+  setTimeout(() => {
+    msgEl.style.transform = "";
+    msgEl.style.transition = "";
+  }, 250);
+
+  startReply(msgEl);
+}
+
+/* function renderReplyPreview(msg) {
   if (!msg.replyToId) return "";
   const original = messages[msg.replyToId];
   if (!original || !original.text || !original.name) {
@@ -632,22 +870,66 @@ function refreshAllReplyPreviews() {
       `;
     }
   });
+}*/
+
+function hydrateReplyBubble(msg) {
+  const el = domCache[msg.id];
+  if (!el) return;
+
+  const container = el.querySelector(".bubble-content");
+  if (!container) return;
+
+  if (!msg.replyToId) {
+    const existing = container.querySelector(".reply-bubble");
+    if (existing) existing.remove();
+    return;
+  }
+
+  let bubble = container.querySelector(".reply-bubble");
+  if (!bubble) {
+    bubble = document.createElement("div");
+    bubble.className = "reply-bubble loading";
+    container.prepend(bubble);
+  }
+
+  const original = messages[msg.replyToId];
+  if (!original) {
+    bubble.classList.add("loading");
+    return;
+  }
+
+  bubble.classList.remove("loading");
+  bubble.dataset.replyJump = msg.replyToId;
+
+  bubble.innerHTML = `
+    <strong>${escapeHtml(original.name)}</strong>
+    <div class="reply-snippet">
+      ${escapeHtml(original.text.slice(0, 80))}
+      ${original.edited ? " (edited)" : ""}
+    </div>`;
 }
 
-function activateReplyJump(msgEl) {
-  const bubble = msgEl.querySelector(".reply-bubble");
+function updateRepliesPointingTo(editedMsgId) {
+  for (const id in messages) {
+    const msg = messages[id];
+    if (msg.replyToId === editedMsgId) {
+      hydrateReplyBubble(msg);
+    }
+  }
+}
+
+messagesEl.addEventListener("click", e => {
+  const bubble = e.target.closest(".reply-bubble");
   if (!bubble) return;
 
-  bubble.onclick = () => {
-    const targetId = bubble.dataset.replyJump;
-    if (!targetId) return;
+  const targetId = bubble.dataset.replyJump;
+  if (!targetId) return;
 
-    const targetEl = document.getElementById("msg-" + targetId);
-    if (!targetEl) return;
+  const targetEl = document.getElementById("msg-" + targetId);
+  if (!targetEl) return;
 
-    targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-  };
-}
+  targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+});
 
 function sendTypingStatus(isTyping) {
   const ref = firebase.database().ref("users/" + accountId + "/typing");
@@ -711,44 +993,98 @@ document.getElementById("cancel-reply").onclick = () => {
 };
 
 /* ================= FIREBASE LISTENERS: initial load + live updates ================= */
+const levelEventCache = {};
 (async function initMessageLoading() {
-  await new Promise(res => setTimeout(res, 80));
-  console.log("Cached user profiles:", Object.keys(allUsers).length);
+  const loadStart = performance.now();
+  const timeline = [];
 
-  const snapshot = await messagesRef.orderByKey().limitToLast(150).once("value");
-  const items = [];
-  snapshot.forEach(child => {
-    items.push({ id: child.key, ...child.val() });
+  const [messagesSnap, levelsSnap] = await Promise.all([ messagesRef.orderByChild("time").once("value"), levelEventsRef.once("value") ]);
+  messagesSnap.forEach(child => { timeline.push({ type: "msg", id: child.key, ...child.val() }); });
+  levelsSnap.forEach(child => { timeline.push({ type: "level", id: child.key, ...child.val() }); });
+  timeline.sort((a, b) => a.time - b.time);
+
+  const fragment = document.createDocumentFragment();
+  let lastDateLabel = null;
+
+  for (const item of timeline) {
+    const label = formatDateLabel(item.time);
+    if (label !== lastDateLabel) {
+      fragment.appendChild(createDateSeparator(label));
+      lastDateLabel = label;
+    }
+
+    if (item.type === "msg") {
+      const info = allUsers[item.senderId] || {};
+      const msg = { ...item, name: info.username || "Unknown User" };
+      messages[item.id] = msg;
+
+      const el = createMessageElement({
+        ...msg,
+        icon: info.profileIcon || "default",
+        badges: info.badges || {}
+      });
+
+      domCache[item.id] = el;
+      fragment.appendChild(el);
+
+      hydrateReplyBubble(msg);
+
+      if (pendingReplies[item.id]) {
+        for (const replyMsgId of pendingReplies[item.id]) {
+          hydrateReplyBubble(messages[replyMsgId]);
+        }
+        delete pendingReplies[item.id];
+      }
+
+      if (msg.replyToId && !messages[msg.replyToId]) {
+        (pendingReplies[msg.replyToId] ??= []).push(msg.id);
+      }
+    } else {
+      levelEventCache[item.id] = true;
+      fragment.appendChild(createLevelSeparator(item));
+    }
+  }
+  
+  messagesEl.appendChild(fragment);
+  const msgEls = [...messagesEl.querySelectorAll(".msg")];
+
+  requestAnimationFrame(() => {
+    for (const el of msgEls) {
+      const id = el.dataset.id;
+      const msg = messages[id];
+      if (!msg) continue;
+
+      attachActionHandlers(el, id, msg);
+      attachLongPress(el);
+      enableSwipeToReply(el);
+    }
   });
 
-  items.sort((a, b) => a.time - b.time);
+  requestAnimationFrame(() => {
+    regroupMessages();
 
-  for (const msg of items) {
-    const info = allUsers[msg.senderId] || {};
-    messages[msg.id] = msg;
+    for (const el of msgEls) {
+      const msg = messages[el.dataset.id];
+      if (msg?.reactions) {
+        renderReactions(el, msg);
+      }
+      positionActions(el);
+      positionIcons(el);
+    }
 
-    appendMessage({
-      ...msg,
-      name: info.username || "Unknown User",
-      icon: info.profileIcon || "default",
-      badges: info.badges || {}
-    });
-  }
-
-  if (items.length > 0) {
-    oldestLoadedKey = items[0].id;
-  }
-
-  updateLoadOlderVisibility();
-  console.log("[LOAD] Initial load complete:", items.length, "messages");
+    messagesViewport.scrollTop = messagesViewport.scrollHeight;
+  });
+  
+  isInitialLoading = false;
+  const loadEnd = performance.now();
+  console.log(`[LOAD] Loaded ${timeline.length} items in ${(loadEnd - loadStart).toFixed(2)}ms`);
 
   messagesRef.limitToLast(1).on("child_added", snap => {
-    const msg = snap.val();
     const id = snap.key;
+    if (domCache[id]) return
 
-    if (messages[id]) return;
+    const msg = snap.val();
     messages[id] = { id, ...msg };
-
     const info = allUsers[msg.senderId] || {};
 
     appendMessage({
@@ -759,27 +1095,42 @@ document.getElementById("cancel-reply").onclick = () => {
       badges: info.badges || {}
     });
 
-    const box = messagesViewport;
-    const isNearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 200;
-    if (isNearBottom) box.scrollTop = box.scrollHeight;
-
     const isMe = msg.senderId === accountId;
-    updateLoadOlderVisibility();
-    if (!isNearBottom && !isMe) showNewMsgIndicator();
+    if (isMe && messagesViewport) {
+      hideNewMsgIndicator();
+      messagesViewport.scrollTop = messagesViewport.scrollHeight;
+    } else if (messagesViewport) {
+      if (userIsAtBottom) {
+        messagesViewport.scrollTop = messagesViewport.scrollHeight;
+      } else {
+        showNewMsgIndicator();
+      }
+    }
+  });
+
+  levelEventsRef.limitToLast(1).on("child_added", snap => {
+    const id = snap.key;
+    if (levelEventCache[id]) return;
+
+    const data = snap.val();
+    levelEventCache[id] = true;
+
+    insertLevelSeparator({ id, ...data });
   });
 })();
 
 messagesRef.on("child_changed", snap => {
-  const msg = snap.val();
   const id = snap.key;
-  messages[id] = { ...msg, id };
+  const incoming = snap.val();
+  const prev = messages[id] || {};
+  const msg = { ...prev, ...incoming, id };
 
-  if (domCache[id]) {
-    updateMessageElement(messages[id]);
-    refreshAllReplyPreviews();
-    positionActions(domCache[id]);
-    positionIcons(domCache[id]);
-  }
+  messages[id] = msg;
+  const el = domCache[id];
+  if (!el) return;
+
+  updateMessageElement(msg);
+  updateRepliesPointingTo(id);
 });
 
 messagesRef.on("child_removed", snap => {
@@ -795,7 +1146,7 @@ messagesRef.on("child_removed", snap => {
 });
 
 /* ================= LOAD MESSAGES / INFINITE SCROLL ================= */
-let oldestLoadedKey = null;
+/* let oldestLoadedKey = null;
 let isLoadingMore = false;
 
 if (messagesViewport) {
@@ -889,29 +1240,9 @@ function updateLoadOlderVisibility() {
       loadOlderBtn.style.display = "block";
     }
   });
-}
+} */
 
 /* ================= GROUPING & ALIGNMENTS ================= */
-function adjustBubbleAlignment(bubbleEl) {
-  if (!bubbleEl) return;
-  try {
-    const range = document.createRange();
-    range.selectNodeContents(bubbleEl);
-
-    const rects = range.getClientRects();
-    const lines = rects.length || 1;
-
-    bubbleEl.style.textAlign = lines === 1 ? "center" : "left";
-    if (typeof range.detach === "function") range.detach();
-  } catch (err) {
-    bubbleEl.style.textAlign = "left";
-  }
-}
-
-function updateAllBubbleAlignments() {
-  document.querySelectorAll(".bubble").forEach(b => adjustBubbleAlignment(b));
-}
-
 function positionIcons(msgEl) {
   const bubble = msgEl.querySelector(".bubble");
   const profileIcon = msgEl.querySelector(".profile-icon");
@@ -994,13 +1325,78 @@ function scheduleRegroup() {
   }, 50);
 }
 
-function regroupMessages() {
-  const all = [...messagesViewport.querySelectorAll(".msg")];
+function regroupAround(el) {
+  const prev = previousMessage(el);
+  const next = nextMessage(el);
 
-  for (let i = 0; i < all.length; i++) {
-    const cur = all[i];
-    const prev = all[i - 1] || null;
-    const next = all[i + 1] || null;
+  if (prev) regroupSingle(prev);
+  regroupSingle(el);
+  if (next) regroupSingle(next);
+}
+
+function regroupSingle(cur) {
+  if (!cur || !cur.classList.contains("msg")) return;
+
+  const prev = previousMessage(cur);
+  const next = nextMessage(cur);
+
+  const curMsg = messages[cur.dataset.id];
+  const prevMsg = prev ? messages[prev.dataset.id] : null;
+  const nextMsg = next ? messages[next.dataset.id] : null;
+
+  const sameAsPrev = prevMsg && isSameGroup(prevMsg, curMsg);
+  const sameAsNext = nextMsg && isSameGroup(curMsg, nextMsg);
+
+  cur.classList.remove("single", "first-in-group", "grouped", "last-in-group");
+
+  if (!sameAsPrev && !sameAsNext) {
+    cur.classList.add("single");
+    showMeta(cur); showIcon(cur); showTime(cur);
+  } else if (!sameAsPrev && sameAsNext) {
+    cur.classList.add("first-in-group");
+    showMeta(cur); hideIcon(cur); hideTime(cur);
+  } else if (sameAsPrev && sameAsNext) {
+    cur.classList.add("grouped");
+    hideMeta(cur); hideIcon(cur); hideTime(cur);
+  } else {
+    cur.classList.add("last-in-group");
+    hideMeta(cur); showIcon(cur); showTime(cur);
+  }
+
+  positionActions(cur);
+  positionIcons(cur);
+}
+
+function isSeparator(el) {
+  return el?.classList?.contains("level-separator") || el?.classList?.contains("date-separator");
+}
+
+function previousMessage(el) {
+  let p = el.previousElementSibling;
+  while (p) {
+    if (p.classList.contains("msg")) return p;
+    if (isSeparator(p)) return null;
+    p = p.previousElementSibling;
+  }
+  return null;
+}
+
+function nextMessage(el) {
+  let n = el.nextElementSibling;
+  while (n) {
+    if (n.classList.contains("msg")) return n;
+    if (isSeparator(n)) return null;
+    n = n.nextElementSibling;
+  }
+  return null;
+}
+
+function regroupMessages() {
+  const msgs = [...messagesViewport.querySelectorAll(".msg")];
+
+  for (const cur of msgs) {
+    const prev = previousMessage(cur);
+    const next = nextMessage(cur);
 
     const curMsg = messages[cur.dataset.id];
     const prevMsg = prev ? messages[prev.dataset.id] : null;
@@ -1009,9 +1405,9 @@ function regroupMessages() {
     const sameAsPrev = prevMsg && isSameGroup(prevMsg, curMsg);
     const sameAsNext = nextMsg && isSameGroup(curMsg, nextMsg);
 
-    cur.classList.remove("first-in-group", "grouped", "last-in-group");
+    cur.classList.remove("single", "first-in-group", "grouped", "last-in-group" );
 
-    // CASE 1: NOT grouped at all → show all
+    // CASE 1 - Single
     if (!sameAsPrev && !sameAsNext) {
       cur.classList.add("single");
       showMeta(cur);
@@ -1020,7 +1416,7 @@ function regroupMessages() {
       continue;
     }
 
-    // CASE 2: FIRST in group → meta ONLY
+    // CASE 2 - First in group
     if (!sameAsPrev && sameAsNext) {
       cur.classList.add("first-in-group");
       showMeta(cur);
@@ -1029,7 +1425,7 @@ function regroupMessages() {
       continue;
     }
 
-    // CASE 3: MIDDLE in group → hide everything
+    // CASE 3 - Middle in group
     if (sameAsPrev && sameAsNext) {
       cur.classList.add("grouped");
       hideMeta(cur);
@@ -1038,7 +1434,7 @@ function regroupMessages() {
       continue;
     }
 
-    // CASE 4: LAST in group → icon + time only
+    // CASE 4 - Last in group
     if (sameAsPrev && !sameAsNext) {
       cur.classList.add("last-in-group");
       hideMeta(cur);
@@ -1049,12 +1445,233 @@ function regroupMessages() {
   }
 
   requestAnimationFrame(() => {
-    for (let el of all) {
+    for (let el of msgs) {
       positionActions(el);
       positionIcons(el);
     }
   });
 }
+
+/* ================= SETTINGS HANDLER ================= */
+let themeIndex = 0;
+const THEMES_PER_VIEW = 2;
+const TOTAL_PAGES = Math.ceil(THEME_LIST.length / THEMES_PER_VIEW);
+
+function applyTheme(theme) {
+  const root = document.documentElement;
+  root.style.setProperty("--bg", theme.bg);
+  root.style.setProperty("--text1", theme.text1);
+  root.style.setProperty("--text2", theme.text2);
+  root.style.setProperty("--text3", theme.text3);
+  root.style.setProperty("--sidebar", theme.sidebar);
+  root.style.setProperty("--input", theme.input);
+  root.style.setProperty("--inputArea", theme.inputArea);
+  root.style.setProperty("--sendButton", theme.sendButton);
+  root.style.setProperty("--sendButtonHover", theme.sendButtonHover);
+  root.style.setProperty("--sendButtonShadow", theme.sendButtonShadow);
+  root.style.setProperty("--actionMenu", theme.actionMenu);
+  root.style.setProperty("--bubble-me", theme.bubbleMe);
+  root.style.setProperty("--bubble-other", theme.bubbleOther);
+}
+
+function initAccountSettings() {
+  const user = allUsers?.[accountId];
+  if (!user) return;
+
+  accountUsername.textContent = user.username || "Unknown User";
+
+  const level = user.experience?.level || 0;
+  const zxp = user.experience?.zxp || 0;
+  const max = zxpLevel(level);
+
+  levelText.textContent = level;
+  xpText.textContent = `${zxp} / ${max} ZXP`;
+
+  const progress = Math.min((zxp / max), 1);
+  xpFill.style.width = `${progress * 100}%`;
+
+  renderBadgeDropdown(user.badges || {});
+  renderEquippedBadge(allUsers[accountId].badges);
+}
+
+function renderBadgeDropdown(badges) {
+  badgeDropdown.innerHTML = "";
+
+  let equippedBadge = null;
+  const badgeEntries = Object.entries(badges);
+
+  badgeEntries.forEach(([name, equipped]) => {
+    if (equipped) equippedBadge = name;
+
+    const item = document.createElement("div");
+    item.className = "badge-item" + (equipped ? " equipped" : "");
+
+    item.innerHTML = `
+      <img src="../Assets/Badges/${name}.png" />
+      <span>${formatBadgeName(name)}</span>`;
+
+    item.onclick = () => equipBadge(name);
+    badgeDropdown.appendChild(item);
+  });
+
+  if (equippedBadge) {
+    const unequip = document.createElement("div");
+    unequip.className = "badge-item unequip";
+    unequip.innerHTML = `
+      <span class="fas fa-minus-circle"></span>
+      <span>Unequip Badge</span>`;
+    unequip.onclick = () => equipBadge(null);
+    badgeDropdown.appendChild(unequip);
+  }
+}
+
+function renderEquippedBadge(badges) {
+  let equipped = null;
+
+  Object.entries(badges).forEach(([name, state]) => {
+    if (state === true) equipped = name;
+  });
+
+  if (!equipped) {
+    equippedBadgeEl.innerHTML = "None ▾";
+    return;
+  }
+
+  equippedBadgeEl.innerHTML = `
+    <img src="../Assets/Badges/${equipped}.png" class="badge-icon" style="vertical-align: middle;"/>
+    <span>${formatBadgeName(equipped)} ▾</span>`;
+}
+
+async function equipBadge(badgeName) {
+  const updates = {};
+  const userBadges = allUsers?.[accountId]?.badges;
+  if (!userBadges) return;
+
+  Object.keys(userBadges).forEach(b => {
+    updates[`badges/${b}`] = (b === badgeName);
+  });
+
+  await usersRef.child(accountId).update(updates);
+
+  Object.keys(userBadges).forEach(b => {
+    allUsers[accountId].badges[b] = (b === badgeName);
+  });
+
+  settingsUpdate = true;
+  badgeDropdown.classList.add("hidden");
+
+  initAccountSettings();
+}
+
+function initThemeSelector() {
+  const myTheme = allUsers?.[accountId]?.chatTheme || "dark";
+
+  if (THEMES[myTheme])
+    applyTheme(THEMES[myTheme]);
+
+  renderThemeCarousel();
+}
+
+async function renderThemeCarousel() {
+  themeTrack.innerHTML = "";
+  const snap = await usersRef.child(accountId).child("chatTheme").once("value");
+  const currentTheme = snap.val() || "dark";
+
+  THEME_LIST.forEach(theme => {
+    const card = document.createElement("div");
+    card.className = "theme-card";
+    card.dataset.theme = theme.id;
+
+    if (theme.id === currentTheme) {
+      card.classList.add("selected");
+    }
+
+    card.innerHTML = `
+      <img src="../Assets/Themes/${theme.img}" />
+      <div class="theme-name">${theme.label}</div>
+    `;
+
+    card.onclick = async () => {
+      if (!THEMES[theme.id]) return;
+
+      applyTheme(THEMES[theme.id]);
+
+      await usersRef.child(accountId).update({
+        chatTheme: theme.id
+      });
+
+      document
+        .querySelectorAll(".theme-card")
+        .forEach(c => c.classList.remove("selected"));
+
+      card.classList.add("selected");
+    };
+
+    themeTrack.appendChild(card);
+  });
+
+  updateThemePosition();
+}
+
+function updateThemePosition() {
+  const card = themeTrack.querySelector(".theme-card");
+  if (!card) return;
+
+  const cardWidth = card.offsetWidth;
+  const gap = 22;
+  const pageWidth = (cardWidth + gap) * THEMES_PER_VIEW;
+
+  themeTrack.style.transform = `translateX(-${themeIndex * pageWidth}px)`;
+}
+
+badgeButton.onclick = () => {
+  badgeDropdown.classList.toggle("hidden");
+};
+
+themePrev.onclick = () => {
+  themeIndex = Math.max(0, themeIndex - 1);
+  updateThemePosition();
+};
+
+themeNext.onclick = () => {
+  themeIndex = Math.min(TOTAL_PAGES - 1, themeIndex + 1);
+  updateThemePosition();
+};
+
+themeSelect.addEventListener("change", async () => {
+  const themeName = themeSelect.value;
+  if (!THEMES[themeName]) return;
+
+  applyTheme(THEMES[themeName]);
+
+  await usersRef.child(accountId).update({ chatTheme: themeName });
+});
+
+document.addEventListener("click", e => {
+  if (!e.target.closest(".badge-selector")) {
+    badgeDropdown.classList.add("hidden");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  settingsBtn.addEventListener("click", () => {
+    initAccountSettings();
+    settingsModal.classList.remove("hidden");
+  });
+
+  closeSettings.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+    
+    if (settingsUpdate) location.reload();
+  });
+
+  settingsModal.addEventListener("click", (e) => {
+    if (e.target === settingsModal) {
+      settingsModal.classList.add("hidden");
+      if (settingsUpdate) location.reload();
+    }
+  });
+});
 
 /* ================= ACTION MENU HANDLER ================= */
 function attachActionHandlers(el, id, data) {
@@ -1300,7 +1917,6 @@ function renderReactions(msgEl, data) {
     badge.dataset.emoji = emoji;
     badge.innerHTML = `${emoji} <span>${users.length}</span>`;
 
-    badge.onclick = () => toggleReaction(msgEl, emoji);
     container.appendChild(badge);
   });
 }
@@ -1578,7 +2194,6 @@ function hideNewMsgIndicator() {
 }
 
 function updateAllActionPositions() {
-  requestAnimationFrame(updateAllBubbleAlignments);
   document.querySelectorAll(".msg").forEach(positionActions);
   document.querySelectorAll(".msg").forEach(positionIcons);
 }
@@ -1589,7 +2204,6 @@ function chatSideBar() {
   const sidebarBackdrop = document.getElementById("sidebar-backdrop");
 
   if (!sidebar || !toggleBtn) {
-    console.warn("chatSideBar: sidebar or toggle button not found");
     return;
   }
 
@@ -1657,9 +2271,8 @@ function enableSwipeToReply(msgEl) {
   let swiping = false;
   const isMine = msgEl.classList.contains("me");
 
-  // Make swipe LESS sensitive (increase threshold)
-  const TRIGGER_DISTANCE = 120;     // was 60
-  const MAX_DRAG = 80;              // still allows a bit of movement
+  const TRIGGER_DISTANCE = 120;
+  const MAX_DRAG = 60; // 80
 
   msgEl.addEventListener("touchstart", e => {
     startX = e.touches[0].clientX;
@@ -1668,19 +2281,15 @@ function enableSwipeToReply(msgEl) {
 
   msgEl.addEventListener("touchmove", e => {
     if (!swiping) return;
-
     const deltaX = e.touches[0].clientX - startX;
 
-    // --- BLOCK opposite direction completely ---
-    if (isMine && deltaX > 0) return;      // mine → can't swipe right
-    if (!isMine && deltaX < 0) return;     // others → can't swipe left
+    if (isMine && deltaX > 0) return;
+    if (!isMine && deltaX < 0) return;
 
-    // --- Allow slight drag (visual feedback) ---
     if (Math.abs(deltaX) < MAX_DRAG) {
       msgEl.style.transform = `translateX(${deltaX}px)`;
     }
 
-    // --- Trigger swipe-to-reply ---
     if (!isMine && deltaX > TRIGGER_DISTANCE) {
       swiping = false;
       triggerReplySwipe(msgEl, deltaX);
@@ -1713,25 +2322,6 @@ document.addEventListener("click", (ev) => {
     if (typeof hideReactionPicker === "function") hideReactionPicker();
     if (typeof closeAllMenus === "function") closeAllMenus();
 }, true);
-
-document.addEventListener("DOMContentLoaded", () => {
-  const settingsModal = document.getElementById("settingsModal");
-  const settingsBtn = document.getElementById("sidebarSettingsBtn");
-  const closeSettings = document.getElementById("closeSettings");
-
-  settingsBtn.addEventListener("click", () => {
-    settingsModal.classList.remove("hidden");
-  });
-
-  closeSettings.addEventListener("click", () => {
-    settingsModal.classList.add("hidden");
-  });
-
-  settingsModal.addEventListener("click", (e) => {
-    if (e.target === settingsModal) settingsModal.classList.add("hidden");
-  });
-
-});
 
 window.addEventListener('resize', () => {
   if (resizeTimer) cancelAnimationFrame(resizeTimer);
@@ -1777,7 +2367,7 @@ async function join(name, restoredInfo = null) {
     const entries = Object.values(list);
     const count = entries.length;
 
-    if (whoEl) whoEl.innerHTML = "";
+    if (presenceEl) presenceEl.innerHTML = "";
     if (onlineCountEl) onlineCountEl.textContent = count + " online";
 
     for (const p of entries) {
@@ -1793,16 +2383,17 @@ async function join(name, restoredInfo = null) {
 
       el.innerHTML = `
       <div class="presence-left">
-        <img class="presence-icon" src="../Assets/${icon}.png" />
+        <img class="presence-icon" src="../Assets/Icons/${icon}.png" />
         <div class="presence-name">${escapeHtml(name)}</div>
       </div>`;
 
-      whoEl.appendChild(el);
+      presenceEl.appendChild(el);
     }
   });
 
   const userRef = usersRef.child(accountId);
   const snap = await userRef.once("value");
+  const userData = snap.val();
 
   if (!snap.exists()) {
     if (!restoredInfo) {
@@ -1810,7 +2401,7 @@ async function join(name, restoredInfo = null) {
       const payload = {
         accountId,
         username: displayName,
-        chatTheme: "light",
+        chatTheme: "dark",
         profileIcon: "default",
 
         experience: {
@@ -1844,13 +2435,21 @@ async function join(name, restoredInfo = null) {
     console.log("[JOIN] user:", snap.val());
   }
 
+  if (userData?.chatTheme && THEMES[userData.chatTheme]) {
+    applyTheme(THEMES[userData.chatTheme]);
+  } else {
+    applyTheme(THEMES.dark);
+  }
+
   await usersRef.child(accountId).update({ lastActive: Date.now() });
   console.log("[JOIN] complete — accountId active:", accountId);
 }
 
 async function restoreWithCode(code) {
+  recoveryErrorEl.textContent = "";
+
   if (!code || typeof code !== "string") {
-    alert("Enter a recovery code.");
+    recoveryErrorEl.textContent = "Please enter a recovery code to proceed.";
     return;
   }
 
@@ -1861,7 +2460,7 @@ async function restoreWithCode(code) {
     const snap = await idxRef.once("value");
 
     if (!snap.exists()) {
-      alert("Invalid recovery code.");
+      recoveryErrorEl.textContent = "Invalid recovery code.";
       return;
     }
 
@@ -1872,7 +2471,7 @@ async function restoreWithCode(code) {
     console.log("[RESTORE] usersRef lookup exists:", userSnap.exists());
 
     if (!userSnap.exists()) {
-      alert("This account no longer exists.");
+      recoveryErrorEl.textContent = "This account no longer exists. Create a new one to continue.";
       return;
     }
 
@@ -1891,7 +2490,7 @@ async function restoreWithCode(code) {
     if (promptEl) promptEl.style.display = "none";
     await join(displayName, restoredInfo);
 
-    alert("Account restored — now using accountId: " + accountId);
+    alert("Account Successfully Restored");
     location.reload();
   } catch (err) {
     console.error("[RESTORE] restoreWithCode ERROR:", err);
@@ -1944,8 +2543,31 @@ function generateRecoveryCode(len = 8) {
   return out;
 }
 
-joinBtn && (joinBtn.onclick = () => {
-  const n = promptName.value || displayName || "Guest";
+joinBtn && (joinBtn.onclick = async () => {
+  let n = promptName.value.trim();
+  promptErrorEl.textContent = "";
+
+  if (n.length < 3) {
+    promptErrorEl.textContent = "Username must be at least 3 characters.";
+    return;
+  }
+  if (n.length > 15) {
+    promptErrorEl.textContent = "Username must be at most 15 characters.";
+    return;
+  }
+
+  try {
+    const snap = await usersRef.orderByChild("username").equalTo(n).once("value");
+    if (snap.exists()) {
+      promptErrorEl.textContent = "That username is already taken.";
+      return;
+    }
+  } catch (err) {
+    console.error("[JOIN] Username check failed:", err);
+    promptErrorEl.textContent = "Error checking username. Try again.";
+    return;
+  }
+
   join(n);
 });
 
