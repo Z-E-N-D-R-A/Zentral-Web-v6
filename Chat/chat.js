@@ -386,13 +386,11 @@ const ZXP_PER_MESSAGE = 5;
 const HEAT_MAX = 100;
 const HEAT_PER_MESSAGE = 25;
 const HEAT_DECAY_PER_SECOND = 15;
-const LOCAL_TIMEOUT_MS = 15_000; // 15 seconds
 
 const PAGE_SIZE = 50;
 const LOAD_THRESHOLD = 300;
 const ICONS_PER_PAGE = 8;
 const THEMES_PER_PAGE = 2;
-const TOTAL_PAGES = Math.ceil(THEME_LIST.length / THEMES_PER_PAGE);
 
 let originalText = "";
 let editingId = null;
@@ -1332,10 +1330,9 @@ function updateCharLimitIndicator() {
 function updateIndicatorRow() {
   const row = document.getElementById("indicatorRow");
   const typing = document.getElementById("typingIndicator");
-  const warning = document.getElementById("warningIndicator");
   const charLimit = document.getElementById("charLimitIndicator");
 
-  const visible = typing.classList.contains("show") || charLimit.classList.contains("show") || warning.classList.contains("show");
+  const visible = typing.classList.contains("show") || charLimit.classList.contains("show");
   row.classList.toggle("active", visible);
 }
 
@@ -1368,6 +1365,19 @@ newMsgIndicator.onclick = () => {
 };
 
 messagesEl.addEventListener("click", e => {
+  const bubble = e.target.closest(".reply-bubble");
+  if (!bubble) return;
+
+  const targetId = bubble.dataset.replyJump;
+  if (!targetId) return;
+
+  const targetEl = document.getElementById("msg-" + targetId);
+  if (!targetEl) return;
+
+  targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+
+messagesEl.addEventListener("pointerup", e => {
   const bubble = e.target.closest(".reply-bubble");
   if (!bubble) return;
 
@@ -1691,7 +1701,9 @@ function updateTimeoutText(until) {
   const hours = Math.floor(totalSeconds / 3600);
 
   const timeLeft = hours > 0 ? `${hours}h ${minutes}m ${seconds}s` : `${minutes}m ${seconds}s`;
-  timeoutEndEl.textContent =  `${timeLeft} (till ${new Date(until).toLocaleString().replace(",", "")})`;
+  const till = new Date(until).toLocaleString().replace(",", "");
+
+  timeoutEndEl.innerHTML = `${timeLeft} <span class="timeout-till">(till ${till})</span>`;
 }
 
 function enableBannedUI() {
@@ -1754,6 +1766,67 @@ function forceLogout(reason) {
   alert(reason);
   firebase.auth().signOut();
   location.reload();
+}
+
+/* ================= HEAT SPAM SYSTEM ================= */
+function applyHeat(amount) {
+  const now = Date.now();
+  const delta = now - heatSystem.lastAction;
+  heatSystem.lastAction = now;
+
+  if (delta < 2000) amount *= 2.3;
+  else if (delta < 3000) amount *= 2.8;
+  else if (delta < 4000) amount *= 1.2;
+
+  heatSystem.heat = Math.min(heatSystem.maxHeat, heatSystem.heat + amount);
+
+  // updateHeatUI();
+
+  /* if (window.innerWidth >= 900) {
+    if (heatSystem.heat >= 80 && heatSystem.heat < 100) {
+      warningIndicator.textContent = `⚠️ Slow down or you may be timed out.`;
+      warningIndicator.classList.add("show");
+      updateIndicatorRow();
+      setTimeout(() => {
+        warningIndicator.textContent = "";
+        warningIndicator.classList.remove("show");
+        updateIndicatorRow();
+      }, 8000);
+    }
+} */
+
+  if (heatSystem.heat >= 100) {
+    triggerTimeout();
+  }
+}
+
+function updateHeatUI() {
+  const pct = Math.min(100, heatSystem.heat);
+  document.getElementById("heat-fill").style.width = pct + "%";
+  document.getElementById("heat-percent").textContent = Math.round(pct) + "%";
+}
+
+async function triggerTimeout() {
+  let duration;
+  if (heatSystem.heat < 140) duration = 60_000;
+  else if (heatSystem.heat < 200) duration = 5 * 60_000; // 5 min
+  else if (heatSystem.heat < 260) duration = 10 * 60_000; // 10 min
+  else duration = 60 * 60_000;
+
+  heatSystem.heat *= 0.8;
+  const until = Date.now() + duration;
+  heatSystem.lockedUntil = until;
+
+  await usersRef.child(accountId).update({ timeout: until });
+
+  moderationLogsRef.push({
+    moderation: "spam",
+    durations: duration,
+    accountId,
+    time: Date.now()
+  });
+
+  alert(`You have been timed out for ${Math.round(duration / 60000)} minute(s).`);
 }
 
 /* ================= SETTINGS HANDLER ================= */
@@ -1893,10 +1966,14 @@ function equipIcon(iconName) {
 
 async function renderThemePage() {
   themeTrack.innerHTML = "";
+
   const snap = await usersRef.child(accountId).child("chatTheme").once("value");
   const currentTheme = snap.val() || "dark";
 
-  THEME_LIST.forEach(theme => {
+  const start = themeIndex * THEMES_PER_PAGE;
+  const pageThemes = THEME_LIST.slice(start, start + THEMES_PER_PAGE);
+
+  pageThemes.forEach(theme => {
     const card = document.createElement("div");
     card.className = "theme-card";
     card.dataset.theme = theme.id;
@@ -1906,7 +1983,7 @@ async function renderThemePage() {
     }
 
     card.innerHTML = `
-      <img src="../Assets/Themes/${theme.img}" />
+      <img src="../Assets/Themes/${theme.img}">
       <div class="theme-name">${theme.label}</div>`;
 
     card.onclick = async () => {
@@ -1922,18 +1999,10 @@ async function renderThemePage() {
     themeTrack.appendChild(card);
   });
 
-  updateThemePosition();
-}
+  const maxPage = Math.ceil(THEME_LIST.length / THEMES_PER_PAGE) - 1;
 
-function updateThemePosition() {
-  const card = themeTrack.querySelector(".theme-card");
-  if (!card) return;
-
-  const cardWidth = card.offsetWidth;
-  const gap = 22;
-  const pageWidth = (cardWidth + gap) * THEMES_PER_PAGE;
-
-  themeTrack.style.transform = `translateX(-${themeIndex * pageWidth}px)`;
+  document.getElementById("themePrev").disabled = themeIndex <= 0;
+  document.getElementById("themeNext").disabled = themeIndex >= maxPage;
 }
 
 async function fetchRecoveryCode() {
@@ -1981,13 +2050,18 @@ badgeButton.onclick = () => {
 };
 
 themePrev.onclick = () => {
-  themeIndex = Math.max(0, themeIndex - 1);
-  updateThemePosition();
+  if (themeIndex > 0) {
+    themeIndex--;
+    renderThemePage();
+  }
 };
 
 themeNext.onclick = () => {
-  themeIndex = Math.min(TOTAL_PAGES - 1, themeIndex + 1);
-  updateThemePosition();
+  const maxPage = Math.ceil(THEME_LIST.length / THEMES_PER_PAGE) - 1;
+  if (themeIndex < maxPage) {
+    themeIndex++;
+    renderThemePage();
+  }
 };
 
 iconPrev.onclick = () => {
@@ -2004,14 +2078,6 @@ iconNext.onclick = () => {
     renderIconPage();
   }
 };
-
-themeSelect.addEventListener("change", async () => {
-  const themeName = themeSelect.value;
-  if (!THEMES[themeName]) return;
-
-  applyTheme(THEMES[themeName]);
-  await usersRef.child(accountId).update({ chatTheme: themeName });
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   settingsBtn.addEventListener("click", () => {
@@ -2625,6 +2691,7 @@ messagesViewport?.addEventListener("scroll", () => {
   clearTimeout(tooltipPressTimer);
 
   hideReactionTooltip();
+  hideBadgeTooltip();
   closeReactionPicker();
 }, { passive: true });
 
@@ -2991,68 +3058,10 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-/* ================= HEAT MODERATION SYSTEM ================= */
-function applyHeat(amount) {
-  const now = Date.now();
-  const delta = now - heatSystem.lastAction;
-  heatSystem.lastAction = now;
-
-  if (delta < 2000) amount *= 2.3;
-  else if (delta < 3000) amount *= 2.8;
-  else if (delta < 4000) amount *= 1.2;
-
-  heatSystem.heat = Math.min(heatSystem.maxHeat, heatSystem.heat + amount);
-
-  updateHeatUI();
-
-  if (heatSystem.heat >= 80 && heatSystem.heat < 100) {
-    warningIndicator.textContent = `⚠️ Slow down or you may be timed out.`;
-    warningIndicator.classList.add("show");
-    updateIndicatorRow();
-    setTimeout(() => {
-      warningIndicator.textContent = "";
-      warningIndicator.classList.remove("show");
-      updateIndicatorRow();
-    }, 8000);
-  }
-
-  if (heatSystem.heat >= 100) {
-    triggerTimeout();
-  }
-}
-
-function updateHeatUI() {
-  const pct = Math.min(100, heatSystem.heat);
-  document.getElementById("heat-fill").style.width = pct + "%";
-  document.getElementById("heat-percent").textContent = Math.round(pct) + "%";
-}
-
-async function triggerTimeout() {
-  let duration;
-  if (heatSystem.heat < 140) duration = 30_000;
-  else if (heatSystem.heat < 200) duration = 5 * 60_000; // 5 min
-  else if (heatSystem.heat < 260) duration = 10 * 60_000; // 10 min
-  else duration = 60 * 60_000;
-
-  heatSystem.heat *= 0.8;
-  const until = Date.now() + duration;
-  heatSystem.lockedUntil = until;
-
-  await usersRef.child(accountId).update({ timeout: until });
-
-  moderationLogsRef.push({
-    moderation: "spam",
-    accountId,
-    time: Date.now()
-  });
-
-  alert(`You have been timed out for ${Math.round(duration / 60000)} minutes.`);
-}
-
 setInterval(() => {
   if (heatSystem.heat > 0) {
     heatSystem.heat = Math.max(0, heatSystem.heat - heatSystem.decayRate);
-    updateHeatUI();
+    // updateHeatUI();
   }
 }, 1000);
 
@@ -3065,78 +3074,3 @@ setInterval(() => {
     if (!el.classList.contains("hidden")) el.textContent = timeAgo(ts);
   }
 }, 30000);
-
-const spacer = document.getElementById("keyboardSpacer");
-const messagesScroll = document.querySelector(".messages-scroll");
-const chatArea = document.getElementById("chat-area");
-
-let lastViewportHeight = window.visualViewport?.height || window.innerHeight;
-
-function handleViewportResize() {
-  if (!window.visualViewport) return;
-
-  const viewport = window.visualViewport;
-  const keyboardHeight = Math.max(
-    0,
-    window.innerHeight - viewport.height - viewport.offsetTop
-  );
-
-  if (keyboardHeight > 100) {
-    // Move chat up instead of padding
-    chatArea.style.transform = `translateY(-${keyboardHeight}px)`;
-
-    // Keep messages pinned to bottom
-    requestAnimationFrame(() => {
-      messagesScroll.scrollTop = messagesScroll.scrollHeight;
-    });
-  } else {
-    chatArea.style.transform = "";
-  }
-}
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", handleViewportResize);
-}
-
-document.getElementById("messageInput").addEventListener("focus", () => {
-  setTimeout(() => {
-    messagesScroll.scrollTop = messagesScroll.scrollHeight;
-  }, 50);
-});
-
-let scrollLockY = 0;
-
-function lockScroll() {
-  scrollLockY = window.scrollY;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollLockY}px`;
-  document.body.style.width = "100%";
-}
-
-function unlockScroll() {
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.width = "";
-  window.scrollTo(0, scrollLockY);
-}
-
-const input = document.getElementById("messageInput");
-
-input.addEventListener("focus", () => {
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    lockScroll();
-  }
-});
-
-input.addEventListener("blur", () => {
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    unlockScroll();
-  }
-});
-
-input.addEventListener("focus", () => {
-  setTimeout(() => {
-    handleViewportResize();
-    messagesScroll.scrollTop = messagesScroll.scrollHeight;
-  }, 100);
-});
