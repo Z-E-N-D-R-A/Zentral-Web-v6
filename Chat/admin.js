@@ -165,6 +165,16 @@ function renderModerationLogs(id, log) {
         <div><strong>Reported By:</strong> <span>${allUsers?.[log.reporterId]?.username || log.reporterId}</span></div>
       </div>`;
   }
+  
+  if (log.moderation === "spam") {
+    username = allUsers?.[log.accountId]?.username || "Unknown User";
+    messageText = "N/A"
+
+    extraDetails = `
+    <div class="mod-extra">
+        <div><strong>Action:</strong> <span>Timeout (${log.durations > 60000 ?  (log.durations/60000) + " minutes" : (log.durations/60000) + " minute"})</span></div>
+    </div>`;
+   }
 
   row.innerHTML = `
     <div class="mod-left">
