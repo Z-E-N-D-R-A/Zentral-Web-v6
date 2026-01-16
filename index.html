@@ -55,14 +55,14 @@
     <img src="Assets/Image_1.png" alt="Channel" class="hiddenTrans slide-left">
     <div class="text slide-right hiddenTrans">
       <h2>About Me</h2>
-      <p>Hey! I'm ゼンダ・クレイジー (Zenda Kureiji), or just call me <b>Zendra</b>.<br>Blah blah blah...</p>
+      <p>Hey, I'm ゼンダ ・ クレイジー! You can call me Zendra for short. I am a creator who believes in breaking personal boundaries to achieve perfection. I create not just to entertain, but to inspire others to embrace their own "crazy".</p>
     </div>
   </section>
 
   <section class="content">
     <div class="text slide-left hiddenTrans">
-      <h2 class="right-aligned">Zentralverse</h2>
-      <p class="right-aligned">Yada yada noise cancellation...</p>
+      <h2 class="right-aligned">About Zentralverse</h2>
+      <p class="right-aligned">Zentralverse is a fandom where "Zentrals" unite to celebrate a shared spirit of energy and creativity. It is a global sanctuary of belonging where individuality is the standard and being yourself is your greatest strength. By being here, you are already part of a powerful collective that transcends borders.</p>
     </div>
     <img src="Assets/Image_2.png" alt="Community" class="hiddenTrans slide-right">
   </section>
@@ -81,42 +81,36 @@
 
   <footer id="contact">
     <div class="footer-socials">
-      <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-      <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-      <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-      <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fa-brands fa-discord"></i></a>
-      <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-      <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+      <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+      <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+      <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+      <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+      <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
     </div>
-    2025 Zentral-Web | Powered by KuraWorks
+    2026 Zentral-Web | Powered by KuraWorks
   </footer>
 
   <script>
-    /* -------- Scroll-triggered animations -------- */
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('show');
-      });
-    }, { threshold: 0.2 });
-    document.querySelectorAll('.hiddenTrans').forEach(el => observer.observe(el));
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', event => {
+      if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+        event.preventDefault();
+      }
+    });
 
-    /* --- Social buttons pop-in --- */
-    const socialBtns = document.querySelectorAll('.social-btn');
-    const socialObserver = new IntersectionObserver((entries) => {
+    /* -------- Page Animations -------- */
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          socialBtns.forEach((btn, i) => {
-            setTimeout(() => {
-              btn.style.animation = `popIn 0.4s ease forwards`;
-            }, i * 150);
-          });
-          socialObserver.unobserve(entry.target);
+          entry.target.classList.add('show');
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.3 });
-    socialObserver.observe(document.querySelector('.social-buttons'));
-    
-    /* --- Title fade-in --- */
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.hiddenTrans').forEach(el => observer.observe(el));
+
     const titleObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -127,21 +121,47 @@
     }, { threshold: 0.3 });
     titleObserver.observe(document.querySelector('.social-title'));
 
+    const socialObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
 
-    /* -------- Parallax Background -------- */
+        document.querySelectorAll('.social-btn').forEach((btn, i) => {
+          btn.style.animationDelay = `${i * 150}ms`;
+          btn.classList.add('pop');
+        });
+
+        socialObserver.disconnect();
+      });
+    }, { threshold: 0.3 });
+
+    socialObserver.observe(document.querySelector('.social-buttons'));
+
+    const heroBg = document.querySelector('.hero-bg');
+    const heroSection = document.querySelector('.hero');
+    let ticking = false;
+    let heroVisible = true;
+
+    const heroObserver = new IntersectionObserver(entries => {
+      heroVisible = entries[0].isIntersecting;
+    }, { threshold: 0 });
+
+    heroObserver.observe(heroSection);
+
     window.addEventListener('scroll', () => {
-      const bg = document.querySelector('.hero-bg');
-      bg.style.transform = `translateY(${window.scrollY * 0.3}px) scale(1.05)`;
-    });
+      if (!heroVisible || ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { heroBg.style.transform = `translate3d(0, ${window.scrollY * 0.3}px, 0) scale(1.05)`;
+        ticking = false;
+      });
+    }, { passive: true });
 
-    /* -------- Staggered Text Reveal -------- */
-    window.addEventListener('load', () => {
+    window.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.reveal-text').forEach((el, i) => {
-        setTimeout(() => el.classList.add('visible'), i * 300);
+        el.style.animationDelay = `${i * 300}ms`;
+        el.classList.add('visible');
       });
     });
 
-    /* -------- Smooth Scroll -------- */
     document.getElementById('exploreBtn').addEventListener('click', () => {
       document.querySelector('#about').scrollIntoView({ behavior: 'smooth' });
     });
@@ -197,7 +217,7 @@
       const pct = Math.min(y / 300, 1);
       headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
       headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
-      
+
       if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
     });
 

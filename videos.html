@@ -59,118 +59,130 @@
     <section class="suggested" id="suggestedSection"></section>
   
     <section class="videos-gallery">
-      <h2>Recent Videos</h2>
+      <h2 id="videos-title">Recent Videos</h2>
       <div id="videoGrid" class="video-grid"></div>
     </section>
-
+    
     <footer>
-      <div class="footer-socials">
-        <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-        <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-        <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fa-brands fa-discord"></i></a>
-        <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-        <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
-      </div>
-      2025 Zentral-Web | Powered by KuraWorks
+        <div class="footer-socials">
+          <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+          <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+          <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+          <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+          <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+          <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
+        </div>
+        2026 Zentral-Web | Powered by KuraWorks
     </footer>
   
     <script>
-      const YT_API_KEY = "AIzaSyASpo1GSqi3cEgjFnL-Th0VPvvzdSoKFQI";
-      const CHANNEL_ID = "UCaWAxGQH0nU3w5PXDppmcvQ";
-  
-      /* -------- Fetch YouTube Data -------- */
-      async function updateYouTubeStats() {
-        try {
-          const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${YT_API_KEY}`);
-          const data = await res.json();
-          const stats = data.items[0].statistics;
-          animateCount("ytCount", Number(stats.subscriberCount));
-        } catch (err) {
-          console.error("YouTube API Error:", err);
-        }
+      /* -------- Animate Count -------- */
+      const YAK = "AIzaSyBCtzknAcH5qynOqexUD-szsNYcCKfR7Sk";
+      const YCI = "UCaWAxGQH0nU3w5PXDppmcvQ";
+      function initFollowerCounts() {
+        updateYouTubeStats();
+        animateCount("igCount", 1300);
+        animateCount("tiktokCount", 1350);
       }
 
-      /* -------- Animate Count -------- */
       function animateCount(id, target) {
-        let count = 0;
         const el = document.getElementById(id);
+        if (!el) return;
+
+        let count = 0;
         const increment = target / 50;
+        
         const timer = setInterval(() => {
           count += increment;
           el.textContent = Math.floor(count).toLocaleString();
-          if (count >= target) clearInterval(timer);
+          
+          if (count >= target) {
+            el.textContent = target.toLocaleString();
+            clearInterval(timer);
+          }
         }, 40);
       }
-  
-      function initFollowerCounts() {
-        updateYouTubeStats();
-        animateCount("igCount", 1055);
-        animateCount("tiktokCount", 1391);
+
+      async function updateYouTubeStats() {
+        try {
+          const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${YCI}&key=${YAK}`);
+          const data = await res.json();
+          if (!data.items || !data.items.length) {
+            animateCount("ytCount", 1000);
+            return;
+          }
+
+          const stats = data.items[0].statistics;
+          animateCount("ytCount", Number(stats.subscriberCount));
+        } catch (err) {
+          console.log("YouTube Stats Loading Error: " + err);
+        }
       }
       
+      /* -------- Suggested Contents -------- */
       async function loadSuggestedData() {
-          const videoId = "a0kRmWHs-H0";
-          const playlistId = "PLE9_yXA2umvKX27H9yC5u4xE8aQ0wXH4L";
-          const section = document.getElementById("suggestedSection");
-          section.innerHTML = "";
+        const videoId = "jDHrCU9Q0ME";
+        const playlistId = "PLE9_yXA2umvKX27H9yC5u4xE8aQ0wXH4L";
+        const section = document.getElementById("suggestedSection");
+        section.innerHTML = "";
 
-          const [videoRes, playlistRes] = await Promise.all([
-            fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${YT_API_KEY}`),
-            fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${playlistId}&key=${YT_API_KEY}`)
-          ]);
+        const [videoRes, playlistRes] = await Promise.all([
+          fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${YAK}`),
+          fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${playlistId}&key=${YAK}`)
+        ]);
 
-          const videoData = await videoRes.json();
-          const playlistData = await playlistRes.json();
+        const videoData = await videoRes.json();
+        const playlistData = await playlistRes.json();
 
-          /* === Suggested Video === */
-          if (videoData.items && videoData.items.length) {
-            const v = videoData.items[0];
-            const videoUrl = `https://youtu.be/${videoId}`;
-            const videoHTML = `
-            <div class="suggested-content">
-              <h2>Suggested Video</h2>
-              <div class="suggested-thumbnail" data-url="${videoUrl}">
-                <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${v.snippet.title}">
-                <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
-              </div>
-              <div class="suggested-info">
-                <h3>${v.snippet.title}</h3>
-                <p>Uploaded ${timeAgo(v.snippet.publishedAt)} • Video</p>
-              </div>
-            </div>`;
-            section.insertAdjacentHTML("beforeend", videoHTML);
-          }
+        if (!videoData.items || !videoData.items.length) return;
+        if (!playlistData.items || !playlistData.items.length) return;
 
-          /* === Suggested Playlist === */
-          if (playlistData.items && playlistData.items.length) {
-            const p = playlistData.items[0];
-            const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
-            const playlistThumb = "https://img.youtube.com/vi/rQo1wFpkcmc/hqdefault.jpg";
-            const playlistHTML = `
-            <div class="suggested-content">
-              <h2>Suggested Playlist</h2>
-              <div class="suggested-thumbnail playlist" data-url="${playlistUrl}">
-                <div class="playlist-stack first"></div>
-                <div class="playlist-stack second"></div>
-                <img src="${playlistThumb}" alt="${p.snippet.title}">
-                <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
-              </div>
-              <div class="suggested-info">
-                <h3>${p.snippet.title}</h3>
-                <p>${p.contentDetails.itemCount} videos • Playlist</p>
-              </div>
-            </div>`;
-            section.insertAdjacentHTML("beforeend", playlistHTML);
-          }
-
-          document.querySelectorAll('.suggested-thumbnail').forEach(thumb => {
-            thumb.addEventListener('click', () => {
-              const url = thumb.getAttribute('data-url');
-              window.open(url, '_blank');
-            });
-          });
+        if (videoData.items && videoData.items.length) {
+          const v = videoData.items[0];
+          const videoUrl = `https://youtu.be/${videoId}`;
+          const videoHTML = `
+          <div class="suggested-content">
+            <h2>Suggested Video</h2>
+            <div class="suggested-thumbnail" data-url="${videoUrl}">
+              <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${v.snippet.title}">
+              <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
+            </div>
+            <div class="suggested-info">
+              <h3>${v.snippet.title}</h3>
+              <p>Uploaded ${timeAgo(v.snippet.publishedAt)} • Video</p>
+            </div>
+          </div>`;
+          section.insertAdjacentHTML("beforeend", videoHTML);
         }
+
+        if (playlistData.items && playlistData.items.length) {
+          const p = playlistData.items[0];
+          const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
+          const playlistThumb = "https://img.youtube.com/vi/rQo1wFpkcmc/hqdefault.jpg";
+          const playlistHTML = `
+          <div class="suggested-content">
+            <h2>Suggested Playlist</h2>
+            <div class="suggested-thumbnail playlist" data-url="${playlistUrl}">
+              <div class="playlist-stack first"></div>
+              <div class="playlist-stack second"></div>
+              <img src="${playlistThumb}" alt="${p.snippet.title}">
+              <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
+            </div>
+            <div class="suggested-info">
+              <h3>${p.snippet.title}</h3>
+              <p>${p.contentDetails.itemCount} videos • Playlist</p>
+            </div>
+          </div>`;
+          section.insertAdjacentHTML("beforeend", playlistHTML);
+        }
+
+        document.querySelectorAll('.suggested-thumbnail').forEach(thumb => {
+          thumb.addEventListener('click', () => {
+            const url = thumb.getAttribute('data-url');
+            window.open(url, '_blank');
+          });
+        });
+      }
   
       function timeAgo(dateString) {
         const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
@@ -182,48 +194,81 @@
         return "Just now";
       }
   
-      /* -------- Fetch YouTube Videos -------- */
-      const numVideos = 12;
+      /* -------- Recent Videos -------- */
+      let videosLoaded = false;
+      const numVideos = 18;
       async function loadYouTubeVideos() {
         try {
-          const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${YT_API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=${numVideos}`);
+          if (videosLoaded) return;
+          videosLoaded = true;
+
+          const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${YAK}&channelId=${YCI}&part=snippet,id&order=date&maxResults=${numVideos}`);
           const data = await res.json();
-          const videoGrid = document.getElementById("videoGrid");
-  
-          for (const item of data.items) {
-              if (item.id.kind === "youtube#video") {
-                  const videoId = item.id.videoId;
-                  const title = item.snippet.title;
-                  const thumbnail = item.snippet.thumbnails.medium.url;
-                  const publishedAt = item.snippet.publishedAt;
-
-                  const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=${YT_API_KEY}`);
-                  const statsData = await statsRes.json();
-                  const views = statsData.items[0]?.statistics?.viewCount || 0;
-
-                  const card = document.createElement("div");
-                  card.className = "video-card";
-                  card.style.cursor = "pointer";
-
-                  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-                  card.innerHTML = `<div class="video-thumb"><img src="${thumbnail}" alt="${title}"></div><div class="video-info"><h4>${title}</h4><p>${Number(views).toLocaleString()} views • ${timeAgo(publishedAt)}</p></div>`;
-
-                  card.addEventListener("click", () => {
-                      window.open(videoUrl, "_blank");
-                  });
-
-                  videoGrid.appendChild(card);
-              }
+          if (!data.items || !data.items.length) {
+            document.getElementById("videos-title").innerHTML = "Unable to load videos. Please try again later.";
+            document.getElementById("videos-title").style.fontSize = "15px";
+            return;
           }
+
+          const videoGrid = document.getElementById("videoGrid");
+          videoGrid.innerHTML = "";
+          
+          const videoItems = data.items.filter(i => i.id.kind === "youtube#video");
+          const videoIds = videoItems.map(i => i.id.videoId).join(",");
+
+          const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${YAK}`);
+          const statsData = await statsRes.json();
+          const statsMap = {};
+          statsData.items.forEach(v => { statsMap[v.id] = v.statistics; });
+
+          const fragment = document.createDocumentFragment();
+          
+          for (const item of videoItems) {
+            const videoId = item.id.videoId;
+            const title = item.snippet.title;
+            const thumbnail = item.snippet.thumbnails.medium.url;
+            const publishedAt = item.snippet.publishedAt;
+            const views = statsMap[videoId]?.viewCount || 0;
+
+            const card = document.createElement("div");
+            card.className = "video-card";
+            card.style.cursor = "pointer";
+
+            card.innerHTML = `
+              <div class="video-thumb">
+                <img src="${thumbnail}" alt="${title}" loading="lazy" decoding="async">
+              </div>
+              
+              <div class="video-info">
+                <h4>${title}</h4>
+                <p>${Number(views).toLocaleString()} views • ${timeAgo(publishedAt)}</p>
+              </div>`;
+
+            card.addEventListener("click", () => {
+              window.open(`https://www.youtube.com/watch?v=${videoId}`, "_blank");
+            });
+
+            fragment.appendChild(card);
+          }
+          
+          await new Promise(r => requestAnimationFrame(r));
+          videoGrid.appendChild(fragment);
         } catch (err) {
-          console.error("Error loading videos:", err);
+          console.log("YouTube Video Loading Error: " + err);
         }
       }
-  
+
       window.addEventListener("load", () => {
         initFollowerCounts();
-        loadYouTubeVideos();
         loadSuggestedData();
+        loadYouTubeVideos();
+      });
+
+      document.addEventListener('contextmenu', event => event.preventDefault());
+      document.addEventListener('keydown', event => {
+        if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+          event.preventDefault();
+        }
       });
 
       const headerEl = document.querySelector('header');

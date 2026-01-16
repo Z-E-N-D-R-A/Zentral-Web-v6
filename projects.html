@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
-  <title>Zentral-Web | Projects</title>
 
-  <link href="Assets/Icon.png" rel="icon">
-  <link href="CSS/style.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link  rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Poppins:wght@400;600&display=swap">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
+    <title>Zentral-Web | Projects</title>
+
+    <link href="Assets/Icon.png" rel="icon">
+    <link href="CSS/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Poppins:wght@400;600&display=swap">
 </head>
 
 <body>
@@ -36,26 +37,33 @@
             <span></span>
         </div>
     </header>
-
-    <section class="blackboard-section">
-        <div class="blackboard">
-            <svg class="chalk-svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet">
-                <text x="100" y="70" class="chalk-stroke yellow">Gem Guardians</text>
-                <text x="550" y="90" class="chalk-stroke pink">Z.E.N.D.R.A.</text>
-                <text x="50" y="230" class="chalk-stroke blue">1.23.23</text>
-                <text x="600" y="320" class="chalk-stroke pink">Zentrals</text>
-                <text x="250" y="380" class="chalk-stroke yellow">Kura</text>
-                <text x="280" y="225" class="chalk-stroke white">Project STARR</text>
-            </svg>
     
-            <div class="chalks">
-                <div class="chalk white"></div>
-                <div class="chalk yellow"></div>
-                <div class="chalk pink"></div>
-                <div class="chalk blue"></div>
-                <div class="eraser"></div>
+    <section class="calendar-section">
+        <h2 class="page-title">Projects</h2>
+    
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth">‹</button>
+                <h3 id="monthLabel"></h3>
+                <button class="nav-btn" id="nextMonth">›</button>
             </div>
+    
+            <div class="calendar-grid">
+                <div class="day-name">Sun</div>
+                <div class="day-name">Mon</div>
+                <div class="day-name">Tue</div>
+                <div class="day-name">Wed</div>
+                <div class="day-name">Thu</div>
+                <div class="day-name">Fri</div>
+                <div class="day-name">Sat</div>
+            </div>
+    
+            <div class="calendar-grid" id="calendarDays"></div>
         </div>
+    
+        <!-- Decorative graphics -->
+        <div class="calendar-glow glow-1"></div>
+        <div class="calendar-glow glow-2"></div>
     </section>
     
     <section class="projects-section">
@@ -66,7 +74,7 @@
                 <p>Dates: Dec 2025 – Present</p>
                 <p>Code: PF0325 | PF0426</p>
                 <span class="status active">Active</span>
-                <a href="Projects/starr.html" class="view-btn">View More</a>
+                <a href="Others/Projects/starr.html" class="view-btn">View More</a>
             </div>
     
             <div class="project-card">
@@ -74,7 +82,7 @@
                 <p>Dates: Mar 2024 – Dec 2024</p>
                 <p>Code: PZ0024</p>
                 <span class="status cancelled">Cancelled</span>
-                <a href="Projects/zen.html" class="view-btn">View More</a>
+                <a href="Others/Projects/zen.html" class="view-btn">View More</a>
             </div>
     
             <div class="project-card">
@@ -82,7 +90,7 @@
                 <p>Dates: Nov 2023 – Jan 2024</p>
                 <p>Code: PF0123</p>
                 <span class="status published">Published</span>
-                <a href="Projects/gem.html" class="view-btn">View More</a>
+                <a href="Others/Projects/gem.html" class="view-btn">View More</a>
             </div>
 
             <div class="project-card">
@@ -90,7 +98,7 @@
                 <p>Dates: Sep 2023 – Jun 2024</p>
                 <p>Code: PG0223</p>
                 <span class="status cancelled">Cancelled</span>
-                <a href="Projects/cod.html" class="view-btn">View More</a>
+                <a href="Others/Projects/cod.html" class="view-btn">View More</a>
             </div>
 
             <div class="project-card">
@@ -98,105 +106,178 @@
                 <p>Dates: Feb 2025 – Aug 2025</p>
                 <p>Code: PG0325</p>
                 <span class="status cancelled">Cancelled</span>
-                <a href="Projects/element.html" class="view-btn">View More</a>
+                <a href="Others/Projects/element.html" class="view-btn">View More</a>
             </div>
         </div>
     </section>
     
     <footer>
         <div class="footer-socials">
-            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fa-brands fa-discord"></i></a>
-            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
         </div>
-        2025 Zentral-Web | Powered by KuraWorks
+        2026 Zentral-Web | Powered by KuraWorks
     </footer>
     
     <script>
-    function animateChalkStroke(el, delay = 0) {
-        el.style.strokeDashoffset = '1000';
-        el.style.opacity = '0.3';
+        const calendarDays = document.getElementById("calendarDays");
+        const monthLabel = document.getElementById("monthLabel");
+        let currentDate = new Date();
 
-        const anim = el.animate([
-            { strokeDashoffset: 1000, opacity: 0.3 },
-            { strokeDashoffset: 0, opacity: 0.95 }
-        ], {
-            duration: 5000, 
-            easing: 'ease',
-            delay: delay,
-            fill: 'forwards'
-        });
+        const plans = {
+            "2026-1-29": "24 hours Live Stream",
+            "2026-1-30": "Zentral Web 6.0 Launch",
+            "2026-2-1": "February Comeback"
+        };
 
-        return anim;
-    }
+        function renderCalendar() {
+            calendarDays.innerHTML = "";
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
 
-    function replayHandwriting() {
-        const texts = Array.from(document.querySelectorAll('.chalk-stroke'));
-        texts.forEach((t, i) => {
-            animateChalkStroke(t, i * 500);
-        });
-    }
-    setInterval(() => { replayHandwriting(); }, 8000);
+            monthLabel.textContent = currentDate.toLocaleString("default", {
+                month: "long",
+                year: "numeric"
+            });
 
-    const headerEl = document.querySelector('header');
-    window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      const maxOpacity = 0.45;
-      const maxBlur = 12;
-      const pct = Math.min(y / 300, 1);
-      headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
-      headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
-      
-      if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
-    });
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
 
-    const dropdown = document.querySelector('.dropdown');
-    const dropbtn = dropdown.querySelector('.dropbtn');
-    const dropdownContent = dropdown.querySelector('.dropdown-content');
-    let isDropdownOpen = false;
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement("div");
+                empty.className = "calendar-day empty";
+                calendarDays.appendChild(empty);
+            }
 
-    dropbtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      isDropdownOpen = !isDropdownOpen;
-      dropdown.classList.toggle('show', isDropdownOpen);
-    });
-    dropdown.addEventListener('mouseenter', () => {
-      dropdown.classList.add('show');
-      isDropdownOpen = true;
-    });
-    dropdown.addEventListener('mouseleave', (e) => {
-      const rect = dropdownContent.getBoundingClientRect();
-      const buffer = 60;
-      const checkMouse = (ev) => {
-        if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
-          dropdown.classList.remove('show');
-          isDropdownOpen = false;
-          window.removeEventListener('mousemove', checkMouse);
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateKey = `${year}-${month + 1}-${day}`;
+                const cell = document.createElement("div");
+                cell.className = "calendar-day";
+
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    cell.classList.add("today");
+                }
+
+                cell.innerHTML = `<div class="day-number">${day}</div>`;
+
+                if (plans[dateKey]) {
+                    const plan = document.createElement("div");
+                    plan.className = "plan";
+                    plan.dataset.title = plans[dateKey];
+
+                    const text = document.createElement("span");
+                    text.textContent = plans[dateKey];
+                    plan.appendChild(text);
+
+                    if (window.matchMedia("(max-width: 768px)").matches) {
+                        let pressTimer;
+
+                        plan.addEventListener("pointerdown", (e) => {
+                            e.preventDefault();
+                            pressTimer = setTimeout(() => { plan.classList.add("show-tooltip"); }, 350);
+                        });
+
+                        plan.addEventListener("pointerup", () => {
+                            clearTimeout(pressTimer);
+                            setTimeout(() => { plan.classList.remove("show-tooltip"); }, 1800);
+                        });
+
+                        plan.addEventListener("pointerleave", () => {
+                            clearTimeout(pressTimer);
+                            plan.classList.remove("show-tooltip");
+                        });
+
+                        plan.addEventListener("pointercancel", () => {
+                            clearTimeout(pressTimer);
+                            plan.classList.remove("show-tooltip");
+                        });
+                    }
+                    cell.appendChild(plan);
+                }
+                calendarDays.appendChild(cell);
+            }
         }
-      };
-      window.addEventListener('mousemove', checkMouse);
-    });
 
-    window.addEventListener('scroll', () => {
-      dropdown.classList.remove('show');
-      isDropdownOpen = false;
-    });
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-        isDropdownOpen = false;
-      }
-    });
+        document.getElementById("prevMonth").onclick = () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        };
 
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('active');
-      navLinks.classList.toggle('active');
-    });
-  </script>
+        document.getElementById("nextMonth").onclick = () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        };
+
+        renderCalendar();
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+                event.preventDefault();
+            }
+        });
+
+        const headerEl = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            const y = window.scrollY;
+            const maxOpacity = 0.45;
+            const maxBlur = 12;
+            const pct = Math.min(y / 300, 1);
+            headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
+            headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
+
+            if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
+        });
+
+        const dropdown = document.querySelector('.dropdown');
+        const dropbtn = dropdown.querySelector('.dropbtn');
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        let isDropdownOpen = false;
+
+        dropbtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isDropdownOpen = !isDropdownOpen;
+            dropdown.classList.toggle('show', isDropdownOpen);
+        });
+        dropdown.addEventListener('mouseenter', () => {
+            dropdown.classList.add('show');
+            isDropdownOpen = true;
+        });
+        dropdown.addEventListener('mouseleave', (e) => {
+            const rect = dropdownContent.getBoundingClientRect();
+            const buffer = 60;
+            const checkMouse = (ev) => {
+                if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
+                    dropdown.classList.remove('show');
+                    isDropdownOpen = false;
+                    window.removeEventListener('mousemove', checkMouse);
+                }
+            };
+            window.addEventListener('mousemove', checkMouse);
+        });
+
+        window.addEventListener('scroll', () => {
+            dropdown.classList.remove('show');
+            isDropdownOpen = false;
+        });
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+                isDropdownOpen = false;
+            }
+        });
+
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pixel Arcade — Level 2: Forest (Escort)</title>
+<style>
+  :root{
+    --canvas-w: 640px; /* pixel resolution width */
+    --canvas-h: 384px; /* pixel resolution height */
+    --scale: 1.5; /* scale on screen */
+    --bg: #0b2a12;
+    --accent: #7af59a;
+    --text: #e9ffe7;
+  }
+  html,body{
+    height:100%;
+    margin:0;
+    background: linear-gradient(180deg, #04120a 0%, #083017 60%, #071014 100%);
+    color:var(--text);
+    font-family: "Courier New", monospace;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* Container to center the game */
+  .game-wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+
+  /* Canvas pixelated & scaled */
+  canvas#game {
+    width: calc(var(--canvas-w) * var(--scale));
+    height: calc(var(--canvas-h) * var(--scale));
+    image-rendering: pixelated; /* crisp pixels */
+    background: linear-gradient(180deg,#0b2a12 0%, #133a20 60%);
+    border: 6px solid #042a13;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  }
+
+  /* HUD */
+  .hud {
+    width: calc(var(--canvas-w) * var(--scale));
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:14px;
+    color:var(--text);
+    user-select:none;
+  }
+  .hud .left, .hud .right { display:flex; gap:8px; align-items:center; }
+  .lives { display:flex; gap:6px; align-items:center; }
+  .heart {
+    width:18px;
+    height:18px;
+    background: red;
+    clip-path: polygon(50% 15%, 61% 10%, 72% 12%, 85% 26%, 85% 41%, 50% 80%, 15% 41%, 15% 26%, 28% 12%, 39% 10%);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.2) inset;
+  }
+  .bar {
+    width:120px;
+    height:10px;
+    background:#2a2a2a;
+    border:1px solid rgba(255,255,255,0.06);
+    position:relative;
+  }
+  .bar-inner {
+    height:100%;
+    background: linear-gradient(90deg, #9ff0a7, #4cc97f);
+    width:100%;
+  }
+  .center-info { font-weight:bold; }
+  /* small footer */
+  .controls {
+    width: calc(var(--canvas-w) * var(--scale));
+    font-size:12px;
+    color:#bfeec1;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  /* overlay messages */
+  .overlay {
+    position:absolute;
+    pointer-events:none;
+    color:var(--text);
+    font-family: "Courier New", monospace;
+    text-align:center;
+    width:100%;
+  }
+  .message {
+    background: rgba(0,0,0,0.6);
+    padding: 8px 16px;
+    border-radius:8px;
+    display:inline-block;
+    margin-top:8px;
+  }
+</style>
+</head>
+<body>
+  <div class="game-wrap">
+    <div class="hud">
+      <div class="left">
+        <div style="font-weight:bold">Level 2 — Forest (Escort)</div>
+      </div>
+      <div class="center-info">Protect the NPC — reach the glowing exit on the right!</div>
+      <div class="right">
+        <div class="lives" id="livesContainer"></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;">
+          <div style="font-size:12px;color:#bfeec1">NPC</div>
+          <div class="bar" title="NPC Health">
+            <div class="bar-inner" id="npcHealthBar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="position:relative;">
+      <canvas id="game" width="640" height="384"></canvas>
+      <div class="overlay" id="overlay" style="position:relative; top: -300px;">
+        <!-- overlay messages inserted here -->
+      </div>
+    </div>
+
+    <div class="controls">
+      <div>Move: W/A/S/D or Arrow keys • Shoot: SPACE</div>
+      <div id="status">Lives: 3 • Score: 0</div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   Level 2: Forest Escort
+   Single-file implementation
+   ========================= */
+
+/* Canvas setup */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false; // crisp pixels
+
+const W = canvas.width;
+const H = canvas.height;
+
+/* Game state */
+let lives = 3;
+let score = 0;
+let gameOver = false;
+let levelComplete = false;
+
+/* Entities arrays */
+const bullets = [];
+const enemies = [];
+
+/* Simple tile-like ground (for visuals) */
+const groundY = H - 48;
+
+/* Player config */
+const player = {
+  x: 64, y: groundY - 24,
+  w: 14, h: 20,
+  speed: 2.25,
+  color: '#6fe3a6',
+  invuln: 0, // frames of invulnerability after hit
+  fireCooldown: 0
+};
+
+/* NPC (escort) config */
+const npc = {
+  x: 120, y: groundY - 20,
+  w: 12, h: 18,
+  color: '#ffd78a',
+  speed: 1.2,
+  hp: 100,
+  maxHp: 100,
+  state: 'walking' // walking / hurt / dead / done
+};
+
+/* Exit zone */
+const exitZone = { x: W - 48, y: groundY - 64, w: 32, h: 64 };
+
+/* Controls */
+const keys = {};
+window.addEventListener('keydown', e => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Spacebar',' '].includes(e.key)) e.preventDefault();
+  keys[e.key.toLowerCase()] = true;
+});
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+/* UI elements */
+const livesContainer = document.getElementById('livesContainer');
+const npcHealthBar = document.getElementById('npcHealthBar');
+const statusEl = document.getElementById('status');
+const overlay = document.getElementById('overlay');
+
+function updateUI() {
+  // Lives hearts
+  livesContainer.innerHTML = '';
+  for (let i=0;i<lives;i++){
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    livesContainer.appendChild(heart);
+  }
+  // NPC bar
+  const pct = Math.max(0, npc.hp / npc.maxHp) * 100;
+  npcHealthBar.style.width = pct + '%';
+  // status text
+  statusEl.textContent = `Lives: ${lives} • Score: ${score}`;
+}
+
+/* Utility: rectangle collision */
+function rectsOverlap(a,b){
+  return !(a.x + a.w < b.x || a.x > b.x + b.w || a.y + a.h < b.y || a.y > b.y + b.h);
+}
+
+/* Shooting */
+function shoot(x,y,dirX,dirY,owner='player'){
+  bullets.push({
+    x:x, y:y, vx: dirX*6, vy: dirY*6,
+    w:4, h:4, ttl: 90, owner
+  });
+}
+
+/* Enemy spawn logic */
+let spawnTimer = 0;
+function spawnEnemy(){
+  // spawn at random y near ground or in trees
+  const side = Math.random() < 0.6 ? 'right' : 'top';
+  let ex, ey;
+  if (side === 'right') {
+    ex = W + 12;
+    ey = groundY - 24 - Math.floor(Math.random()*20);
+  } else {
+    ex = Math.random() * (W - 120) + 100;
+    ey = -20;
+  }
+  enemies.push({
+    x: ex, y: ey, w: 14, h: 16,
+    speed: 1.0 + Math.random()*0.6,
+    color: '#d44e4e',
+    hp: 1,
+    target: 'npc' // they go for NPC first
+  });
+}
+
+/* Damage helpers */
+function damagePlayer(amount){
+  if (player.invuln > 0 || gameOver) return;
+  lives--;
+  player.invuln = 90; // ~1.5s at 60fps
+  // small knockback
+  player.x = Math.max(8, player.x - 18);
+  if (lives <= 0) {
+    gameOver = true;
+    showMessage("GAME OVER — You lost all lives");
+  }
+}
+
+function damageNPC(amount){
+  if (npc.state === 'dead' || gameOver) return;
+  npc.hp -= amount;
+  npc.state = 'hurt';
+  if (npc.hp <= 0) {
+    npc.hp = 0;
+    npc.state = 'dead';
+    gameOver = true;
+    showMessage("NPC died — Mission failed");
+  }
+}
+
+/* Messages */
+let messageTimer = 0;
+function showMessage(text, duration = 3000){
+  overlay.innerHTML = `<div class="message">${text}</div>`;
+  messageTimer = duration;
+}
+
+/* Game loop */
+let lastTime = performance.now();
+function loop(now) {
+  const dt = Math.min(40, now - lastTime);
+  lastTime = now;
+  update(dt/16.6667); // normalize roughly to 60fps steps
+  render();
+  if (!gameOver && !levelComplete) requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* Main update */
+function update(delta){
+  // Timers & spawn
+  spawnTimer -= delta;
+  if (spawnTimer <= 0) {
+    spawnEnemy();
+    spawnTimer = 60 + Math.random()*80; // frames until next spawn
+  }
+
+  if (messageTimer > 0) {
+    messageTimer -= delta * 16.6667;
+    if (messageTimer <= 0) overlay.innerHTML = '';
+  }
+
+  // Player input
+  let vx = 0, vy = 0;
+  if (keys['arrowleft'] || keys['a']) vx -= 1;
+  if (keys['arrowright'] || keys['d']) vx += 1;
+  if (keys['arrowup'] || keys['w']) vy -= 1;
+  if (keys['arrowdown'] || keys['s']) vy += 1;
+  // normalize diagonal
+  if (vx !== 0 && vy !== 0) {
+    vx *= 0.7071; vy *= 0.7071;
+  }
+  player.x += vx * player.speed * delta;
+  player.y += vy * player.speed * delta;
+
+  // Clamp to world bounds (simple)
+  player.x = Math.max(4, Math.min(W - player.w - 4, player.x));
+  player.y = Math.max(12, Math.min(groundY - player.h, player.y));
+
+  // Fire bullets
+  player.fireCooldown = Math.max(0, player.fireCooldown - delta);
+  if ((keys[' '] || keys['space']) && player.fireCooldown <= 0) {
+    // direction toward mouse? For now shoot rightwards if no movement, else toward facing direction
+    const dirX = vx || 1;
+    const dirY = vy || 0;
+    shoot(player.x + player.w/2, player.y + player.h/2, dirX, dirY, 'player');
+    player.fireCooldown = 10; // frames between shots
+  }
+
+  // bullets update
+  for (let i = bullets.length -1; i >= 0; i--) {
+    const b = bullets[i];
+    b.x += b.vx * delta;
+    b.y += b.vy * delta;
+    b.ttl -= delta;
+    if (b.x < -20 || b.x > W + 20 || b.y < -20 || b.y > H + 20 || b.ttl <= 0) {
+      bullets.splice(i,1);
+      continue;
+    }
+    // bullet collisions: player bullets -> enemies
+    if (b.owner === 'player') {
+      for (let j = enemies.length-1; j >=0; j--){
+        const e = enemies[j];
+        if (rectsOverlap(b,e)) {
+          // destroy bullet and enemy
+          bullets.splice(i,1);
+          enemies.splice(j,1);
+          score += 10;
+          break;
+        }
+      }
+    }
+  }
+
+  // enemies update: move toward target (NPC by default)
+  for (let i = enemies.length -1; i >=0; i--){
+    const e = enemies[i];
+    const target = (npc.state !== 'dead') ? npc : player;
+    // homing movement
+    const dx = (target.x + target.w/2) - (e.x + e.w/2);
+    const dy = (target.y + target.h/2) - (e.y + e.h/2);
+    const dist = Math.max(0.1, Math.hypot(dx,dy));
+    e.x += (dx / dist) * e.speed * delta;
+    e.y += (dy / dist) * e.speed * delta;
+
+    // collisions with NPC / player
+    if (npc.state !== 'dead' && rectsOverlap(e,npc)) {
+      // enemy damages npc and is removed
+      damageNPC(20);
+      enemies.splice(i,1);
+      continue;
+    } else if (rectsOverlap(e, player)) {
+      // damage player
+      enemies.splice(i,1);
+      damagePlayer(1);
+      continue;
+    }
+  }
+
+  // NPC behavior: slowly walk to the right; if enemies nearby, slow and step back?
+  if (npc.state === 'walking') {
+    // if enemy within 110 px, slower & chance to pause
+    const close = enemies.some(en => Math.hypot(en.x - npc.x, en.y - npc.y) < 110);
+    const step = (close ? npc.speed * 0.5 : npc.speed) * delta;
+    npc.x += step;
+  } else if (npc.state === 'hurt') {
+    // short stun then resume
+    // simple: switch back to walking after small delay
+    setTimeout(()=> { if(npc.state !== 'dead') npc.state = 'walking'; }, 300);
+  }
+
+  // Check if NPC reached exit
+  if (npc.x + npc.w >= exitZone.x + 8 && !levelComplete && !gameOver) {
+    levelComplete = true;
+    showMessage("LEVEL COMPLETE — NPC reached the exit!");
+    // allow frame to render final
+    setTimeout(()=> {
+      // stop game loop
+      // NOTE: in a bigger project you would advance to level 3 here
+    }, 1200);
+  }
+
+  // player invulnerability tick
+  if (player.invuln > 0) player.invuln = Math.max(0, player.invuln - delta);
+
+  // Update UI
+  updateUI();
+}
+
+/* Render function */
+function render(){
+  // clear background
+  // sky + layered trees
+  ctx.fillStyle = '#052214';
+  ctx.fillRect(0,0,W,H);
+
+  // parallax backgrounds (simple rectangles for pixel-art trees)
+  // distant trees
+  for (let i=0;i<12;i++){
+    const bx = (i*72 + (Date.now()/40 % 72)) % (W + 80) - 40;
+    ctx.fillStyle = '#0c2611';
+    ctx.fillRect(bx, groundY - 120, 24, 80);
+    ctx.fillStyle = '#063015';
+    ctx.fillRect(bx+6, groundY - 140, 12, 20);
+  }
+
+  // ground strip
+  ctx.fillStyle = '#163a20';
+  ctx.fillRect(0, groundY, W, H - groundY);
+
+  // decorative plants
+  for (let p = 0; p < 24; p++){
+    const px = (p*120 + (Date.now()/60 % 120)) % W;
+    ctx.fillStyle = (p%3===0) ? '#28a262' : '#1e8c4f';
+    ctx.fillRect(px, groundY - 8 - (p%4), 4, 8 + (p%3));
+  }
+
+  // exit (glowing)
+  ctx.fillStyle = '#0f3f2b';
+  ctx.fillRect(exitZone.x, exitZone.y, exitZone.w, exitZone.h);
+  ctx.fillStyle = '#90ffd7';
+  ctx.fillRect(exitZone.x+6, exitZone.y+8, 20, exitZone.h - 16);
+
+  // draw NPC (escort)
+  if (npc.state !== 'dead') {
+    drawRect(npc.x, npc.y, npc.w, npc.h, npc.color);
+    // small face pixel
+    drawRect(npc.x + 3, npc.y + 4, 2, 2, '#6b3f1e');
+  } else {
+    // draw collapsed npc
+    drawRect(npc.x, npc.y+6, npc.w, npc.h-6, '#5a3f2f');
+  }
+
+  // draw player (blinking when invuln)
+  if (player.invuln > 0 && Math.floor(player.invuln / 6) % 2 === 0) {
+    // flicker: skip draw
+  } else {
+    drawRect(player.x, player.y, player.w, player.h, player.color);
+    // eyes
+    drawRect(player.x + 3, player.y + 5, 2, 2, '#03220f');
+  }
+
+  // bullets
+  for (const b of bullets) {
+    drawRect(b.x - b.w/2, b.y - b.h/2, b.w, b.h, '#ffd');
+  }
+
+  // enemies
+  for (const e of enemies){
+    drawRect(e.x, e.y, e.w, e.h, e.color);
+    // simple legs
+    drawRect(e.x+3, e.y+12, 3, 3, '#8b2b2b');
+  }
+
+  // HUD overlays: NPC hp as floating text
+  ctx.font = '12px monospace';
+  ctx.fillStyle = '#bfeec1';
+  ctx.fillText(`NPC HP: ${Math.max(0,npc.hp)}/${npc.maxHp}`, 8, 18);
+
+  // game over overlay
+  if (gameOver) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#ffbaba';
+    ctx.font = 'bold 28px monospace';
+    ctx.fillText('GAME OVER', W/2 - 90, H/2 - 4);
+    ctx.font = '14px monospace';
+    ctx.fillText('Press R to restart', W/2 - 68, H/2 + 20);
+  }
+  if (levelComplete) {
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#dfffe6';
+    ctx.font = 'bold 26px monospace';
+    ctx.fillText('LEVEL COMPLETE!', W/2 - 110, H/2 - 6);
+    ctx.font = '12px monospace';
+    ctx.fillText('Well done. (Use this point to transition to next level)', W/2 - 180, H/2 + 14);
+  }
+}
+
+/* helper: pixel rectangle with integer coordinates */
+function drawRect(x,y,w,h,color){
+  ctx.fillStyle = color;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+}
+
+/* Restart keys handling */
+window.addEventListener('keydown', (e) => {
+  if (gameOver && (e.key.toLowerCase() === 'r')) {
+    restart();
+  }
+});
+
+/* restart function */
+function restart(){
+  // reset state
+  lives = 3;
+  score = 0;
+  gameOver = false;
+  levelComplete = false;
+  bullets.length = 0;
+  enemies.length = 0;
+  player.x = 64; player.y = groundY - 24; player.invuln = 0;
+  npc.x = 120; npc.y = groundY - 20; npc.hp = npc.maxHp; npc.state = 'walking';
+  spawnTimer = 30;
+  updateUI();
+  showMessage('Protect the NPC — reach the exit!', 2200);
+  requestAnimationFrame(loop);
+}
+
+/* initial UI & message */
+updateUI();
+showMessage('Protect the NPC — reach the exit!', 2200);
+
+/* small autosave events to keep NPC from stuck */
+spawnTimer = 30;
+
+/* Optional: simple mobile touch controls (virtual joystick) could be added later */
+
+</script>
+</body>
+</html>

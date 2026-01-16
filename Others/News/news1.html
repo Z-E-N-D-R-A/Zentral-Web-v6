@@ -5,27 +5,27 @@
   <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
   <title>Zentral-Web | News One</title>
 
-  <link href="../Assets/Icon.png" rel="icon">
-  <link href="../CSS/style.css" rel="stylesheet">
+  <link href="../../Assets/Icon.png" rel="icon">
+  <link href="../../CSS/style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
     <header>
         <div class="logo">
-            <img src="../Assets/Logo.png" alt="Logo">
+            <img src="../../Assets/Logo.png" alt="Logo">
             <span>Zendra クレイジー</span>
         </div>
         <nav class="nav-links">
-            <a href="../index.html">Home</a>
-            <a href="../videos.html">Videos</a>
-            <a href="../zentral.html">Zentral</a>
+            <a href="../../index.html">Home</a>
+            <a href="../../videos.html">Videos</a>
+            <a href="../../zentral.html">Zentral</a>
             <div class="dropdown">
                 <button class="dropbtn">More ▾</button>
                 <div class="dropdown-content">
-                    <a href="../projects.html">Projects</a>
-                    <a href="../newsletter.html"><b>Newsletter</b></a>
-                    <a href="../others.html">Others</a>
+                    <a href="../../projects.html">Projects</a>
+                    <a href="../../newsletter.html"><b>Newsletter</b></a>
+                    <a href="../../others.html">Others</a>
                 </div>
             </div>
         </nav>
@@ -38,17 +38,24 @@
     
     <footer>
         <div class="footer-socials">
-            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fa-brands fa-discord"></i></a>
-            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
         </div>
-        2025 Zentral-Web | Powered by KuraWorks
+        2026 Zentral-Web | Powered by KuraWorks
     </footer>
     
     <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+                event.preventDefault();
+            }
+        });
+        
         const headerEl = document.querySelector('header');
         window.addEventListener('scroll', () => {
             const y = window.scrollY;
