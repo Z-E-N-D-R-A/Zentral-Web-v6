@@ -797,6 +797,7 @@ section.content h2 {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
     margin-top: 40px;
+    min-height: 1000px;
 }
 
 .video-card {
@@ -806,6 +807,7 @@ section.content h2 {
     overflow: hidden;
     transition: all 0.3s ease;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    will-change: transform;
 }
 
 .video-card:hover {
