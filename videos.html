@@ -202,7 +202,7 @@
           if (videosLoaded) return;
           videosLoaded = true;
 
-          const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${YAK}&channelId=${YCI}&part=snippet,id&order=date&maxResults=${numVideos}`);
+          const res = await fetch('/.netlify/functions/get-videos');
           const data = await res.json();
           if (!data.items || !data.items.length) {
             document.getElementById("videos-title").innerHTML = "Unable to load videos. Please try again later.";

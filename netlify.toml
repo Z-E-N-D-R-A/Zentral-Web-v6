@@ -1,0 +1,3 @@
+[build]
+  functions = "netlify/functions"
+  publish = "."  # or your build folder like 'dist'
