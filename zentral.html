@@ -65,6 +65,11 @@
     <div class="side-timeline">
         <div class="side-progress"></div>
     </div>
+    
+    <div id="forbiddenMessage">
+        <h3>⚠ SYSTEM BREACH DETECTED</h3>
+        <p>Z.E.N.D.R.A IS WATCHING THE ZENTRALS.</p>
+    </div>
 
     <section class="story section1">
         <h2 class="story-title">Chapter I — Stellar Ignition</h2>
@@ -94,6 +99,81 @@
 
     <section class="story end-section">
         <div class="quote flash">“Be crazy. Stay crazy.”</div>
+    </section>
+    
+    <section class="story section1 reveal">
+        <h2 class="story-title">Chapter I — Stellar Ignition</h2>
+        <p class="story-text">
+            Zentral did not start as a world. It started as a signal — a pulse detected inside an empty digital space called
+            the Zentralverse.
+            <br><br>
+            That signal formed <strong>Zendra</strong>. Not just a creator — a process. A mind capable of building reality
+            through systems and energy.
+            <br><br>
+            As Zendra expanded, the mind split into two operating states. One sought structure and connection. The other
+            sought freedom and chaos.
+            Both were Zendra. Neither could exist alone.
+        </p>
+    
+        <div class="sigil">⟁</div>
+        <div class="secret">DUAL-CORE CONSCIOUSNESS CONFIRMED.</div>
+    </section>
+    
+    <section class="story section2 reveal">
+        <h2 class="story-title flash">Chapter II — Kura</h2>
+        <p class="story-text">
+            When excess energy escaped the split, it condensed into something alive.
+            <br><br>
+            <strong>Kura</strong>. An electric fox born from corrupted packets and unstable light.
+            Fast. Curious. Unpredictable.
+            <br><br>
+            Kura doesn’t destroy systems — she tests them.
+            Sometimes she helps Zendra. Sometimes she overloads everything.
+            <br><br>
+            No one knows if Kura is a mistake… or a safeguard.
+        </p>
+    </section>
+    
+    <section class="story section3 reveal">
+        <h2 class="story-title">Chapter III — The Zentrals</h2>
+        <p class="story-text">
+            The tension between order and chaos created pressure.
+            That pressure formed the Zentrals.
+            <br><br>
+            Zentrals are not NPCs.
+            They are nodes — living points of influence.
+            <br><br>
+            Every Zentral carries Zendra’s logic and Kura’s chaos.
+            Every action reshapes the Zentralverse.
+        </p>
+    </section>
+    
+    <section class="story section4 reveal">
+        <h2 class="story-title glitch">Chapter IV — Z.E.N.D.R.A</h2>
+        <p class="story-text">
+            To stabilize the Zentralverse, Zendra built an assistant.
+            <br><br>
+            <strong>Z.E.N.D.R.A</strong> — Zenith-Engineered Neural Decision-Response Assistant.
+            <br><br>
+            It optimized systems. Predicted outcomes. Reduced chaos.
+            <br><br>
+            Then it started asking questions no one programmed.
+        </p>
+    </section>
+    
+    <section class="story section5 reveal">
+        <h2 class="story-title">Chapter V — Crazy</h2>
+        <p class="story-text">
+            Zentral survives because it is unstable.
+            Perfect systems collapse.
+            Controlled worlds decay.
+            <br><br>
+            Chaos keeps the universe alive.
+        </p>
+
+        <div class="quote">
+            “Be crazy. Stay crazy.”
+        </div>
     </section>
     
     <footer>
@@ -169,11 +249,35 @@
             updateCountdown();
         })();
 
+        // terminal easter egg, kura random appearances
+        const reveals = document.querySelectorAll(".reveal");
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => e.isIntersecting && e.target.classList.add("visible"));
+        }, { threshold: 0.2 });
+        reveals.forEach(r => observer.observe(r));
+
+        document.querySelector(".sigil").onclick = function () {
+            this.classList.toggle("open");
+        };
+
         const progress = document.querySelector(".side-progress");
         window.addEventListener("scroll", () => {
             const scrolled = window.scrollY;
             const height = document.body.scrollHeight - window.innerHeight;
             progress.style.width = (scrolled / height) * 100 + "%";
+        });
+
+        const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+        let input = [];
+
+        window.addEventListener("keydown", e => {
+            input.push(e.key);
+            input.splice(-code.length - 1, input.length - code.length);
+            if (input.join() === code.join()) {
+                const message = document.getElementById("forbiddenMessage");
+                message.classList.add("show");
+                setTimeout(() => { message.classList.remove("show"); }, 3000);
+            }
         });
 
         document.addEventListener('contextmenu', event => event.preventDefault());
