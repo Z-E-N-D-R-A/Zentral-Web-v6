@@ -982,10 +982,6 @@ section.content h2 {
 }
 
 .section1 { background: linear-gradient(#1d0242, #420222); }
-.section2 { background: linear-gradient(#420222, #4a431c); }
-.section3 { background: linear-gradient(#4a431c, #364506); }
-.section4 { background: linear-gradient(#364506, #5d0a56); }
-.section5 { background: linear-gradient(#5d0a56, #000); }
 .end-section { background: linear-gradient(#420222, #000); }
 
 .story-title {
@@ -995,10 +991,6 @@ section.content h2 {
 }
 
 .section1 .story-title { background: linear-gradient(90deg, #40c9ff, #e81cff); background-clip: text; -webkit-text-fill-color: transparent; }
-.section2 .story-title { background: linear-gradient(90deg, #ff0f7b, #f89b29); background-clip: text; -webkit-text-fill-color: transparent; }
-.section3 .story-title { background: linear-gradient(90deg, #ff930f, #fff95b); background-clip: text; -webkit-text-fill-color: transparent; }
-.section4 .story-title { background: linear-gradient(90deg, #00ff87, #60efff); background-clip: text; -webkit-text-fill-color: transparent; }
-.section5 .story-title { background: linear-gradient(90deg, #696eff, #f8acff); background-clip: text; -webkit-text-fill-color: transparent; }
 
 .story-text {
     font-size: 18px;
