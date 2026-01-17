@@ -65,85 +65,35 @@
     <div class="side-timeline">
         <div class="side-progress"></div>
     </div>
-    
-    <div id="forbiddenMessage">
-        <h3>⚠ SYSTEM BREACH DETECTED</h3>
-        <p>Z.E.N.D.R.A IS WATCHING THE ZENTRALS.</p>
-    </div>
-    
-    <section class="story chapter1 reveal">
-        <h2 class="story-title chapter1">Chapter I — The Signal</h2>
-        <p class="story-text">
-            Zentral did not start as a world. It started as a signal — a pulse detected inside an empty digital space called
-            the Zentralverse.
-            <br><br>
-            That signal formed <strong>Zendra</strong>. Not just a creator — a process. A mind capable of building reality
-            through systems and energy.
-            <br><br>
-            As Zendra expanded, the mind split into two operating states. One sought structure and connection. The other
-            sought freedom and chaos.
-            Both were Zendra. Neither could exist alone.
-        </p>
-    
-        <div class="sigil">⟁</div>
-        <div class="secret">DUAL-CORE CONSCIOUSNESS CONFIRMED.</div>
-    </section>
-    
-    <section class="story chapter2 reveal">
-        <h2 class="story-title chapter2 glitch">Chapter II — Kura</h2>
-        <p class="story-text">
-            When excess energy escaped the split, it condensed into something alive.
-            <br><br>
-            <strong>Kura</strong>. An electric fox born from corrupted packets and unstable light.
-            Fast. Curious. Unpredictable.
-            <br><br>
-            Kura doesn’t destroy systems — she tests them.
-            Sometimes she helps Zendra. Sometimes she overloads everything.
-            <br><br>
-            No one knows if Kura is a mistake… or a safeguard.
-        </p>
-    </section>
-    
-    <section class="story chapter3 reveal">
-        <h2 class="story-title chapter3">Chapter III — The Zentrals</h2>
-        <p class="story-text">
-            The tension between order and chaos created pressure.
-            That pressure formed the Zentrals.
-            <br><br>
-            Zentrals are not NPCs.
-            They are nodes — living points of influence.
-            <br><br>
-            Every Zentral carries Zendra’s logic and Kura’s chaos.
-            Every action reshapes the Zentralverse.
-        </p>
-    </section>
-    
-    <section class="story chapter4 reveal">
-        <h2 class="story-title chapter4 glitch">Chapter IV — Z.E.N.D.R.A</h2>
-        <p class="story-text">
-            To stabilize the Zentralverse, Zendra built an assistant.
-            <br><br>
-            <strong>Z.E.N.D.R.A</strong> — Zenith-Engineered Neural Decision-Response Assistant.
-            <br><br>
-            It optimized systems. Predicted outcomes. Reduced chaos.
-            <br><br>
-            Then it started asking questions no one programmed.
-        </p>
-    </section>
-    
-    <section class="story chapter5 reveal">
-        <h2 class="story-title chapter5">Chapter V — Crazy</h2>
-        <p class="story-text">
-            Zentral survives because it is unstable.
-            Perfect systems collapse.
-            Controlled worlds decay.
-            <br><br>
-            Chaos keeps the universe alive.
-        </p>
 
-        <div class="quote">
-            “Be crazy. Stay crazy.”
+    <section class="story section1">
+        <h2 class="story-title">Chapter I — Stellar Ignition</h2>
+        <p class="story-text" id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">Ignition begins in</p>
+        <div class="countdown-container">
+            <div class="countdown-timer" id="countdown">
+                <div class="time-box">
+                    <span id="days">00</span>
+                    <small>DAYS</small>
+                </div>
+                <div class="time-box">
+                    <span id="hours">00</span>
+                    <small>HOURS</small>
+                </div>
+                <div class="time-box">
+                    <span id="minutes">00</span>
+                    <small>MIN</small>
+                </div>
+                <div class="time-box">
+                    <span id="seconds">00</span>
+                    <small>SEC</small>
+                </div>
+            </div>
         </div>
+        <p class="story-text" style="font-size: 11px; letter-spacing: 3px; opacity: 0.6;">February 23 • 10:00 AM JST</p>
+    </section>
+
+    <section class="story end-section">
+        <div class="quote flash">“Be crazy. Stay crazy.”</div>
     </section>
     
     <footer>
@@ -159,35 +109,71 @@
     </footer>
     
     <script>
-        // terminal easter egg, kura random appearances
-        const reveals = document.querySelectorAll(".reveal");
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(e => e.isIntersecting && e.target.classList.add("visible"));
-        }, { threshold: 0.2 });
-        reveals.forEach(r => observer.observe(r));
+        (function () {
+            const targetDate = new Date("2026-02-23T20:00:00-05:00");
 
-        document.querySelector(".sigil").onclick = function () {
-            this.classList.toggle("open");
-        };
+            const els = {
+                days: document.getElementById("days"),
+                hours: document.getElementById("hours"),
+                minutes: document.getElementById("minutes"),
+                seconds: document.getElementById("seconds"),
+                countdown: document.getElementById("countdown"),
+                message: document.getElementById("countdown-message")
+            };
+
+            let lastMinute = null;
+
+            function updateCountdown() {
+                const now = new Date();
+                let diff = targetDate - now;
+
+                if (diff <= 0) {
+                    triggerIgnition();
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                diff %= 1000 * 60 * 60 * 24;
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                diff %= 1000 * 60 * 60;
+                const minutes = Math.floor(diff / (1000 * 60));
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                els.days.textContent = String(days).padStart(2, "0");
+                els.hours.textContent = String(hours).padStart(2, "0");
+                els.minutes.textContent = String(minutes).padStart(2, "0");
+                els.seconds.textContent = String(seconds).padStart(2, "0");
+
+                if (minutes !== lastMinute) {
+                    glitchDigits();
+                    lastMinute = minutes;
+                }
+            }
+
+            function glitchDigits() {
+                Object.values(els).forEach(el => {
+                    if (el && el.tagName === "SPAN") {
+                        el.classList.add("glitch");
+                        setTimeout(() => el.classList.remove("glitch"), 600);
+                    }
+                });
+            }
+
+            function triggerIgnition() {
+                els.countdown.classList.add("ignite");
+                els.message.innerHTML = "Ignition begins momentarily...";
+                clearInterval(timer);
+            }
+
+            const timer = setInterval(updateCountdown, 1000);
+            updateCountdown();
+        })();
 
         const progress = document.querySelector(".side-progress");
         window.addEventListener("scroll", () => {
             const scrolled = window.scrollY;
             const height = document.body.scrollHeight - window.innerHeight;
             progress.style.width = (scrolled / height) * 100 + "%";
-        });
-
-        const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
-        let input = [];
-
-        window.addEventListener("keydown", e => {
-            input.push(e.key);
-            input.splice(-code.length - 1, input.length - code.length);
-            if (input.join() === code.join()) {
-                const message = document.getElementById("forbiddenMessage");
-                message.classList.add("show");
-                setTimeout(() => { message.classList.remove("show"); }, 3000);
-            }
         });
 
         document.addEventListener('contextmenu', event => event.preventDefault());
