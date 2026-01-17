@@ -76,10 +76,75 @@
     </footer>
   
     <script>
-      /* -------- Animate Count -------- */
-      const YAK = "AIzaSyBCtzknAcH5qynOqexUD-szsNYcCKfR7Sk";
-      const YCI = "UCaWAxGQH0nU3w5PXDppmcvQ";
-      function initFollowerCounts() {
+      document.addEventListener('contextmenu', event => event.preventDefault());
+      document.addEventListener('keydown', event => {
+        if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+          event.preventDefault();
+        }
+      });
+
+      const headerEl = document.querySelector('header');
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        const maxOpacity = 0.45;
+        const maxBlur = 12;
+        const pct = Math.min(y / 300, 1);
+        headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
+        headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
+
+        if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
+      });
+
+      const dropdown = document.querySelector('.dropdown');
+      const dropbtn = dropdown.querySelector('.dropbtn');
+      const dropdownContent = dropdown.querySelector('.dropdown-content');
+      let isDropdownOpen = false;
+
+      dropbtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isDropdownOpen = !isDropdownOpen;
+        dropdown.classList.toggle('show', isDropdownOpen);
+      });
+      dropdown.addEventListener('mouseenter', () => {
+        dropdown.classList.add('show');
+        isDropdownOpen = true;
+      });
+      dropdown.addEventListener('mouseleave', (e) => {
+        const rect = dropdownContent.getBoundingClientRect();
+        const buffer = 60;
+        const checkMouse = (ev) => {
+          if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
+            dropdown.classList.remove('show');
+            isDropdownOpen = false;
+            window.removeEventListener('mousemove', checkMouse);
+          }
+        };
+        window.addEventListener('mousemove', checkMouse);
+      });
+
+      window.addEventListener('scroll', () => {
+        dropdown.classList.remove('show');
+        isDropdownOpen = false;
+      });
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          dropdown.classList.remove('show');
+          isDropdownOpen = false;
+        }
+      });
+
+      const hamburger = document.querySelector('.hamburger');
+      const navLinks = document.querySelector('.nav-links');
+      const Channel_Key = "UCaWAxGQH0nU3w5PXDppmcvQ";
+      const Channel_Code = "rN1NSZ2SDNWWONnez1CRVhXZx9kb5FXNINWQutme0NkQ5NVY6lUQ";
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+      });
+
+      const EN = () => atob(Channel_Code.split('').reverse().join(''));
+      const Channel_ID = EN();
+      function followerCounts() {
         updateYouTubeStats();
         animateCount("igCount", 1300);
         animateCount("tiktokCount", 1350);
@@ -105,7 +170,7 @@
 
       async function updateYouTubeStats() {
         try {
-          const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${YCI}&key=${YAK}`);
+          const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${Channel_Key}&key=${Channel_ID}`);
           const data = await res.json();
           if (!data.items || !data.items.length) {
             animateCount("ytCount", 1000);
@@ -119,16 +184,15 @@
         }
       }
       
-      /* -------- Suggested Contents -------- */
-      async function loadSuggestedData() {
+      async function suggestedContent() {
         const videoId = "jDHrCU9Q0ME";
         const playlistId = "PLE9_yXA2umvKX27H9yC5u4xE8aQ0wXH4L";
         const section = document.getElementById("suggestedSection");
         section.innerHTML = "";
 
         const [videoRes, playlistRes] = await Promise.all([
-          fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${YAK}`),
-          fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${playlistId}&key=${YAK}`)
+          fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${Channel_ID}`),
+          fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${playlistId}&key=${Channel_ID}`)
         ]);
 
         const videoData = await videoRes.json();
@@ -197,12 +261,12 @@
       /* -------- Recent Videos -------- */
       let videosLoaded = false;
       const numVideos = 18;
-      async function loadYouTubeVideos() {
-        try {
-          if (videosLoaded) return;
-          videosLoaded = true;
+      async function recentContent() {
+        if (videosLoaded) return;
+        videosLoaded = true;
 
-          const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${YAK}&channelId=${YCI}&part=snippet,id&order=date&maxResults=${numVideos}`);
+        try {
+          const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${Channel_ID}&channelId=${Channel_Key}&part=snippet,id&order=date&maxResults=${numVideos}`);
           const data = await res.json();
           if (!data.items || !data.items.length) {
             document.getElementById("videos-title").innerHTML = "Unable to load videos. Please try again later.";
@@ -211,12 +275,12 @@
           }
 
           const videoGrid = document.getElementById("videoGrid");
-          videoGrid.innerHTML = "";
+          if (videoGrid.children.length > 0) return; 
           
           const videoItems = data.items.filter(i => i.id.kind === "youtube#video");
           const videoIds = videoItems.map(i => i.id.videoId).join(",");
 
-          const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${YAK}`);
+          const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${Channel_ID}`);
           const statsData = await statsRes.json();
           const statsMap = {};
           statsData.items.forEach(v => { statsMap[v.id] = v.statistics; });
@@ -254,78 +318,15 @@
           await new Promise(r => requestAnimationFrame(r));
           videoGrid.appendChild(fragment);
         } catch (err) {
-          console.log("YouTube Video Loading Error: " + err);
+          videosLoaded = false;
+          console.log("[ERROR] Loading Recent Videos: " + err);
         }
       }
 
       window.addEventListener("load", () => {
-        initFollowerCounts();
-        loadSuggestedData();
-        loadYouTubeVideos();
-      });
-
-      document.addEventListener('contextmenu', event => event.preventDefault());
-      document.addEventListener('keydown', event => {
-        if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
-          event.preventDefault();
-        }
-      });
-
-      const headerEl = document.querySelector('header');
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY;
-        const maxOpacity = 0.45;
-        const maxBlur = 12;
-        const pct = Math.min(y / 300, 1);
-        headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
-        headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
-
-        if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
-      });
-
-      const dropdown = document.querySelector('.dropdown');
-      const dropbtn = dropdown.querySelector('.dropbtn');
-      const dropdownContent = dropdown.querySelector('.dropdown-content');
-      let isDropdownOpen = false;
-
-      dropbtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        isDropdownOpen = !isDropdownOpen;
-        dropdown.classList.toggle('show', isDropdownOpen);
-      });
-      dropdown.addEventListener('mouseenter', () => {
-        dropdown.classList.add('show');
-        isDropdownOpen = true;
-      });
-      dropdown.addEventListener('mouseleave', (e) => {
-        const rect = dropdownContent.getBoundingClientRect();
-        const buffer = 60;
-        const checkMouse = (ev) => {
-          if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
-            dropdown.classList.remove('show');
-            isDropdownOpen = false;
-            window.removeEventListener('mousemove', checkMouse);
-          }
-        };
-        window.addEventListener('mousemove', checkMouse);
-      });
-
-      window.addEventListener('scroll', () => {
-        dropdown.classList.remove('show');
-        isDropdownOpen = false;
-      });
-      document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) {
-          dropdown.classList.remove('show');
-          isDropdownOpen = false;
-        }
-      });
-
-      const hamburger = document.querySelector('.hamburger');
-      const navLinks = document.querySelector('.nav-links');
-      hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
+        followerCounts();
+        suggestedContent();
+        recentContent();
       });
     </script>
   </body>
