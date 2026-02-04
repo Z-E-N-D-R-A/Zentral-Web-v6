@@ -128,7 +128,7 @@
 
   <div id="prompt" class="prompt">
     <div class="prompt-container">
-      <h3 class="prompt-header">Welcome to Zentral Chat</h3>
+      <h3 class="prompt-header">Welcome to Zentral-Chat</h3>
       <div class="prompt-title"><b>Username</b></div>
       <div class="prompt-description">Choose a unique username; this will be your public display name.</div>
       <input id="prompt-name" placeholder="Username" maxlength="30" style="margin-top: 8px;"/>
@@ -140,7 +140,9 @@
         <button id="recovery-button">Recover</button>
       </div>
       <div id="recovery-error" class="prompt-description" style="color: #FF2900; margin-top: 4px;"></div>
-      <div class="prompt-description" style="text-align: center; margin-top: 8px;">By joining, you agree to the Term and Conditions.</div>
+      <div class="prompt-description" style="text-align: center; margin-top: 8px;">
+        By joining, you agree to the <a href="../Chat/terms.html" style="text-decoration: underline;">Terms and Conditions</a>.
+      </div>
     </div>
   </div>
 
@@ -251,8 +253,10 @@
       </div>
   
       <textarea id="report-custom-reason" placeholder="Report Reason (max 200 characters)" class="report-custom-reason hidden" maxlength="200"></textarea>
-  
+
       <div class="report-actions">
+        <div id="report-status" class="report-status"></div>
+      
         <button id="report-submit" class="reportBtn sendReport">Send Report</button>
         <button id="report-cancel" class="reportBtn cancel">Cancel</button>
       </div>

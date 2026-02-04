@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
-  <title>Zentral-Web | Questionnaire</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
+    <title>Zentral-Web | Questionnaire</title>
 
-  <link href=".../Assets/Icon.png" rel="icon">
-  <link href="../CSS/style.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href=".../Assets/Icon.png" rel="icon">
+    <link href="../CSS/style.css" rel="stylesheet">
+    <link href="../CSS/others.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -35,7 +36,158 @@
             <span></span>
         </div>
     </header>
+
+    <div class="form">
+        <div class="form-wrapper">
+            <div class="form-box">
+                <div class="form-header">
+                    <h1>ZENTRAL QUESTIONNAIRE</h1>
+                    <p>Zentral-Web • Others <br><br>
+                        Please take a couple minutes to fill in this questionnaire. By learning more about your experiences
+                        with our channel and website, we will further improve and continue to provide better services.</p>
+                </div>
     
+                <div class="form-tabs">
+                    <button class="tab active" data-tab="website">Website</button>
+                    <button class="tab" data-tab="channel">Channel</button>
+                </div>
+    
+                <div class="form-body">
+                    <div class="form-section active" id="tab-website">
+                        <div class="question-row">
+                            <div class="form-question">Website User-friendliness</div>
+                            <div class="stars" data-name="w_q1"></div>
+                        </div>
+    
+                        <div class="question-row">
+                            <div class="form-question">Visual Design Quality</div>
+                            <div class="stars" data-name="w_q2"></div>
+                        </div>
+    
+                        <div class="form-question"><span>Ease of Navigation</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="w_q3" value="Simple"> Simple</label>
+                            <label><input type="radio" name="w_q3" value="Average"> Average</label>
+                            <label><input type="radio" name="w_q3" value="Difficult"> Difficult</label>
+                        </div>
+    
+                        <div class="form-question"><span>Website Performance</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="w_q4" value="Fast"> Fast</label>
+                            <label><input type="radio" name="w_q4" value="Average"> Average</label>
+                            <label><input type="radio" name="w_q4" value="Slow"> Slow</label>
+                        </div>
+    
+                        <div class="form-question"><span>Where did you learn about Zentral-Web?</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="w_q5" value="Social Media"> Social Media (e.g. YouTube, Instagram)</label>
+                            <label><input type="radio" name="w_q5" value="Friends/Family"> Friends and Family</label>
+                            <label><input type="radio" name="w_q5" value="Others"> Others</label>
+                            <label><input type="radio" name="w_q5" value="Not sure"> Not sure</label>
+                        </div>
+    
+                        <div class="form-question"><span>What features would you like to see in the future?</span></div>
+                        <div class="options">
+                            <label><input type="checkbox" name="w_q6" value="Games"> Interactive Games</label>
+                            <label><input type="checkbox" name="w_q6" value="Posts"> Community Posts</label>
+                            <label><input type="checkbox" name="w_q6" value="Settings"> Settings (e.g. Light/Dark Mode)</label>
+                            <label class="other-option"><input type="checkbox" name="w_q6" value="Other">Other</label>
+                            <input type="text" class="other-input" placeholder="Please specify..." data-for="w_q6" hidden>
+                        </div>
+    
+                        <div class="form-question"><span>Have you tried Zentral-Chat?</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="w_q7" value="Yes"> Yes</label>
+                            <label><input type="radio" name="w_q7" value="No"> No</label>
+                        </div>
+    
+                        <div class="question-row">
+                            <div class="form-question">Overall Satisfaction</div>
+                            <div class="stars" data-name="w_q8"></div>
+                        </div>
+    
+                        <div class="form-question"><span>Your name</span></div>
+                        <input id="w_name" placeholder="Name (or Anonymous if blank)">
+                    </div>
+    
+                    <div class="form-section" id="tab-channel">
+                        <div class="question-row">
+                            <div class="form-question">Content Quality</div>
+                            <div class="stars" data-name="c_q1"></div>
+                        </div>
+    
+                        <div class="question-row">
+                            <div class="form-question">Upload Consistency</div>
+                            <div class="stars" data-name="c_q2"></div>
+                        </div>
+    
+                        <div class="form-question"><span>Favorite Content Type</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="c_q3" value="Reel/Shorts"> Reels/Shorts</label>
+                            <label><input type="radio" name="c_q3" value="Video"> Videos</label>
+                            <label><input type="radio" name="c_q3" value="Live Stream"> Live Streams</label>
+                        </div>
+    
+                        <div class="form-question"><span>What platforms do you watch on?</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="c_q4" value="YouTube"> YouTube</label>
+                            <label><input type="radio" name="c_q4" value="Instagram"> Instagram</label>
+                            <label><input type="radio" name="c_q4" value="TikTok"> TikTok</label>
+                        </div>
+    
+                        <div class="form-question"><span>What content do you enjoy the most currently?</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="c_q5" value="Kahoot"> Kahoot Series</label>
+                            <label><input type="radio" name="c_q5" value="Iconic Quotes"> Iconic Quote Series</label>
+                            <label><input type="radio" name="c_q5" value="Pause Game"> Pause Game Series</label>
+                            <label><input type="radio" name="c_q5" value="Others"> Others</label>
+                        </div>
+    
+                        <div class="form-question"><span>What content would you like in the future?</span></div>
+                        <div class="options">
+                            <label><input type="checkbox" name="c_q6" value="Guide/Tutorial"> Guides and Tutorials</label>
+                            <label><input type="checkbox" name="c_q6" value="Gameplay/Montage"> Gameplay and Montages</label>
+                            <label><input type="checkbox" name="c_q6" value="Tierlist/Ranking"> Tier Lists and Rankings</label>
+                            <label class="other-option"><input type="checkbox" name="c_q6" value="Other">Other</label>
+                            <input type="text" class="other-input" placeholder="Please specify..." data-for="c_q6" hidden>
+                        </div>
+    
+                        <div class="form-question"><span>Would you continue supporting if we post contents of other games as well?</span></div>
+                        <div class="options">
+                            <label><input type="radio" name="c_q7" value="Yes"> Yes</label>
+                            <label><input type="radio" name="c_q7" value="No"> No</label>
+                        </div>
+    
+                        <div class="question-row">
+                            <div class="form-question">Overall Channel Rating</div>
+                            <div class="stars" data-name="c_q8"></div>
+                        </div>
+    
+                        <div class="form-question"><span>Your name</span></div>
+                        <input id="c_name" placeholder="Name (or Anonymous if blank)">
+                    </div>
+    
+                    <label class="consent">
+                        <input type="checkbox" id="consent">I consent to my responses being collected and analysed.
+                    </label>
+    
+                    <div class="status" id="status"></div>
+                    <div class="form-button" onclick="submitQuestionnaire()">Submit</div>
+    
+                    <div class="thank-you hidden" id="qnThankYou">
+                        <h2>Thank you!</h2>
+                        <p>Your feedback has been submitted successfully.</p>
+                    </div>
+                </div>
+    
+                <div class="loading-overlay hidden" id="loadingOverlay">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Submitting…</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-socials">
             <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
@@ -49,6 +201,114 @@
     </footer>
     
     <script>
+        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #001f62, #050008)");
+        document.documentElement.style.setProperty("--form-title", "#6380ff");
+        document.documentElement.style.setProperty("--form-question", "#93abff");
+        document.documentElement.style.setProperty("--form-btn", "linear-gradient(0deg, #759eff, #2f51c1)");
+        document.documentElement.style.setProperty("--form-btnHover", "rgba(90, 120, 255, 0.75)");
+
+        let activeTab = "website";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW5mmrs2ERxM8SBWAoZapJ7ibq_PQWodzYxBKRwzcvmMRPI5r7n0k1wIMut3QITBx7-g/exec";
+
+        document.addEventListener("change", e => {
+            if (e.target.matches("input[value='Other']")) {
+                const input = document.querySelector(`.other-input[data-for="${e.target.name}"]`);
+                if (input) input.hidden = !e.target.checked;
+            }
+        });
+
+        document.querySelectorAll(".tab").forEach(tab => {
+            tab.onclick = () => {
+                document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                document.querySelectorAll(".form-section").forEach(s => s.classList.remove("active"));
+
+                tab.classList.add("active");
+                activeTab = tab.dataset.tab;
+                document.getElementById("tab-" + activeTab).classList.add("active");
+                document.getElementById("consent").checked = false;
+            };
+        });
+
+        document.querySelectorAll(".stars").forEach(starBox => {
+            const name = starBox.dataset.name;
+            for (let i = 1; i <= 5; i++) {
+                const s = document.createElement("span");
+                s.textContent = "★";
+                s.className = "star";
+                s.onclick = () => {
+                    starBox.dataset.value = i;
+                    [...starBox.children].forEach((c, idx) => c.classList.toggle("active", idx < i));
+                };
+                starBox.appendChild(s);
+            }
+        });
+
+        async function submitQuestionnaire() {
+            const status = document.getElementById("status");
+            const section = document.getElementById("tab-" + activeTab);
+            const payload = { type: activeTab };
+            let qIndex = 1;
+
+            for (const el of section.querySelectorAll(".stars")) {
+                if (!el.dataset.value) {
+                    status.textContent = "Please complete all questions.";
+                    status.className = "status error";
+                    return;
+                }
+                payload["q" + qIndex++] = el.dataset.value;
+            }
+
+            if (!document.getElementById("consent").checked) {
+                status.textContent = "Consent is required.";
+                status.className = "status error";
+                return;
+            }
+
+            section.querySelectorAll(".options").forEach(opt => {
+                const radios = opt.querySelectorAll("input[type=radio]");
+                if (radios.length) {
+                    const r = [...radios].find(r => r.checked);
+                    if (!r) throw "incomplete";
+                    payload["q" + qIndex++] = r.value;
+                } else {
+                    const checks = [];
+                    for (const c of opt.querySelectorAll("input:checked")) {
+                        if (c.value === "Other") {
+                            const input = section.querySelector(`.other-input[data-for="${c.name}"]`);
+                            if (!input || !input.value.trim()) throw "other";
+                            checks.push("Other: " + input.value.trim());
+                        } else {
+                            checks.push(c.value);
+                        }
+                    }
+                    if (!checks.length) throw "incomplete";
+                    payload["q" + qIndex++] = checks.join(", ");
+                }
+            });
+
+            payload.name = (activeTab === "website" ? document.getElementById("w_name").value : document.getElementById("c_name").value) || "Anonymous";
+            document.getElementById("loadingOverlay").classList.remove("hidden");
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                    mode: "no-cors"
+                });
+
+                document.querySelector(".form-tabs").style.display = "none";
+                document.querySelector(".form-body > .form-section.active").style.display = "none";
+                document.querySelector(".consent").style.display = "none";
+                document.querySelector(".form-button").style.display = "none";
+                status.style.display = "none";
+
+                document.getElementById("qnThankYou").classList.remove("hidden");
+            } finally {
+                document.getElementById("loadingOverlay").classList.add("hidden");
+            }
+        }
+
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {

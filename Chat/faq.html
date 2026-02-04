@@ -7,6 +7,7 @@
 
   <link href="../Assets/Icon.png" rel="icon">
   <link href="../CSS/style.css" rel="stylesheet">
+  <link href="../CSS/others.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
@@ -35,20 +36,351 @@
             <span></span>
         </div>
     </header>
+
+    <div class="faq">
+    <div class="faq-wrapper">
+        <div class="faq-window">
+            <div class="faq-header">
+                <h1>FREQUENTLY ASKED QUESTIONS</h1>
+                <p>Zentral Chat • Help & Information</p>
+                <input id="faqSearch" type="text" placeholder="Search questions..." autocomplete="off" />
+            </div>
     
+            <div class="faq-list" id="faqList">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What is Zentral Chat?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Zentral Chat is a real-time online communication platform designed specifically for the Zendra community to <strong>interact, chat, and share experiences</strong>. With badges, themes, and reactions to further enhance the experience.</div>
+                    </div>
+                </div>
+    
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Is Zentral Chat free to use?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Yes, <strong>Zentral Chat is completely free</strong>. We focus on bringing the best user experiences possible while keeping all features free to use.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What platforms does Zentral Chat support?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Zentral Chat is web-based and accessible on <strong>modern desktop, laptop, tablet, and mobile browsers</strong>. Additional platforms may be introduced in the future.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How is my data handled on Zentral Chat?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Unlike most chat platforms, <strong>we prioritize your privacy by avoiding collecting any personal data</strong> (e.g. IP addresses, device information, location data).
+                             Only data such as messages, account identifiers, and moderation logs are stored temporarily for security and functionality purposes. We will protect your data at all cost as we believe creating a safe environment is the key to our success.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I report a bug or issue with Zentral Chat?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>If you encounter a bug or issue with Zentral Chat, please report it through the <a href="../Others/feedback.html" style="color: #fff; text-decoration: underline;">Feedback Form</a>. We will look into the issue and update the server as soon as possible.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I reply to messages?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Yes, you can reply to a message by opening the action menu (press and hold the message) and selecting 'reply' for tablet/mobile devices, or hovering and clicking the reply icon on laptops/desktops. Altenatively, you can use the swipe-to-reply feature on tablet and mobile devices by swiping the message to the side.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I edit or delete my messages?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Yes, you can edit or delete your own messages within 48 hours of sending them. To edit or delete, open the action menu (Phones/Tablet: press and hold the message, Desktops/Laptops: hover and click the three dots) and select the apropriate option.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I add reaction to a message?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>To react, open the action menu (Phones/Tablet: press and hold the message, Desktops/Laptops: hover and click the three dots). Next, press click 'react' and select a reaction. As of early 2026, only six emojis are available for reactions.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I remove reaction from a message?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>To remove a reaction, simply click on the reaction you want to remove.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I see who reacted to my message?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>To see who reacted to your message, press and hold the reaction badge for tablet and mobile devices, or hover over the badge on desktop and laptops. A reaction tooltip will appear and show all users who reacted.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What is leveling for in Zentral Chat?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Levels is a progression system in Zentral Chat to encourage active chatting. ZXP (Zentral Experience Point) are rewarded for sending and reacting to messages. By reaching the ZXP requirement for each level, you will level up and obtain badges. To check how much ZXP you have/need, head to settings (settings button on sidebar).</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I obtain badges?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Badges can be obtained for leveling up or contributing to the Zendra community. Here are the badges you can obtain from leveling.<br>Level 1 - Starter<br>Level 5 - Rookie<br>Level 10 - Expert<br>Level 25 - Veteran<br>Level 50 - Elite<br>Level 100 - Champion</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How do I equip/unequip my badges?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>To equip or unequip your badges, head to settings (settings button on sidebar) and click on the badges, a dropdown menu will showup with all avaiable options.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I change my profile icon?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>To change your profile icon, head to settings (settings button on sidebar) and select the profile icon of your choice. It will automatically apply once you close the settings. Custom profile icons is not available currently.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I change my chat theme?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>To change your chat theme, head to settings (settings button on sidebar) and select the chat theme of your choice.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How is moderation handled?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Moderation is handled using <strong>automated systems alongside human moderation</strong> to detect spam, abuse, and suspicious behavior.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What to do if I encounter inappropriate content or behavior?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>If you encounter inappropriate content or behavior, please use the report feature available in the action menu (Phones/Tablet: press and hold the message, Desktops/Laptops: hover and click the three dots) to notify moderators.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What happens when I report a message?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Reports are logged securely and reviewed by moderators. Repeated abuse of the reporting system may result in restrictions. </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Are messages stored permanently?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>No, messages are <strong>only stored temporarily</strong> for moderation, security, and system integrity purposes.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Will my account be deleted after inactivity?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Yes, accounts are automatically deleted after long period of inactivity.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What is recovery code used for?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Recovery codes are used to recovery the account when lost or identity verification. Recovery codes can be found in the settings. Please make sure to save it and keep it private, anyone with it can access your account.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What to do if my account is lost?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>If your account is lost, you may recovery it using your recovery code in the login page. If you did not save your recovery code, you may request assistance through <a href="../Others/support.html" style="color: #fff; text-decoration: underline;">Support Form</a>.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        What to do if my account is hacked?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>If your account has been hacked, please notify us immediately through <a href="../Others/support.html" style="color: #fff; text-decoration: underline;">Support Form</a>. We will verify your identity and logout the account on all devices.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can my account be banned or restricted?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Yes. Violating the Terms & Conditions may result in warnings, timeout, or permanent bans.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I appeal a ban or restriction?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Yes, appeals may be submitted through <a href="../Others/support.html" style="color: #fff; text-decoration: underline;">Support Form</a> and are reviewed case-by-case. It might take few weeks for your appeal to be processed.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        Can I create multiple accounts?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>No, you are only allowed to have <strong>one account per user</strong> due to identification and security reasons.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I delete my account?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>Account deletion is not supported at this time. Accounts cannot be deleted or logged out by you once created.</div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How can I change my username?
+                        <span class="faq-arrow">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <div>As of early 2026, username changes are not supported. Please submit <a href="../Others/support.html" style="color: #fff; text-decoration: underline;">Support Form</a> if you need assistance with your username.</div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="faq-footer">
+                <button onclick="location.href='chat.html'">Return to Chat</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <footer>
         <div class="footer-socials">
-            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fa-brands fa-discord"></i></a>
-            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
         </div>
-        2025 Zentral-Web | Powered by KuraWorks
+        2026 Zentral-Web | Powered by KuraWorks
     </footer>
     
     <script>
+        const faqItems = document.querySelectorAll(".faq-item");
+        const searchInput = document.getElementById("faqSearch");
+
+        faqItems.forEach(item => {
+            const btn = item.querySelector(".faq-question");
+            btn.addEventListener("click", () => {
+                item.classList.toggle("open");
+            });
+        });
+
+        searchInput.addEventListener("input", () => {
+            const query = searchInput.value.toLowerCase();
+
+            faqItems.forEach(item => {
+                const q = item.querySelector(".faq-question").innerText.toLowerCase();
+                const a = item.querySelector(".faq-answer").innerText.toLowerCase();
+
+                const match = q.includes(query) || a.includes(query);
+                item.style.display = match ? "block" : "none";
+
+                if (!match) item.classList.remove("open");
+            });
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+                event.preventDefault();
+            }
+        });
+
         const headerEl = document.querySelector('header');
         window.addEventListener('scroll', () => {
             const y = window.scrollY;

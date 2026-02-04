@@ -1262,8 +1262,8 @@ section.content h2 {
 
 .plan {
     margin-top: 6px;
-    background: linear-gradient(0deg, #f27a7c9c, #f7d4869c);
-    color: #434343;
+    background: linear-gradient(45deg, #f27a7c9c, #f7d4869c);
+    color: #fffedcb7;
     font-size: 12px;
     padding: 6px 8px;
     border-radius: 10px;
@@ -1787,7 +1787,7 @@ section.content h2 {
 }
 
 .milestone.highlight .milestone-card {
-    background: linear-gradient(180deg, #ff9fe4, #7303c0);
+    background: linear-gradient(180deg, #ff9fe48f, #7303c08f);
     font-weight: bold;
 }
 

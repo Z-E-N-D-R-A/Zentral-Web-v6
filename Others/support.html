@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
-  <title>Zentral-Web | Feedback</title>
+  <title>Zentral-Web | Support</title>
 
-  <link href="../Assets/Icon.png" rel="icon">
+  <link href=".../Assets/Icon.png" rel="icon">
   <link href="../CSS/style.css" rel="stylesheet">
   <link href="../CSS/others.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -41,41 +41,35 @@
         <div class="form-wrapper">
             <div class="form-box">
                 <div class="form-header">
-                    <h1>ZENTRAL FEEDBACK</h1>
+                    <h1>ZENTRAL SUPPORT</h1>
                     <p>Zentral-Web • Others <br><br>
-                    Provide suggestions and feedbacks for us to improve our services. Your ideas are revolutionary for us!</p>
+                        Need help? Contact us below</p>
                 </div>
     
-                <div class="form-body" id="feedbackForm">
+                <div class="form-body" id="supportForm">
                     <div class="form-question"><span>Your name</span></div>
-                    <input id="fb_name" placeholder="Name (or Anonymous if blank)">
+                    <input id="sp_name" placeholder="Name (or Anonymous if blank)">
     
-                    <div class="form-question"><span>This feedback is for...</span></div>
+                    <div class="form-question"><span>Describe your issue</span></div>
+                    <textarea id="sp_issue" rows="4" placeholder="Explain the issue in detail..."></textarea>
+    
+                    <div class="form-question"><span>How should we contact you?</span></div>
                     <div class="options">
-                        <label><input type="radio" name="fb_target" value="Website"> Website</label>
-                        <label><input type="radio" name="fb_target" value="Channel"> Channel</label>
-                        <label><input type="radio" name="fb_target" value="Zentral-Chat"> Zentral-Chat</label>
-                        <label><input type="radio" name="fb_target" value="Other"> Other</label>
+                        <label><input type="radio" name="sp_contact" value="Email"> Email</label>
+                        <label><input type="radio" name="sp_contact" value="Instagram"> Instagram</label>
+                        <label><input type="radio" name="sp_contact" value="Discord"> Discord</label>
                     </div>
+                    <input id="sp_contact_value" placeholder="Email / @username / Discord tag">
     
-                    <div class="form-question"><span>Is this a bug report?</span></div>
-                    <div class="options">
-                        <label><input type="radio" name="fb_bug" value="Yes"> Yes</label>
-                        <label><input type="radio" name="fb_bug" value="No"> No</label>
-                    </div>
-    
-                    <div class="form-question"><span>Your feedback</span></div>
-                    <textarea id="fb_text" rows="4" placeholder="Describe your feedback here..."></textarea>
-    
-                    <div class="status" id="fb_status"></div>
-                    <div class="form-button" onclick="submitFeedback()">Submit</div>
+                    <div class="status" id="sp_status"></div>
+                    <div class="form-button" onclick="submitSupport()">Submit Support Request</div>
                 </div>
-    
-                <div class="thank-you hidden" id="fbThankYou">
+                
+                <div class="thank-you hidden" id="spThankYou">
                     <h2>Thank you!</h2>
-                    <p>Your feedback has been sent successfully.</p>
+                    <p>Your support request has been sent successfully.</p>
                 </div>
-    
+                
                 <div class="loading-overlay hidden" id="loadingOverlay">
                     <div class="spinner"></div>
                     <div class="loading-text">Submitting…</div>
@@ -97,31 +91,32 @@
     </footer>
     
     <script>
-        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #054d49, #050008)");
-        document.documentElement.style.setProperty("--form-title", "#63e8ff");
-        document.documentElement.style.setProperty("--form-question", "#b5ffff");
-        document.documentElement.style.setProperty("--form-btn", "linear-gradient(0deg, #2f93c1, #2fc190)");
-        document.documentElement.style.setProperty("--form-btnHover", "rgba(90, 252, 255, 0.75)");
+        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #128729, #050008)");
+        document.documentElement.style.setProperty("--form-title", "#63ffa4");
+        document.documentElement.style.setProperty("--form-question", "#b5ffcb");
+        document.documentElement.style.setProperty("--form-btn", "linear-gradient(0deg, #2fc19f, #2fc151)");
+        document.documentElement.style.setProperty("--form-btnHover", "rgba(90, 255, 142, 0.75)");
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW5mmrs2ERxM8SBWAoZapJ7ibq_PQWodzYxBKRwzcvmMRPI5r7n0k1wIMut3QITBx7-g/exec";
 
-        async function submitFeedback() {
-            const status = document.getElementById("fb_status");
-            const target = document.querySelector("input[name='fb_target']:checked");
-            const bug = document.querySelector("input[name='fb_bug']:checked");
-            const text = document.getElementById("fb_text").value.trim();
+        async function submitSupport() {
+            const status = document.getElementById("sp_status");
+            const name = document.getElementById("sp_name").value || "Anonymous";
+            const issue = document.getElementById("sp_issue").value.trim();
+            const contactMethod = document.querySelector("input[name='sp_contact']:checked");
+            const contactValue = document.getElementById("sp_contact_value").value.trim();
 
-            if (!target || !bug || !text) {
-                status.textContent = "Please complete all fields.";
+            if (!issue || !contactMethod || !contactValue) {
+                status.textContent = "Please complete all required fields.";
                 status.className = "status error";
                 return;
             }
 
             const payload = {
-                type: "feedback",
-                name: document.getElementById("fb_name").value || "Anonymous",
-                target: target.value,
-                isBug: bug.value,
-                message: text
+                type: "support",
+                name,
+                issue,
+                contactMethod: contactMethod.value,
+                contactValue
             };
 
             document.getElementById("loadingOverlay").classList.remove("hidden");
@@ -134,11 +129,12 @@
                     mode: "no-cors"
                 });
 
-                document.getElementById("feedbackForm").style.display = "none";
+                document.getElementById("supportForm").style.display = "none";
                 status.style.display = "none";
-                document.getElementById("fbThankYou").classList.remove("hidden");
+                document.getElementById("spThankYou").classList.remove("hidden");
+
             } catch (err) {
-                status.textContent = "Failed to submit feedback.";
+                status.textContent = "Failed to send support request.";
                 status.className = "status error";
                 console.error(err);
             } finally {

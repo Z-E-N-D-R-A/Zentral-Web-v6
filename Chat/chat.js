@@ -303,6 +303,8 @@ function tryProcessQueue() {
     return;
   }
 
+  initMessageLoading();
+
   if (pendingRestore) {
     const code = pendingRestore;
     pendingRestore = null;
@@ -372,6 +374,7 @@ const reportModal = document.getElementById("report-modal");
 const reportSubmit = document.getElementById("report-submit");
 const reportCancel = document.getElementById("report-cancel");
 const customReasonInput = document.getElementById("report-custom-reason");
+const reportStatusEl = document.getElementById("report-status");
 
 const recoveryCodeEl = document.getElementById("recoveryCode");
 const toggleRecoveryBtn = document.getElementById("toggleRecovery");
@@ -391,6 +394,12 @@ const PAGE_SIZE = 50;
 const LOAD_THRESHOLD = 300;
 const ICONS_PER_PAGE = 8;
 const THEMES_PER_PAGE = 2;
+
+const RESTORE_MAX_ATTEMPTS = 8;
+const RESTORE_LOCK_TIME = 30 * 60 * 1000;
+const REPORT_LIMIT = 3;
+// const REPORT_WINDOW = 24 * 60 * 60 * 1000;
+const REPORT_WINDOW = 1 * 60 * 1000;
 
 let originalText = "";
 let editingId = null;
@@ -815,7 +824,11 @@ function insertMessage(msgEl, timestamp) {
 }
 
 /* ================= FIREBASE LISTENERS (PARTIAL LOAD)================= */
-(async function initMessageLoading() {
+let messagesInitialized = false;
+async function initMessageLoading() {
+  if (messagesInitialized) return;
+  messagesInitialized = true;
+
   const loadStart = performance.now();
 
   const messagesSnap = await messagesRef.orderByChild("time").limitToLast(PAGE_SIZE).once("value")
@@ -937,6 +950,32 @@ function insertMessage(msgEl, timestamp) {
     }
   });
 
+  messagesRef.on("child_changed", snap => {
+    const id = snap.key;
+    const incoming = snap.val();
+    const prev = messages[id] || {};
+    const msg = { ...prev, ...incoming, id };
+
+    messages[id] = msg;
+    const el = domCache[id];
+    if (!el) return;
+
+    updateMessageElement(msg);
+    updateReplyBubble(id);
+  });
+
+  messagesRef.on("child_removed", snap => {
+    const id = snap.key;
+    const el = domCache[id];
+    if (!el) return;
+
+    el.remove();
+    delete domCache[id];
+    delete messages[id];
+
+    regroupMessages();
+  });
+
   levelLogsRef.limitToLast(1).on("child_added", snap => {
     const id = snap.key;
     if (levelEventCache[id]) return;
@@ -947,33 +986,7 @@ function insertMessage(msgEl, timestamp) {
     const el = { id, ...data };
     insertMessage(createLevelSeparator(el), el.time);
   });
-})();
-
-messagesRef.on("child_changed", snap => {
-  const id = snap.key;
-  const incoming = snap.val();
-  const prev = messages[id] || {};
-  const msg = { ...prev, ...incoming, id };
-
-  messages[id] = msg;
-  const el = domCache[id];
-  if (!el) return;
-
-  updateMessageElement(msg);
-  updateReplyBubble(id);
-});
-
-messagesRef.on("child_removed", snap => {
-  const id = snap.key;
-  const el = domCache[id];
-  if (!el) return;
-
-  el.remove();
-  delete domCache[id];
-  delete messages[id];
-
-  regroupMessages();
-});
+};
 
 async function loadOlderMessages() {
   const loadStart = performance.now();
@@ -2497,9 +2510,10 @@ function hideBadgeTooltip() {
 function openReportPage(message) {
   activeReport = message;
   selectedReason = null;
-  reportSubmit.disabled = true;
   customReasonInput.value = "";
+  reportStatusEl.textContent = "";
   customReasonInput.classList.add("hidden");
+  reportSubmit.disabled = false; 
 
   document.querySelectorAll(".report-option").forEach(b => b.classList.remove("selected"));
 
@@ -2513,13 +2527,51 @@ function closeReportPage() {
   activeReport = null;
 }
 
-reportSubmit.onclick = () => {
-  if (!activeReport || !selectedReason) return;
+async function canSubmitReport() {
+  const now = Date.now();
+  const since = now - REPORT_WINDOW;
 
-  const finalReason = selectedReason === "Other" ? customReasonInput.value.trim()  : selectedReason;
+  const snap = await moderationLogsRef.orderByChild("time").startAt(since).once("value");
+
+  let count = 0;
+  let oldestTime = null;
+
+  snap.forEach(child => {
+    const log = child.val();
+
+    if (log.moderation === "report" && log.reporterId === accountId) {
+      count++;
+
+      if (!oldestTime || log.time < oldestTime) {
+        oldestTime = log.time;
+      }
+    }
+  });
+
+  if (count >= REPORT_LIMIT && oldestTime) {
+    reportStatusEl.textContent = `Too many reports. Try again later.`;
+    reportStatusEl.classList.remove("report-success");
+    return false;
+  }
+
+  return true;
+}
+
+reportSubmit.onclick = async () => {
+  if (!activeReport || !selectedReason) {
+    reportStatusEl.textContent = "Please select a reason.";
+    return;
+  }
+
+  const finalReason = selectedReason === "Other" ? customReasonInput.value.trim() : selectedReason;
+
   if (!finalReason) return;
+  reportStatusEl.textContent = "";
 
-  moderationLogsRef.push({
+  const allowed = await canSubmitReport();
+  if (!allowed) return;
+
+  await moderationLogsRef.push({
     moderation: "report",
     reporterId: accountId,
     messageId: activeReport.id,
@@ -2527,8 +2579,13 @@ reportSubmit.onclick = () => {
     time: Date.now()
   });
 
-  closeReportPage();
+  reportStatusEl.innerHTML = "Report Sent Successfully.<br>Admin will review the message.";
+  reportStatusEl.classList.add("report-success");
+  reportSubmit.disabled = true;
+
+  setTimeout(() => { closeReportPage(); }, 3000);
 };
+
 reportBackdrop.onclick = closeReportPage;
 reportCancel.onclick = closeReportPage;
 
@@ -2545,8 +2602,6 @@ document.querySelectorAll(".report-option").forEach(btn => {
       customReasonInput.classList.add("hidden");
       customReasonInput.value = "";
     }
-
-    reportSubmit.disabled = false;
   };
 });
 
@@ -2879,7 +2934,7 @@ async function join(name, restoredInfo = null) {
     console.log("[JOIN] user:", snap.val());
   } else {
     if (!restoredInfo) {
-      const code = generateRecoveryCode(8);
+      const code = generateRecoveryCode(16);
       const payload = {
         accountId,
         username: displayName,
@@ -2951,6 +3006,7 @@ async function restoreWithCode(code) {
     }
 
     if (!restoredId) {
+      recordRestoreFailure();
       recoveryErrorEl.textContent = "Invalid recovery code.";
       return;
     }
@@ -2959,6 +3015,7 @@ async function restoreWithCode(code) {
 
     const userSnap = await usersRef.child(restoredId).once("value");
     if (!userSnap.exists()) {
+      recordRestoreFailure();
       recoveryErrorEl.textContent = "This account no longer exists. Create a new one to continue.";
       return;
     }
@@ -2980,6 +3037,7 @@ async function restoreWithCode(code) {
     if (promptEl) promptEl.style.display = "none";
     await join(displayName, { username: data.username });
 
+    clearRestoreFailures();
     alert("Account restored. A new recovery code has been generated.");
     location.reload();
   } catch (err) {
@@ -3004,7 +3062,35 @@ function recheckPresenceConnection() {
   });
 }
 
-function generateRecoveryCode(len = 8) {
+function isRestoreLocked() {
+  const lockUntil = Number(localStorage.getItem("z_restore_lock_until")) || 0;
+
+  if (Date.now() < lockUntil) {
+    const mins = Math.ceil((lockUntil - Date.now()) / 60000);
+    recoveryErrorEl.textContent = `Too many invalid attempts. Try again in ${mins} minute${mins > 1 ? "s" : ""}.`;
+    return true;
+  }
+  return false;
+}
+
+function recordRestoreFailure() {
+  let fails = Number(localStorage.getItem("z_restore_fail_count")) || 0;
+  fails++;
+
+  if (fails >= RESTORE_MAX_ATTEMPTS) {
+    localStorage.setItem("z_restore_lock_until", Date.now() + RESTORE_LOCK_TIME);
+    localStorage.removeItem("z_restore_fail_count");
+  } else {
+    localStorage.setItem("z_restore_fail_count", fails);
+  }
+}
+
+function clearRestoreFailures() {
+  localStorage.removeItem("z_restore_fail_count");
+  localStorage.removeItem("z_restore_lock_until");
+}
+
+function generateRecoveryCode(len = 16) {
   const CH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   let out = "";
   for (let i = 0; i < len; i++) out += CH[Math.floor(Math.random() * CH.length)];
@@ -3040,6 +3126,8 @@ joinBtn && (joinBtn.onclick = async () => {
 });
 
 restoreBtn.onclick = () => {
+  if (isRestoreLocked()) return;
+
   const c = recoveryInput ? recoveryInput.value : "";
   restoreWithCode(c);
 };
