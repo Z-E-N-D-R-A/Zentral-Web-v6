@@ -116,7 +116,7 @@ body.timed-out .backdrop {
   z-index: 9999;
 }
 
-#mtn-screen {
+#mtn-screen { 
   position: fixed;
   inset: 0;
   color: #fff;
