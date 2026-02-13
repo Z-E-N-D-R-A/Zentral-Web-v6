@@ -43,7 +43,7 @@
     </div>
   </header>
 
-  <div class="chat-wrapper">
+  <!-- <div class="chat-wrapper">
     <button id="toggleSidebar" class="sidebar-toggle">
       <div class="fa-solid fas fa-grip-horizontal"></div>
     </button>
@@ -80,7 +80,6 @@
       <div class="indicator-row" id="indicatorRow">
         <div id="typingIndicator" class="typing-indicator"></div>
         <div id="charLimitIndicator" class="char-limit-indicator"></div>
-        <!-- <div id="warningIndicator" class="warning-indicator"></div> -->
       </div>
 
       <div id="reply-bar" class="hidden">
@@ -279,9 +278,16 @@
     <p>This account has been permanently banned.</p>
   </div>
 
+  <div id="backdrop" class="backdrop"></div> -->
+
+  <div id="banned-screen" class="hidden">
+    <h1>Server Maintenance</h1>
+    <p>We are currently improving Zentral-Chat. Sorry for the inconveniences.</p>
+  </div>
+
   <div id="backdrop" class="backdrop"></div>
 
-  <script src="chat.js"></script>
+  <!-- <script src="chat.js"></script> -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', event => {
