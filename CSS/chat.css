@@ -119,7 +119,7 @@ body.timed-out .backdrop {
 #mtn-screen { 
   position: fixed;
   inset: 0;
-  top: 65px;
+  top: 65px; 
   background: #0f1117;
   color: #fff;
   display: none;
