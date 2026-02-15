@@ -1472,26 +1472,9 @@ window.addEventListener("keydown", (e) => {
     initAccountSettings();
     settingsModal.classList.remove("hidden");
   }
-
-  if (isModifier && e.key.toLowerCase() === "e") {
-    e.preventDefault();
-    
-    const isOpen = emojiMenu.classList.toggle("open");
-    if (isOpen) {
-      renderAllEmojis();
-      const searchInput = emojiMenu.querySelector("input");
-      if (searchInput) searchInput.focus();
-    } else {
-      emojiReactionTarget = null;
-      emojiOpenedFromReaction = false;
-    }
-  }
   
   if (e.key === "Escape") {
     settingsModal.classList.add("hidden");
-    emojiMenu.classList.remove("open");
-    emojiReactionTarget = null;
-    emojiOpenedFromReaction = false;
   }
 });
 
@@ -2878,12 +2861,6 @@ messagesViewport?.addEventListener("scroll", () => {
   hideReactionTooltip();
   hideBadgeTooltip();
   closeReactionPicker();
-
-  if (emojiOpenedFromReaction && !isMobile) {
-    emojiMenu.classList.remove("open");
-    emojiReactionTarget = null;
-    emojiOpenedFromReaction = false;
-  }
 }, { passive: true });
 
 window.addEventListener("resize", () => {
