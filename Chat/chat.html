@@ -43,9 +43,9 @@
     </div>
   </header>
 
-  <!-- <div class="chat-wrapper">
+  <div class="chat-wrapper">
     <button id="toggleSidebar" class="sidebar-toggle">
-      <div class="fa-solid fas fa-grip-horizontal"></div>
+      <div class="fa-solid fa fa-bars"></div>
     </button>
 
     <aside id="sidebar" class="sidebar">
@@ -63,20 +63,39 @@
           <div id="heat-percent">0%</div>
         </div>
     
-        <button id="sidebarSettingsBtn" class="sidebar-settings-btn">
+        <button id="upgradeGoogleBtn" class="sidebar-btn" style="display: none;">
+          <i class="fa-solid fab fa-google"></i>
+          <span>Connect Account</span>
+        </button>
+
+        <button id="sidebarSettingsBtn" class="sidebar-btn">
           <i class="fa-solid fa-gear"></i>
           <span>Settings</span>
+        </button>
+
+        <button class="sidebar-btn" onclick="window.location.href='../Chat/terms.html'">
+          <i class="fa-solid fas fa-address-book"></i>
+          <span>Terms & Conditions</span>
+        </button>
+
+        <button class="sidebar-btn" onclick="window.location.href='../Chat/faq.html'">
+          <i class="fa-solid fas fa-question-circle"></i>
+          <span>FAQs</span>
         </button>
       </div>
     </aside>
     <div id="backdrop" class="backdrop"></div>
 
     <main id="chat-area" class="chat-area">
-      <div id="newMsgIndicator" class="new-msg-indicator hidden">New messages</div>
+      <div id="newMsgIndicator" class="new-msg-indicator hidden">
+        <span id="newMsgText">↓ 0 New Messages ↓</span>
+      </div>
+
       <div class="messages-scroll">
         <div id="messages"></div>
       </div>
       
+      <button id="jumpToLatestBtn" class="jump-to-latest"> ↓ </button>
       <div class="indicator-row" id="indicatorRow">
         <div id="typingIndicator" class="typing-indicator"></div>
         <div id="charLimitIndicator" class="char-limit-indicator"></div>
@@ -91,7 +110,8 @@
       </div>
       
       <div class="input-bar" id="input-bar">
-        <textarea id="messageInput" placeholder="Type a message…"></textarea>
+        <textarea id="messageInput" placeholder="Type message..."></textarea>
+        
         <button id="sendBtn">
           <div class="fa-solid fas fa-paper-plane"></div> Send
         </button>
@@ -125,35 +145,75 @@
     <div class="sheet-cancel">Cancel</div>
   </div>
 
+  <div id="reaction-picker" class="reaction-picker">
+    <span class="react">❤️</span>
+    <span class="react">👍</span>
+    <span class="react">💀</span>
+    <span class="react">😭</span>
+    <span class="react">😂</span>
+    <span class="react">🔥</span>
+  </div>
+  <div id="reaction-tooltip" class="reaction-tooltip hidden"></div>
+  <div id="badge-tooltip" class="tooltip hidden"></div>
+  
   <div id="prompt" class="prompt">
     <div class="prompt-container">
-      <h3 class="prompt-header">Welcome to Zentral-Chat</h3>
-      <div class="prompt-title"><b>Username</b></div>
-      <div class="prompt-description">Choose a unique username; this will be your public display name.</div>
-      <input id="prompt-name" placeholder="Username" maxlength="30" style="margin-top: 8px;"/>
-      <div id="prompt-error" class="prompt-description" style="color: #FF2900; margin-top: 4px;"></div>
-      <button id="prompt-join">Join Chat</button>
   
-      <div id="recovery" class="recovery">
-        <input id="recovery-code" placeholder="Enter recovery code" style="padding:6px;">
-        <button id="recovery-button">Recover</button>
+      <h3 class="prompt-header">Welcome to Zentral Chat</h3>
+  
+      <div class="prompt-section">
+        <div class="prompt-title"><b>Pick a Username</b></div>
+        <div class="prompt-description">
+          Start instantly as a guest. You can secure your account later.
+        </div>
+  
+        <input id="prompt-name" placeholder="Username" maxlength="30" />
+        <div id="prompt-error" class="prompt-error"></div>
+  
+        <button id="prompt-join" class="joinBtn">Enter as Guest</button>
       </div>
-      <div id="recovery-error" class="prompt-description" style="color: #FF2900; margin-top: 4px;"></div>
-      <div class="prompt-description" style="text-align: center; margin-top: 8px;">
-        By joining, you agree to the <a href="../Chat/terms.html" style="text-decoration: underline;">Terms and Conditions</a>.
+  
+      <div class="prompt-divider"><span>OR</span></div>
+  
+      <button id="prompt-google" class="google-btn">
+        <svg xmlns="http://www.w3.org" viewBox="0 0 48 48" width="20px" height="20px">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+          <path fill="none" d="M0 0h48v48H0z" />
+        </svg>
+        <span>Continue with Google</span>
+      </button>
+        
+      <div class="prompt-description center">
+        By continuing, you agree to the
+        <a href="../Chat/terms.html">Terms & Conditions</a>.
       </div>
     </div>
+  </div>
+    
+  <div id="google-username-prompt" class="prompt" style="display: none;">
+      <div class="prompt-container">
+        <h3 class="prompt-header">Almost There 🚀</h3>
+    
+        <div class="prompt-title"><b>Choose Your Display Name</b></div>
+        <div class="prompt-description">
+          Your Google account is connected.<br>
+          Pick the name others will see in chat.
+        </div>
+    
+        <input id="google-username-input" maxlength="30" />
+        <div id="google-username-error" class="prompt-error"></div>
+        <button id="google-username-confirm" class="joinBtn"> Create Account </button>
+      </div>
   </div>
 
   <div id="settingsModal" class="settings-modal hidden">
     <div class="settings-modal-content">
-      <h3><u>User Settings</u></h3>
+      <h3>User Settings <span style="font-size: 16px;">(@<span id="accountUsername">—</span>)</span></h3>
   
-      <div class="setting-item account-setting">
-        <div class="account-item">
-          <span id="accountUsername" class="account-username">—</span>
-        </div>
-      
+      <div class="setting-item account-setting" style="padding-top: 10px;">
         <div class="account-item badge-row">
           <span class="account-title">Badge</span>
       
@@ -167,7 +227,7 @@
           </div>
         </div>
       
-        <div class="account-item level-row">
+        <div class="account-item level-row" style="margin-bottom: 5px;">
           <span class="account-title">Level</span>
           <span id="levelText" class="account-title">0</span>
         </div>
@@ -191,6 +251,8 @@
       
           <button class="carousel-arrow right" id="iconNext">❯</button>
         </div>
+
+        <div class="google-icon-wrapper" id="googleIconWrapper"></div>
       </div>
   
       <div class="setting-item theme-setting">
@@ -207,27 +269,23 @@
         </div>
       </div>
 
-      <div class="setting-item" style="flex-direction: column; border-bottom: 0px">
-        <div class="recovery-setting">
-          <span>Recovery Code</span>
-        
-          <div class="recovery-controls">
-            <span id="recoveryCode" class="recovery-code masked">••••••••••••••</span>
-        
-            <button id="toggleRecovery" class="recovery-btn" title="Show">
-              <i class="fa-solid fa-eye"></i>
-            </button>
-        
-            <button id="copyRecovery" class="recovery-btn" title="Copy">
-              <i class="fa-solid fa-copy"></i>
-            </button>
+      <div class="setting-item" style="flex-direction: column; border-bottom: 0px;">
+        <div class="google-setting">
+          <span>Google Account</span>
+      
+          <div id="googleActionBtn" class="google-btn">
+            <svg xmlns="http://www.w3.org" viewBox="0 0 48 48" width="20px" height="20px">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+              <path fill="none" d="M0 0h48v48H0z" />
+            </svg>
+            <span id="googleBtnText">Continue with Google</span>
           </div>
         </div>
-        
-        <div class="recovery-text">Recovery Code can be used to restore your account if it's lost. Store this somewhere safe. Anyone with this code can access your account.<br><br></div>
-
-        <a class="others-text" href="../Chat/terms.html">Terms and Conditions</a>
-        <a class="others-text" href="../Chat/faq.html">Frequent Asked Questions</a>
+      
+        <div id="googleStatus" class="google-status">Checking...</div>
       </div>
   
       <button id="closeSettings" class="close-settings-btn">Close</button>
@@ -262,30 +320,19 @@
     </div>
   </div>
 
-  <div id="reaction-picker" class="reaction-picker">
-    <span class="react">❤️</span>
-    <span class="react">💀</span>
-    <span class="react">😭</span>
-    <span class="react">😂</span>
-    <span class="react">👍</span>
-    <span class="react">🔥</span>
-  </div>
-  <div id="reaction-tooltip" class="reaction-tooltip hidden"></div>
-  <div id="badge-tooltip" class="tooltip hidden"></div>
-
   <div id="banned-screen" class="hidden">
     <h1>🚫 You are banned</h1>
     <p>This account has been permanently banned.</p>
-  </div> -->
+  </div>
 
-  <div id="mtn-screen" style="display: flex;">
+  <div id="mtn-screen" style="display: none;">
     <h1>🚧 Server Maintenance</h1>
     <p style="margin-top: 15px;">We are currently fixing and improving Zentral-Chat server.<br>Please check back in later. Sorry for the inconveniences.</p>
   </div>
 
   <div id="backdrop" class="backdrop"></div>
 
-  <!-- <script src="chat.js"></script> -->
+  <script src="chat.js"></script>
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', event => {
