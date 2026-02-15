@@ -1472,32 +1472,9 @@ window.addEventListener("keydown", (e) => {
     initAccountSettings();
     settingsModal.classList.remove("hidden");
   }
-<<<<<<< HEAD
-
-  if (isModifier && e.key.toLowerCase() === "e") {
-    e.preventDefault();
-    
-    const isOpen = emojiMenu.classList.toggle("open");
-    if (isOpen) {
-      renderAllEmojis();
-      const searchInput = emojiMenu.querySelector("input");
-      if (searchInput) searchInput.focus();
-    } else {
-      emojiReactionTarget = null;
-      emojiOpenedFromReaction = false;
-    }
-  }
   
   if (e.key === "Escape") {
     settingsModal.classList.add("hidden");
-    emojiMenu.classList.remove("open");
-    emojiReactionTarget = null;
-    emojiOpenedFromReaction = false;
-=======
-  
-  if (e.key === "Escape") {
-    settingsModal.classList.add("hidden");
->>>>>>> 7342d9111486c9ba30de5fffbc7b8485df405725
   }
 });
 
