@@ -63,8 +63,8 @@ const THEMES = {
   futuristic: {
     bg: "linear-gradient(135deg, #1f2833, #0b0c10)",
     text1: "#66fcf1",
-    text2: "#aaa",
-    text3: "#333",
+    text2: "#81e8cb",
+    text3: "#5d8277",
     sidebar: "#1e1e1e",
     input: "#243836",
     inputArea: "#081918",
@@ -78,7 +78,7 @@ const THEMES = {
 
   space: {
     bg: "linear-gradient(135deg, #47118e, #0c2792)",
-    text1: "#e6e6e6",
+    text1: "#e3b9ff",
     text2: "#e89dff",
     text3: "#a784ae",
     sidebar: "#2e1e3f",
@@ -88,8 +88,8 @@ const THEMES = {
     sendButtonHover: "#b100e8",
     sendButtonShadow: "rgba(215, 84, 255, 0.45)",
     actionMenu: "#352068",
-    bubbleMe: "linear-gradient(135deg, #031334, #1d40aa)",
-    bubbleOther: "rgba(185, 128, 255, 0.3)"
+    bubbleMe: "linear-gradient(135deg, #310964, #772eca)",
+    bubbleOther: "rgba(100, 77, 255, 0.5)"
   },
 
   cyberpunk: {
@@ -165,7 +165,7 @@ const PROFILE_ICONS = [
 ];
 
 const PROFANITY_WORDS = [
-  "motherfucker", "fucking", "fucker", "fuck", "shitty", "bullshit", "shit", "bitches", "bitch", "assholes", "asshole", "bastard", "cunt", "douche", "douchebag", "whore", "slut",
+  "motherfucker", "fucking", "fucker", "fuck", "shitty", "bullshit", "shit", "bitches", "bitch", "assholes", "asshole", "bastard", "cunt", "douche", "douchebag", "slut", // whore
   "sexy", "sex", "porno", "pornhub", "porn", "nudes", "nude", "nudity", "boobs", "pussy", "dick", "cock", "penis", "vagina", "blowjob", "handjob", "cumming", "orgasm", "masturbate", "masturbation", "rape", "rapist", // tits, tit, anal, cum
   "nigger", "nigga", "faggot", "fag", "retarded", "retard", "chink", "kike", "wetback", "tranny", "cripple", // spic
   "kill yourself", "kys", "kill myself", "kms", "go die", "hang yourself", "shoot yourself"
@@ -188,89 +188,56 @@ const messages = {};
 const pendingReplies = {};
 const levelEventCache = {};
 const reactionListeners = new Set();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 const usersRef = firebase.database().ref("users");
 const messagesRef = firebase.database().ref("messages");
-const presenceRef = firebase.database().ref("presence");
 const levelLogsRef = firebase.database().ref("levelLogs");
+const presenceRef = firebase.database().ref("presence");
 const moderationLogsRef = firebase.database().ref("moderationLogs");
-const recoveryCodeRef = firebase.database().ref("recoveryCodes");
-
-let user = null;
-let allUsers = {};
 
 let authReady = false;
 let isBanned = false;
 let banReady = false;
 
-let pendingJoin = null;
+let user = null;
+let accountId = null;
+let allUsers = {};
+let pendingJoin = {};
 let pendingSend = false;
-let pendingRestore = null;
-
-let accountId = localStorage.getItem("z_accountId") || null;
-let displayName = localStorage.getItem("z_name") || "";
+let displayName = "";
 
 /* ================= START ANONYMOUS AUTH ================= */
-firebase.auth().signInAnonymously().catch(err => {
-  console.error("[AUTH] signInAnonymously error:", err);
-});
-
-firebase.auth().onAuthStateChanged(u => {
+firebase.auth().onAuthStateChanged(async (u) => {
   if (!u) {
-    console.warn("[AUTH] Logged out");
-
-    user = null;
-    authReady = false;
-    banReady = false;
-    isBanned = false;
-
-    if (accountId) {
-      usersRef.child(accountId).off();
+    try {
+      await firebase.auth().signInAnonymously();
+      return;
+    } catch (err) {
+      console.error("[AUTH] Anonymous sign-in failed:", err);
+      return;
     }
-
-    accountId = null;
-    pendingJoin = null;
-    pendingSend = false;
-    pendingRestore = null;
-
-    localStorage.removeItem("z_accountId");
-    localStorage.removeItem("z_name");
-    localStorage.removeItem("z_sessionVersion");
-
-    return;
   }
 
   user = u;
+  accountId = u.uid;
   authReady = true;
+  console.log("[AUTH] Logged in:", accountId, "Anonymous:", u.isAnonymous);
 
-  const savedAccountId = localStorage.getItem("z_accountId");
-  const revokedAccount = localStorage.getItem("z_revokedAccount");
-
-  if (savedAccountId && revokedAccount === savedAccountId) {
-    console.warn("[AUTH] account revoked on this device");
+  if (!await userHasAccount(accountId)) {
+    document.getElementById("prompt").style.display = "flex";
     return;
   }
+  document.getElementById("prompt").style.display = "none";
 
-  if (savedAccountId) {
-    accountId = savedAccountId;
-  } else {
-    accountId = user.uid;
-    console.log(user.uid);
-    localStorage.setItem("z_accountId", accountId);
-  }
+  setupPresence(accountId);
 
-  if (displayName) {
-    pendingJoin = { name: displayName, restoredInfo: null };
-  }
+  if (u.isAnonymous) upgradeGoogleBtn.style.display = "flex";
+  else upgradeGoogleBtn.style.display = "none";
 
-  userState();
-});
-
-function userState() {
   usersRef.child(accountId).on("value", snap => {
       const data = snap.val();
       if (!data) return;
-
       const state = getCurrentState(data);
       banReady = true;
 
@@ -280,14 +247,15 @@ function userState() {
       } else {
         isBanned = false;
         disableBannedUI();
-
         if (state.type === "timeout") enableTimeoutUI(state.until);
         else disableTimeoutUI();
       }
 
       tryProcessQueue();
   });
-}
+
+  if (user) updateGoogleUI(user);
+});
 
 function getCurrentState(user) {
   const t = user.timeout || 0;
@@ -304,18 +272,16 @@ function tryProcessQueue() {
     return;
   }
 
-  initMessageLoading();
+  attachUsersListener();
 
-  if (pendingRestore) {
-    const code = pendingRestore;
-    pendingRestore = null;
-    restoreWithCode(code).catch(console.error);
-  }
+  usersRef.once("value").then(snap => {
+    allUsers = snap.val() || {};
+    initMessageLoading();
+  });
 
-  if (pendingJoin && !pendingJoin.restoredInfo) {
-    const { name, restoredInfo } = pendingJoin;
+  if (pendingJoin) {
     pendingJoin = null;
-    join(name, restoredInfo).catch(console.error);
+    join().catch(console.error);
   }
 
   if (pendingSend) {
@@ -323,6 +289,71 @@ function tryProcessQueue() {
     sendMessage();
   }
 }
+
+function attachUsersListener() {
+  usersRef.on("child_added", snap => {
+    const uid = snap.key;
+    const data = snap.val();
+    allUsers[uid] = data;
+    refreshPresenceUI();
+  });
+
+  usersRef.on("child_changed", snap => {
+    const uid = snap.key;
+    const data = snap.val();
+    allUsers[uid] = data;
+    refreshPresenceUI();
+  });
+}
+
+document.getElementById("upgradeGoogleBtn").addEventListener("click", async () => {
+  if (!user || !user.isAnonymous) return;
+  const oldUid = user.uid;
+
+  try {
+    console.log("[LINK] Attempting Google link...");
+    const result = await user.linkWithPopup(googleProvider);
+    const googleData = user.providerData.find(p => p.providerId === "google.com");
+
+    await usersRef.child(user.uid).update({
+      google: {
+        IconURL: googleData.photoURL || null,
+        email: googleData.email,
+        emailVerified: googleData.emailVerified || true
+      },
+      authProvider: "google"
+    });
+
+    console.log("[LINK] Success. UID remains:", result.user.uid);
+
+    alert("Account secured with Google!");
+    location.reload();
+  } catch (err) {
+    if (err.code === "auth/credential-already-in-use") {
+      console.warn("[LINK] Google already linked to another account.");
+      const credential = err.credential;
+
+      try {
+        if (sessionListenerRef) {
+          sessionListenerRef.off();
+          sessionListenerRef = null;
+        }
+        
+        await firebase.database().ref("presence").child(oldUid).remove();
+        const result = await firebase.auth().signInWithCredential(credential);
+
+        console.log("[MERGE] Signed into existing Google account:", result.user.uid);
+        alert("Signed into your existing Google account.");
+        location.reload();
+      } catch (signInErr) {
+        console.error("[MERGE ERROR]", signInErr);
+      }
+    } else {
+      console.error("[LINK ERROR]", err);
+      alert("Google linking failed.");
+    }
+  }
+});
 
 /* =============== DOM HOOKS =============== */
 let messageInput = document.getElementById("message") || document.getElementById("messageInput") || document.querySelector(".input-bar input") || null;
@@ -338,15 +369,11 @@ const messagesViewport = messagesEl.parentElement;
 const sendBtn = document.getElementById("sendBtn") || null;
 const newMsgIndicator = document.getElementById("newMsgIndicator") || null;
 const charLimitEl = document.getElementById("charLimitIndicator");
-const warningEl = document.getElementById("warningIndicator");
+const jumpBtn = document.getElementById("jumpToLatestBtn");
 
 const inputBar = document.getElementById("input-bar");
 const timeoutBar = document.getElementById("timeoutBar");
 const timeoutEndEl = document.getElementById("timeoutEnd");
-
-const recoveryInput = document.getElementById("recovery-code") || null;
-const restoreBtn = document.getElementById("recovery-button") || null;
-const recoveryErrorEl = document.getElementById("recovery-error");
 
 const presenceEl = document.getElementById("presence") || null;
 const onlineCountEl = document.getElementById("onlineCount") || null;
@@ -378,14 +405,22 @@ const reportCancel = document.getElementById("report-cancel");
 const customReasonInput = document.getElementById("report-custom-reason");
 const reportStatusEl = document.getElementById("report-status");
 
-const recoveryCodeEl = document.getElementById("recoveryCode");
-const toggleRecoveryBtn = document.getElementById("toggleRecovery");
-const copyRecoveryBtn = document.getElementById("copyRecovery");
+const googleStatusEl = document.getElementById("googleStatus");
+const googleActionBtn = document.getElementById("googleActionBtn");
+const googleBtnText = document.getElementById("googleBtnText");
+
+const googleBtn = document.getElementById("prompt-google");
+const googlePrompt = document.getElementById("google-username-prompt");
+const googleInput = document.getElementById("google-username-input");
+const googleError = document.getElementById("google-username-error");
+const googleConfirm = document.getElementById("google-username-confirm");
 
 const EDIT_DELETE_LIMIT = 48 * 60 * 60 * 1000; // 48 hours
 const MESSAGE_RATE_LIMIT = 1000;
 const MESSAGE_CHAR_LIMIT = 300;
 const CHAR_WARNING_AT = 50;
+const REPORT_LIMIT = 3;
+const REPORT_WINDOW = 24 * 60 * 60 * 1000;
 
 const ZXP_PER_MESSAGE = 5;
 const HEAT_MAX = 100;
@@ -397,16 +432,11 @@ const LOAD_THRESHOLD = 300;
 const ICONS_PER_PAGE = 8;
 const THEMES_PER_PAGE = 2;
 
-const RESTORE_MAX_ATTEMPTS = 8;
-const RESTORE_LOCK_TIME = 30 * 60 * 1000;
-const REPORT_LIMIT = 3;
-// const REPORT_WINDOW = 24 * 60 * 60 * 1000;
-const REPORT_WINDOW = 1 * 60 * 1000;
-
+let unreadCount = 0;
 let originalText = "";
 let editingId = null;
 let replyToId = null;
-let recoveryCode = null;
+let myPresenceRef = null;
 
 let equippedIcon = null;
 let pickerTarget = null;
@@ -418,6 +448,7 @@ let typingTimeout = null;
 let pressTimer = null;
 let resizeTimer = null;
 let tooltipTimer = null;
+let emojiReactionTarget = null;
 let badgeTooltipTimer = null;
 let tooltipPressTimer = null;
 
@@ -440,17 +471,15 @@ let isInitialLoading = true;
 let settingsUpdate = false;
 let isLoggingOut = false;
 let isTimedOut = false;
-let myPresenceRef = null;
+let presenceListenerAttached = false;
 
 let userIsAtBottom = true;
-let recoveryVisible = false;
 let hasScrolledSinceTouch = false;
 let suppressNextActionMenu = false;
 
 let badgePress = { timer: null, startedAt: 0, badge: null, long: false };
 const heatSystem = { heat: 0, lastAction: 0, decayRate: 1.2, maxHeat: 300, lockedUntil: 0 };
 
-usersRef.on("value", snap => { allUsers = snap.val() || {} });
 usersRef.on("value", snap => { updateTypingIndicator(snap.val() || {}); });
 usersRef.child(`${accountId}/profileIcon`).on("value", snap => { equippedIcon = snap.val() || PROFILE_ICONS[0]; renderIconPage(); });
 
@@ -642,6 +671,7 @@ function profanityFilter(text, userId) {
 function createMessageElement(data) {
   const { id, name, text, time, senderId, edited } = data;
   const isMe = senderId === accountId;
+  const icon = (data.icon === "google" && data.googlePhotoURL)  ? data.googlePhotoURL  : `../Assets/Icons/${data.icon}.png`;
 
   const el = document.createElement("div");
   el.className = `msg ${isMe ? "me" : "other"}`;
@@ -654,7 +684,7 @@ function createMessageElement(data) {
       <div class="badges"></div>
     </div>
     
-    <img src="../Assets/Icons/${data.icon}.png" class="profile-icon" />
+    <img src="${icon}" class="profile-icon" />
 
     <div class="bubble">
       <div class="bubble-content">
@@ -864,6 +894,7 @@ async function initMessageLoading() {
       const el = createMessageElement({
         ...msg,
         icon: info.profileIcon || "zendra_blue",
+        googlePhotoURL: info.google?.IconURL || null,
         badges: info.badges || {}
       });
 
@@ -936,6 +967,7 @@ async function initMessageLoading() {
       id,
       name: info.username || "Unknown User",
       icon: info.profileIcon || "zendra_blue",
+      googlePhotoURL: info.google?.IconURL || null,
       badges: info.badges || {}
     });
 
@@ -946,8 +978,10 @@ async function initMessageLoading() {
     } else if (messagesViewport) {
       if (userIsAtBottom) {
         messagesViewport.scrollTop = messagesViewport.scrollHeight;
+        hideNewMsgIndicator();
       } else {
-        showNewMsgIndicator();
+        unreadCount++;
+        updateNewMsgIndicator();
       }
     }
   });
@@ -1190,6 +1224,7 @@ function beginEditMessage(id) {
   messageInput.value = originalText;
   messageInput.focus();
   sendBtn.textContent = "Save Edit";
+  commandBtn.style.display = "none";
   updateCharLimitIndicator();
 
   if (!document.getElementById("cancelEditBtn")) {
@@ -1197,7 +1232,8 @@ function beginEditMessage(id) {
     cancelBtn.id = "cancelEditBtn";
     cancelBtn.textContent = "Cancel";
     cancelBtn.className = "cancel-edit-btn";
-    cancelBtn.style.marginLeft = "8px";
+    cancelBtn.style.marginLeft = "3px";
+    cancelBtn.style.marginRight = "3px";
     cancelBtn.onclick = cancelEdit;
     sendBtn.insertAdjacentElement("afterend", cancelBtn);
   }
@@ -1222,6 +1258,7 @@ function cancelEdit() {
 
   if (messageInput) messageInput.value = "";
   if (sendBtn) sendBtn.textContent = "Send";
+  if (commandBtn) commandBtn.style.display = "block";
   const cancelBtn = document.getElementById("cancelEditBtn");
   if (cancelBtn) cancelBtn.remove();
   updateCharLimitIndicator();
@@ -1300,20 +1337,32 @@ function typingStatus(isTyping) {
 
 function updateTypingIndicator(typingStates) {
   const el = document.getElementById("typingIndicator");
+  const now = Date.now();
 
-  const typingUsers = Object.values(typingStates)
-    .filter(u => u.typing && u.typing.typing)
-    .filter(u => u.typing.ts > Date.now() - 4000)
-    .filter(u => u.accountId !== accountId);
-  
+  const typingUsers = Object.entries(typingStates)
+    .filter(([uid, data]) => uid !== accountId)
+    .filter(([_, data]) => data.typing?.typing)
+    .filter(([_, data]) => data.typing?.ts > now - 4000);
+
   if (typingUsers.length === 0) {
     el.classList.remove("show");
-  } else {
-    let text = typingUsers.length === 1  ? `${typingUsers[0].username} is typing` : `${typingUsers.length} people are typing`;
-    el.innerHTML = `<span>${text}</span><div class="typing-dots"><span></span><span></span><span></span></div>`;
-    el.classList.add("show");
+    return;
   }
 
+  let text;
+  if (typingUsers.length === 1) {
+    text = `${typingUsers[0][1].username} is typing`;
+  } else {
+    text = `${typingUsers.length} people are typing`;
+  }
+
+  el.innerHTML = `
+    <span>${text}</span>
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>`;
+
+  el.classList.add("show");
   updateIndicatorRow();
 }
 
@@ -1345,21 +1394,28 @@ function updateIndicatorRow() {
   row.classList.toggle("active", typingShow || charShow);
 }
 
-function showNewMsgIndicator() {
-  if (newMsgIndicator) {
-    newMsgIndicator.style.display = "block";
-    newMsgIndicator.classList.remove("hidden");
+function updateNewMsgIndicator() {
+  if (!newMsgIndicator) return;
+  if (unreadCount <= 0) {
+    hideNewMsgIndicator();
+    return;
   }
+
+  const textEl = document.getElementById("newMsgText");
+  textEl.textContent = `↓ ${unreadCount} New Message${unreadCount > 1 ? "s" : ""} ↓`;
+  newMsgIndicator.classList.add("show");
+  newMsgIndicator.style.display = "block";
 }
 
 function hideNewMsgIndicator() {
-  if (newMsgIndicator) {
-    newMsgIndicator.classList.add("hidden");
-    setTimeout(() => {
-      if (newMsgIndicator.classList.contains("hidden"))
-        newMsgIndicator.style.display = "none";
-    }, 200);
-  }
+  unreadCount = 0;
+  if (!newMsgIndicator) return;
+
+  newMsgIndicator.classList.remove("show");
+  setTimeout(() => {
+    if (newMsgIndicator.classList.contains("show"))
+      newMsgIndicator.style.display = "none";
+  }, 200);
 }
 
 sendBtn.onclick = () => {
@@ -1405,6 +1461,37 @@ messageInput.addEventListener("keydown", (e) => {
     if (Date.now() - lastSendAt < MESSAGE_RATE_LIMIT) return;
     lastSendAt = Date.now();
     sendMessage();
+  }
+});
+
+window.addEventListener("keydown", (e) => {
+  const isModifier = e.ctrlKey || e.metaKey;
+
+  if (isModifier && e.key === ",") {
+    e.preventDefault();
+    initAccountSettings();
+    settingsModal.classList.remove("hidden");
+  }
+
+  if (isModifier && e.key.toLowerCase() === "e") {
+    e.preventDefault();
+    
+    const isOpen = emojiMenu.classList.toggle("open");
+    if (isOpen) {
+      renderAllEmojis();
+      const searchInput = emojiMenu.querySelector("input");
+      if (searchInput) searchInput.focus();
+    } else {
+      emojiReactionTarget = null;
+      emojiOpenedFromReaction = false;
+    }
+  }
+  
+  if (e.key === "Escape") {
+    settingsModal.classList.add("hidden");
+    emojiMenu.classList.remove("open");
+    emojiReactionTarget = null;
+    emojiOpenedFromReaction = false;
   }
 });
 
@@ -1735,24 +1822,23 @@ function disableBannedUI() {
 
 function sessionListener(accountId) {
   if (!accountId) return;
+  const sessionRef = usersRef.child(accountId).child("sessionVersion");
+  sessionListenerRef = sessionRef;
 
-  const sessionVersionRef = usersRef.child(accountId).child("sessionVersion");
-  sessionListenerRef = sessionVersionRef;
-
-  sessionVersionRef.on("value", snap => {
+  sessionRef.on("value", snap => {
     if (isLoggingOut) return;
     if (!snap.exists()) return;
 
-    const remote = snap.val();
-    const local = Number(localStorage.getItem("z_sessionVersion")) || remote;
+    const remoteVersion = snap.val();
+    const localVersion = Number(localStorage.getItem("z_sessionVersion"));
 
-    if (!localStorage.getItem("z_sessionVersion")) {
-      localStorage.setItem("z_sessionVersion", remote);
+    if (!localVersion) {
+      localStorage.setItem("z_sessionVersion", remoteVersion);
       return;
     }
 
-    if (remote !== local) {
-      forceLogout("You have been logged out by an administrator.");
+    if (remoteVersion !== localVersion) {
+      forceLogout("Your session has been ended by an administrator.");
     }
   });
 }
@@ -1760,21 +1846,23 @@ function sessionListener(accountId) {
 function forceLogout(reason) {
   if (isLoggingOut) return;
   isLoggingOut = true;
-  console.warn("[AUTH] Force logout:", reason);
+  console.warn("[AUTH] Forced logout:", reason);
+
+  if (accountId) {
+    firebase.database().ref("presence").child(accountId).remove();
+  }
 
   if (sessionListenerRef) {
     sessionListenerRef.off();
     sessionListenerRef = null;
   }
 
-  localStorage.removeItem("z_accountId");
-  localStorage.removeItem("z_name");
   localStorage.removeItem("z_sessionVersion");
-  localStorage.setItem("z_revokedAccount", accountId);
-
   alert(reason);
-  firebase.auth().signOut();
-  location.reload();
+
+  firebase.auth().signOut().then(() => {
+    location.reload();
+  });
 }
 
 /* ================= HEAT SPAM SYSTEM ================= */
@@ -1874,8 +1962,8 @@ function initAccountSettings() {
 
   renderBadgeDropdown(user.badges || {});
   renderEquippedBadge(allUsers[accountId].badges);
+  renderIconPage();
   renderThemePage();
-  fetchRecoveryCode();
 }
 
 function renderBadgeDropdown(badges) {
@@ -1902,7 +1990,7 @@ function renderBadgeDropdown(badges) {
     const unequip = document.createElement("div");
     unequip.className = "badge-item unequip";
     unequip.innerHTML = `
-      <span class="fas fa-minus-circle"></span>
+      <img src="../Assets/Badges/Unequip.png" />
       <span>Unequip Badge</span>`;
     unequip.onclick = () => equipBadge(null);
     badgeDropdown.appendChild(unequip);
@@ -1948,6 +2036,33 @@ async function equipBadge(badgeName) {
 
 function renderIconPage() {
   iconGrid.innerHTML = "";
+  googleIconWrapper.innerHTML = "";
+  const userData = allUsers[accountId];
+
+  const equipped = userData?.profileIcon || "zendra_blue";
+
+  if (userData?.google?.IconURL) {
+    const label = document.createElement("span");
+    label.textContent = "Google Icon: ";
+    label.style.marginRight = "12px";
+    label.style.opacity = "0.7";
+
+    const googleImg = document.createElement("img");
+    googleImg.src = userData.google.IconURL;
+    googleImg.className = "profile-icon-option google-avatar standalone";
+    googleImg.dataset.icon = "google";
+
+    if (equipped === "google") {
+      googleImg.classList.add("selected");
+    }
+
+    googleImg.onclick = () => equipIcon("google");
+
+    googleIconWrapper.innerHTML = "";
+    googleIconWrapper.appendChild(label);
+    googleIconWrapper.appendChild(googleImg);
+  }
+
   const start = iconIndex * ICONS_PER_PAGE;
   const pageIcons = PROFILE_ICONS.slice(start, start + ICONS_PER_PAGE);
 
@@ -1957,7 +2072,7 @@ function renderIconPage() {
     img.className = "profile-icon-option";
     img.dataset.icon = iconName;
 
-    if (iconName === equippedIcon) {
+    if (iconName === equipped) {
       img.classList.add("selected");
     }
 
@@ -2014,45 +2129,52 @@ async function renderThemePage() {
   document.getElementById("themeNext").disabled = themeIndex >= maxPage;
 }
 
-async function fetchRecoveryCode() {
-  const snap = await recoveryCodeRef.child(accountId).once("value");
-  recoveryCode = snap.exists() ? snap.val() : null;
-  updateRecoveryDisplay();
-}
+function updateGoogleUI(user) {
+  const googleProviderData = user.providerData.find(p => p.providerId === "google.com");
 
-function updateRecoveryDisplay() {
-  if (!recoveryCode) {
-    recoveryCodeEl.textContent = "—";
-    return;
-  }
+  if (googleProviderData) {
+    googleActionBtn.dataset.connected = "true";
+    googleActionBtn.classList.add("connected");
+    googleActionBtn.style.pointerEvents = "none";
 
-  if (recoveryVisible) {
-    recoveryCodeEl.textContent = recoveryCode;
-    recoveryCodeEl.classList.remove("masked");
-    toggleRecoveryBtn.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
+    document.getElementById("googleBtnText").textContent = "Google Connected";
+    document.getElementById("googleStatus").textContent = "Connected Email: " + googleProviderData.email;
   } else {
-    recoveryCodeEl.textContent = "•".repeat(recoveryCode.length);
-    recoveryCodeEl.classList.add("masked");
-    toggleRecoveryBtn.innerHTML = `<i class="fa-solid fa-eye"></i>`;
+    googleActionBtn.dataset.connected = "false";
+    googleActionBtn.classList.remove("connected");
+    googleActionBtn.style.pointerEvents = "auto";
+
+    document.getElementById("googleBtnText").textContent = "Connect to Google";
+    document.getElementById("googleStatus").textContent = "Not connected. Connect your Google account to enable secure login and account recovery.";
   }
 }
 
-toggleRecoveryBtn.onclick = () => {
-  recoveryVisible = !recoveryVisible;
-  updateRecoveryDisplay();
-};
+googleActionBtn.addEventListener("click", async () => {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
 
-copyRecoveryBtn.onclick = async () => {
-  if (!recoveryCode) return;
+  const isConnected = googleActionBtn.dataset.connected === "true";
+  if (isConnected) return;
 
   try {
-    await navigator.clipboard.writeText(recoveryCode);
-    copyRecoveryBtn.innerHTML = `<i class="fa-solid fa-check"></i>`;
-    setTimeout(() => { copyRecoveryBtn.innerHTML = `<i class="fa-solid fa-copy"></i>`; }, 1200);
-  } catch (e) {
-    console.error("[ERROR] Failed to copy recovery code:", e);
+    await user.linkWithPopup(googleProvider);
+    const googleData = user.providerData.find(p => p.providerId === "google.com");
+
+    await usersRef.child(user.uid).update({
+      google: {
+        IconURL: googleData.photoURL || null,
+        email: googleData.email,
+        emailVerified: googleData.emailVerified || true
+      },
+      authProvider: "google"
+    });
+    alert("Successfully connected Google to your Zentral account!");
+    location.reload();
+    updateGoogleUI(firebase.auth().currentUser);
+  } catch (error) {
+    console.error("Google link error:", error);
   }
-};
+});
 
 badgeButton.onclick = () => {
   badgeDropdown.classList.toggle("hidden");
@@ -2320,11 +2442,15 @@ function openReactionPicker(msgEl) {
 
 function closeReactionPicker() {
   if (!picker) return;
+
   picker.classList.remove("show");
   picker.style.pointerEvents = "none";
+
   setTimeout(() => {
-    if (!picker.classList.contains("show")) picker.style.display = "none";
+    if (!picker.classList.contains("show"))
+      picker.style.display = "none";
   }, 150);
+
   pickerTarget = null;
 }
 
@@ -2403,6 +2529,7 @@ if (picker) {
   picker.querySelectorAll(".react").forEach(el => {
     el.onclick = (ev) => {
       ev.stopPropagation();
+
       if (!pickerTarget) return closeReactionPicker();
       toggleReaction(pickerTarget, el.textContent);
       closeReactionPicker();
@@ -2732,18 +2859,31 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 
 messagesViewport?.addEventListener("scroll", () => {
-  const nearBottom = messagesViewport.scrollTop + messagesViewport.clientHeight >= messagesViewport.scrollHeight - 30;
-  userIsAtBottom = nearBottom;
-  if (nearBottom) hideNewMsgIndicator();
+  const distanceFromBottom = messagesViewport.scrollHeight - messagesViewport.scrollTop - messagesViewport.clientHeight;
+  const atBottom = distanceFromBottom < 20;
+  userIsAtBottom = atBottom;
+
+  if (atBottom) {
+    hideNewMsgIndicator();
+    jumpBtn?.classList.remove("show");
+  } else {
+    if (distanceFromBottom > 150) jumpBtn?.classList.add("show");
+    else jumpBtn?.classList.remove("show");
+  }
 
   hasScrolledSinceTouch = true;
-
   clearTimeout(pressTimer);
   clearTimeout(tooltipPressTimer);
 
   hideReactionTooltip();
   hideBadgeTooltip();
   closeReactionPicker();
+
+  if (emojiOpenedFromReaction && !isMobile) {
+    emojiMenu.classList.remove("open");
+    emojiReactionTarget = null;
+    emojiOpenedFromReaction = false;
+  }
 }, { passive: true });
 
 window.addEventListener("resize", () => {
@@ -2862,285 +3002,308 @@ function chatSideBar() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", chatSideBar);
-
-/* ================= PRESENCE / RECOVERY ================= */
-async function join(name, restoredInfo = null) {
-  if (!authReady || !user) {
-    pendingJoin = { name, restoredInfo };
-    return;
-  }
-
-  if (restoredInfo && !accountId) {
-    console.error("[JOIN] ERROR: restoredInfo provided but accountId missing");
-    return;
-  }
-
-  if (!accountId) {
-    accountId = "u_" + Math.random().toString(36).slice(2);
-    localStorage.setItem("z_accountId", accountId);
-  }
-
-  displayName = (name || "").trim() || "Guest";
-  localStorage.setItem("z_name", displayName);
-  if (promptEl) promptEl.style.display = "none";
-
-  try {
-    await initPresence();
-  } catch (err) {
-    console.error("[JOIN] initPresence failed:", err);
-  }
-  
-  presenceRef.on("value", snap => {
-    const list = snap.val() || {};
-    const entries = Object.entries(list);
-    const count = entries.length;
-
-    if (presenceEl) presenceEl.innerHTML = "";
-    if (onlineCountEl) onlineCountEl.textContent = count + " online";
-
-    for (const [uid, time] of entries) {
-      const user = allUsers[uid] || {};
-      const name = user.username || "Unknown User";
-      const icon = user.profileIcon || "zendra_blue";
-      const equippedBadge = getEquippedBadge(user.badges);
-
-      const el = document.createElement("div");
-      el.className = "presence-item";
-
-      el.innerHTML = `
-      <div class="presence-left">
-        <img class="presence-icon" src="../Assets/Icons/${icon}.png" />
-        <div class="presence-name-wrapper">
-          <div class="presence-name">${escapeHtml(name)}</div>
-          ${equippedBadge ? `<div class="presence-badge"> <img src="../Assets/Badges/${equippedBadge}.png" /><span>${formatBadgeName(equippedBadge).replace(" Badge", "")}</span></div>` : "" }
-        </div>
-      </div>`;
-
-      presenceEl.appendChild(el);
-    }
+jumpBtn?.addEventListener("click", () => {
+  messagesViewport.scrollTo({
+    top: messagesViewport.scrollHeight,
+    behavior: "smooth"
   });
 
-  const userRef = usersRef.child(accountId);
-  const snap = await userRef.once("value");
-  const userData = snap.val();
+  jumpBtn.classList.remove("show");
+  hideNewMsgIndicator();
+});
 
-  if (snap.exists()) {
-    sessionListener(accountId);
-    console.log("[JOIN] user:", snap.val());
-  } else {
-    if (!restoredInfo) {
-      const code = generateRecoveryCode(16);
+document.addEventListener("DOMContentLoaded", chatSideBar);
+
+/* ================= JOIN & PRESENCE ================= */
+async function join(name) {
+  if (!authReady || !user) {
+    pendingJoin = { name };
+    return;
+  }
+
+  if (!firebase.auth().currentUser) {
+    console.log("[JOIN] No authenticated user — aborting");
+    return;
+  }
+
+  accountId = user.uid;
+  displayName = (name || "").trim() || "Guest";
+
+  if (promptEl) promptEl.style.display = "none";
+  const userRef = usersRef.child(accountId);
+
+  try {
+    const snap = await userRef.once("value");
+
+    if (!snap.exists()) {
+      if (user.email) {
+        const emailQuery = await usersRef.orderByChild("email").equalTo(user.email).once("value");
+
+        if (emailQuery.exists()) {
+          alert("An account with this Google email already exists.");
+          await firebase.auth().signOut();
+          return;
+        }
+      }
+
+      console.log("[JOIN] Creating new account:", accountId);
+
       const payload = {
-        accountId,
         username: displayName,
         sessionVersion: 1,
         chatTheme: "dark",
         profileIcon: "zendra_blue",
-
         experience: {
           level: 1,
           zxp: 0,
           messageCount: 0
         },
-
         badges: { Starter: true },
-
-        typing: {
-          typing: false,
-          ts: 0
-        },
-
+        typing: { typing: false, ts: 0 },
         created: Date.now(),
         lastActive: Date.now(),
         timeout: 0
       };
 
-      console.log("[JOIN] creating new user package:", payload);
       await userRef.set(payload);
-
-      await recoveryCodeRef.child(accountId).set(code);
-      localStorage.setItem("z_recovery", JSON.stringify({ code, payload }));
-      localStorage.removeItem("z_revokedAccount");
-
       location.reload();
     } else {
-      console.warn("[JOIN] expected restoredInfo but user package is missing; restoredInfo:", restoredInfo);
-    }
-  }
+      console.log("[JOIN] Existing account:", accountId);
+      await userRef.update({ lastActive: Date.now() });
+      const userData = snap.val();
+      localStorage.setItem("z_sessionVersion", userData.sessionVersion);
 
-  if (userData?.chatTheme && THEMES[userData.chatTheme]) applyTheme(THEMES[userData.chatTheme]);
-  else applyTheme(THEMES.dark);
-
-  const sessionVersion = userData?.sessionVersion ?? 1;
-  localStorage.setItem("z_sessionVersion", sessionVersion);
-
-  await usersRef.child(accountId).update({ lastActive: Date.now() });
-  console.log("[JOIN] complete — accountId active:", accountId);
-}
-
-async function restoreWithCode(code) {
-  recoveryErrorEl.textContent = "";
-
-  if (!code || typeof code !== "string") {
-    recoveryErrorEl.textContent = "Please enter a recovery code to proceed.";
-    return;
-  }
-
-  code = code.trim().toUpperCase();
-
-  try {
-    const snap = await recoveryCodeRef.once("value");
-    const map = snap.val() || {};
-
-    let restoredId = null;
-    for (const [uid, storedCode] of Object.entries(map)) {
-      if (storedCode === code) {
-        restoredId = uid;
-        break;
+      if (userData?.chatTheme && THEMES[userData.chatTheme]) {
+        applyTheme(THEMES[userData.chatTheme]);
+      } else {
+        applyTheme(THEMES.dark);
       }
     }
 
-    if (!restoredId) {
-      recordRestoreFailure();
-      recoveryErrorEl.textContent = "Invalid recovery code.";
-      return;
+    if (await userHasAccount(accountId)) {
+      sessionListener(accountId);
+      attachPresenceListener();
     }
-
-    console.log("[RESTORE] found accountId:", restoredId);
-
-    const userSnap = await usersRef.child(restoredId).once("value");
-    if (!userSnap.exists()) {
-      recordRestoreFailure();
-      recoveryErrorEl.textContent = "This account no longer exists. Create a new one to continue.";
-      return;
-    }
-
-    const newCode = generateRecoveryCode();
-    await recoveryCodeRef.child(restoredId).set(newCode);
-
-    localStorage.setItem("z_recovery", JSON.stringify({ code: newCode }) );
-
-    const data = userSnap.val();
-    accountId = restoredId;
-    localStorage.setItem("z_accountId", restoredId);
-
-    displayName = data.username || "Guest";
-    localStorage.setItem("z_name", displayName);
-
-    localStorage.removeItem("z_revokedAccount");
-
-    if (promptEl) promptEl.style.display = "none";
-    await join(displayName, { username: data.username });
-
-    clearRestoreFailures();
-    alert("Account restored. A new recovery code has been generated.");
-    location.reload();
+    console.log("[JOIN] Complete — active UID:", accountId);
   } catch (err) {
-    console.error("[RESTORE] restoreWithCode ERROR:", err);
-    recoveryErrorEl.textContent = "Failed to restore account. Please try again.";
+    console.error("[JOIN ERROR]", err);
   }
 }
 
-async function initPresence() {
-  myPresenceRef = presenceRef.child(accountId);
-  myPresenceRef.onDisconnect().remove();
-  await myPresenceRef.set(Date.now());
+function attachPresenceListener() {
+  if (presenceListenerAttached) return;
+  presenceListenerAttached = true;
+  presenceRef.on("value", snap => {
+    renderPresence(snap.val() || {});
+  });
 }
 
-function recheckPresenceConnection() {
-  firebase.database().ref(".info/connected").once("value").then(snap => {
+async function userHasAccount(uid) {
+  const snap = await usersRef.child(uid).once("value");
+  return snap.exists();
+}
+
+let connectedRef = null;
+
+function setupPresence(uid) {
+  if (!uid) return;
+  if (connectedRef) connectedRef.off();
+  if (myPresenceRef) myPresenceRef.onDisconnect().cancel();
+
+  connectedRef = firebase.database().ref(".info/connected");
+  myPresenceRef = firebase.database().ref("presence").child(uid);
+
+  connectedRef.on("value", (snap) => {
     if (snap.val() === true) {
-      initPresence();
-    } else {
-      console.log("[PRESENCE] Not connected - waiting for Firebase reconnect");
+      myPresenceRef.onDisconnect().remove().then(() => { myPresenceRef.set(Date.now()); });
     }
   });
 }
 
-function isRestoreLocked() {
-  const lockUntil = Number(localStorage.getItem("z_restore_lock_until")) || 0;
+function refreshPresenceUI() {
+  firebase.database().ref("presence").once("value").then(snap => {
+    renderPresence(snap.val() || {});
+  });
+}
 
-  if (Date.now() < lockUntil) {
-    const mins = Math.ceil((lockUntil - Date.now()) / 60000);
-    recoveryErrorEl.textContent = `Too many invalid attempts. Try again in ${mins} minute${mins > 1 ? "s" : ""}.`;
-    return true;
+function renderPresence(list) {
+  const entries = Object.entries(list);
+
+  if (presenceEl) presenceEl.innerHTML = "";
+  if (onlineCountEl) onlineCountEl.textContent = entries.length + " online";
+
+  for (const [uid] of entries) {
+    const userData = allUsers[uid] || {};
+    const name = userData.username || "Unknown User";
+    const icon = userData.profileIcon || "zendra_blue";
+    const googlePhoto = userData.google?.IconURL || null;
+    const equippedBadge = getEquippedBadge(userData.badges);
+
+    const el = document.createElement("div");
+    el.className = "presence-item";
+
+    el.innerHTML = `
+      <div class="presence-left">
+        ${icon === "google" && googlePhoto ? `<img class="presence-icon google-avatar" src="${googlePhoto}" />` : `<img class="presence-icon" src="../Assets/Icons/${icon}.png" />`}
+        <div class="presence-name-wrapper">
+          <div class="presence-name">${escapeHtml(name)}</div>
+          ${equippedBadge ? `
+            <div class="presence-badge">
+              <img src="../Assets/Badges/${equippedBadge}.png" />
+              <span>${formatBadgeName(equippedBadge).replace(" Badge", "")}</span>
+            </div>` : ""}
+        </div>
+      </div>`;
+
+    presenceEl.appendChild(el);
   }
-  return false;
 }
 
-function recordRestoreFailure() {
-  let fails = Number(localStorage.getItem("z_restore_fail_count")) || 0;
-  fails++;
-
-  if (fails >= RESTORE_MAX_ATTEMPTS) {
-    localStorage.setItem("z_restore_lock_until", Date.now() + RESTORE_LOCK_TIME);
-    localStorage.removeItem("z_restore_fail_count");
-  } else {
-    localStorage.setItem("z_restore_fail_count", fails);
-  }
-}
-
-function clearRestoreFailures() {
-  localStorage.removeItem("z_restore_fail_count");
-  localStorage.removeItem("z_restore_lock_until");
-}
-
-function generateRecoveryCode(len = 16) {
-  const CH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-  let out = "";
-  for (let i = 0; i < len; i++) out += CH[Math.floor(Math.random() * CH.length)];
-  return out;
-}
-
-joinBtn && (joinBtn.onclick = async () => {
-  let n = promptName.value.trim();
+joinBtn.onclick = async () => {
+  const n = promptName.value.trim();
+  const validRegex = /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/;
   promptErrorEl.textContent = "";
 
   if (n.length < 3) {
     promptErrorEl.textContent = "Username must be at least 3 characters.";
     return;
   }
+
   if (n.length > 15) {
     promptErrorEl.textContent = "Username must be at most 15 characters.";
     return;
   }
 
+  if (!validRegex.test(n)) {
+    promptErrorEl.textContent = "Username can only contain letters, numbers, and symbols.";
+    return;
+  }
+
   try {
-    const snap = await usersRef.orderByChild("username").equalTo(n).once("value");
-    if (snap.exists()) {
+    const snap = await usersRef.orderByChild("username").once("value");
+    let exists = false;
+
+    snap.forEach((child) => {
+      if (child.val().username.toLowerCase() === name.toLowerCase()) {
+        exists = true;
+        return true;
+      }
+    });
+
+    if (exists) {
       promptErrorEl.textContent = "That username is already taken.";
-      return;
     }
   } catch (err) {
-    console.error("[JOIN] Username check failed:", err);
-    promptErrorEl.textContent = "Error checking username. Try again.";
+    promptErrorEl.textContent = "Error checking username.";
     return;
   }
 
   join(n);
-});
-
-restoreBtn.onclick = () => {
-  if (isRestoreLocked()) return;
-
-  const c = recoveryInput ? recoveryInput.value : "";
-  restoreWithCode(c);
 };
 
-recoveryInput.onkeydown = e => {
-  if (e.key === "Enter") restoreWithCode(recoveryInput.value);
-};
+googleBtn.onclick = async () => {
+  promptErrorEl.textContent = "";
 
-window.addEventListener("focus", () => {
-  recheckPresenceConnection();
-});
+  try {
+    const result = await firebase.auth().signInWithPopup(googleProvider);
+    const user = result.user;
+    const userRef = usersRef.child(user.uid);
+    const snap = await userRef.once("value");
 
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    recheckPresenceConnection();
+    if (snap.exists()) {
+      promptEl.style.display = "none";
+      join();
+      return;
+    }
+
+    showGoogleUsernamePrompt(user);
+  } catch (err) {
+    if (err.code === "auth/popup-closed-by-user") return;
+    console.error(err);
+    promptErrorEl.textContent = "Google login failed. Please try again.";
   }
-});
+};
+
+function showGoogleUsernamePrompt(user) {
+  promptEl.style.display = "none";
+  googlePrompt.style.display = "flex";
+  googleInput.value = user.displayName || "";
+  googleInput.focus();
+}
+
+googleConfirm.onclick = async () => {
+  const name = googleInput.value.trim();
+  const validRegex = /^[A-Za-z0-9\s!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/;
+  googleError.textContent = "";
+
+  if (name.length < 3) {
+    googleError.textContent = "Username must be at least 3 characters.";
+    return;
+  }
+
+  if (name.length > 15) {
+    googleError.textContent = "Username must be at most 15 characters.";
+    return;
+  }
+
+  if (!validRegex.test(name)) {
+    googleError.textContent = "Username can only contain letters, numbers, and symbols.";
+    return;
+  }
+
+  try {
+    const snap = await usersRef.orderByChild("username").once("value");
+    let exists = false;
+
+    snap.forEach((child) => {
+      if (child.val().username.toLowerCase() === name.toLowerCase()) {
+        exists = true;
+        return true;
+      }
+    });
+
+    if (exists) googleError.textContent = "That username is already taken.";
+
+    const user = firebase.auth().currentUser;
+    const uid = user.uid;
+    const googleProviderData = user.providerData.find(p => p.providerId === "google.com");
+
+    await usersRef.child(uid).set({
+      username: name,
+      sessionVersion: 1,
+      chatTheme: "dark",
+      profileIcon: "zendra_blue",
+
+      google: googleProviderData ? {
+        IconURL: googleProviderData.photoURL || null,
+        email: googleProviderData.email || null,
+        emailVerified: googleProviderData.emailVerified || false
+      } : null,
+
+      authProvider: "google",
+
+      experience: {
+        level: 1,
+        zxp: 0,
+        messageCount: 0
+      },
+
+      badges: { Starter: true },
+      typing: { typing: false, ts: 0 },
+
+      created: Date.now(),
+      lastActive: Date.now(),
+      timeout: 0,
+    });
+
+    googlePrompt.style.display = "none";
+    location.reload();
+    join(name);
+  } catch (err) {
+    console.error(err);
+    googleError.textContent = "Error creating account. Try again.";
+  }
+};
 
 setInterval(() => {
   if (heatSystem.heat > 0) {
