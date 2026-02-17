@@ -563,7 +563,7 @@ function createLevelSeparator({ accountId, level, time }) {
   el.className = "level-separator";
   el.dataset.timestamp = time;
 
-  const username = allUsers[accountId]?.username || "Unknown User";
+  const username = allUsers[accountId]?.displayName || allUsers[accountId]?.username || "Unknown User";
   const badgeName = LEVEL_BADGES[level] || null;
 
   const main = document.createElement("div");
@@ -888,7 +888,7 @@ async function initMessageLoading() {
 
     if (item.type === "msg") {
       const info = allUsers[item.senderId] || {};
-      const msg = { ...item, name: info.username || "Unknown User" };
+      const msg = { ...item, name: info.displayName || info.username || "Unknown User" };
       messages[item.id] = msg;
 
       const el = createMessageElement({
@@ -965,7 +965,7 @@ async function initMessageLoading() {
     appendMessage({
       ...msg,
       id,
-      name: info.username || "Unknown User",
+      name: info.displayName || info.username || "Unknown User",
       icon: info.profileIcon || "zendra_blue",
       googlePhotoURL: info.google?.IconURL || null,
       badges: info.badges || {}
@@ -1062,7 +1062,7 @@ async function loadOlderMessages() {
       if (messages[item.id]) continue;
 
       const info = allUsers[item.senderId] || {};
-      const msg = { ...item, name: info.username || "Unknown User" };
+      const msg = { ...item, name: info.displayName || info.username || "Unknown User" };
       messages[item.id] = msg;
 
       const el = createMessageElement({
@@ -2993,7 +2993,7 @@ jumpBtn?.addEventListener("click", () => {
 document.addEventListener("DOMContentLoaded", chatSideBar);
 
 /* ================= JOIN & PRESENCE ================= */
-async function join(name) {
+async function join(name, username) {
   if (!authReady || !user) {
     pendingJoin = { name };
     return;
@@ -3027,7 +3027,8 @@ async function join(name) {
       console.log("[JOIN] Creating new account:", accountId);
 
       const payload = {
-        username: displayName,
+        username,
+        displayName,
         sessionVersion: 1,
         chatTheme: "dark",
         profileIcon: "zendra_blue",
@@ -3112,7 +3113,7 @@ function renderPresence(list) {
 
   for (const [uid] of entries) {
     const userData = allUsers[uid] || {};
-    const name = userData.username || "Unknown User";
+    const name = userData.displayName || userData.username || "Unknown User";
     const icon = userData.profileIcon || "zendra_blue";
     const googlePhoto = userData.google?.IconURL || null;
     const equippedBadge = getEquippedBadge(userData.badges);
@@ -3157,26 +3158,21 @@ joinBtn.onclick = async () => {
     return;
   }
 
+  const username = n.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+
   try {
-    const snap = await usersRef.orderByChild("username").once("value");
-    let exists = false;
-
-    snap.forEach((child) => {
-      if (child.val().username.toLowerCase() === name.toLowerCase()) {
-        exists = true;
-        return true;
-      }
-    });
-
-    if (exists) {
+    const snap = await usersRef.orderByChild("username").equalTo(username).once("value");
+    
+    if (snap.exists()) {
       promptErrorEl.textContent = "That username is already taken.";
+      return;
     }
   } catch (err) {
     promptErrorEl.textContent = "Error checking username.";
     return;
   }
 
-  join(n);
+  join(n, username);
 };
 
 googleBtn.onclick = async () => {
@@ -3229,25 +3225,23 @@ googleConfirm.onclick = async () => {
     return;
   }
 
+  const username = name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+
   try {
-    const snap = await usersRef.orderByChild("username").once("value");
-    let exists = false;
-
-    snap.forEach((child) => {
-      if (child.val().username.toLowerCase() === name.toLowerCase()) {
-        exists = true;
-        return true;
-      }
-    });
-
-    if (exists) googleError.textContent = "That username is already taken.";
+    const snap = await usersRef.orderByChild("username").equalTo(username).once("value");
+    
+    if (snap.exists()) {
+      googleError.textContent = "That username is already taken.";
+      return;
+    }
 
     const user = firebase.auth().currentUser;
     const uid = user.uid;
     const googleProviderData = user.providerData.find(p => p.providerId === "google.com");
 
     await usersRef.child(uid).set({
-      username: name,
+      username,
+      displayName: name,
       sessionVersion: 1,
       chatTheme: "dark",
       profileIcon: "zendra_blue",
