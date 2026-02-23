@@ -241,7 +241,7 @@
         2026 Zentral-Web | Powered by KuraWorks
     </footer>
     
-    <script>    
+    <script>
         window.addEventListener("load", () => {
             const wrapper = document.getElementById("milestonesWrapper");
             if (!wrapper) return;
@@ -260,7 +260,7 @@
                 wrapper.scrollLeft = target * easeOutCubic(progress);
                 if (progress < 1) requestAnimationFrame(animateScroll);
             }
-            
+
             requestAnimationFrame(animateScroll);
         });
 
@@ -268,6 +268,27 @@
         document.addEventListener('keydown', event => {
             if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
                 event.preventDefault();
+            }
+        });
+
+        let buffer = [];
+        const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+        window.addEventListener("keydown", e => {
+            if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+
+            const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+            buffer.push(key);
+
+            if (buffer.length > code.length) {
+                buffer.shift();
+            }
+
+            const recent = buffer.slice(-code.length);
+
+            if (recent.join() === code.join()) {
+                location.href = "./Others/terminal.html";
+                buffer.length = 0;
             }
         });
 

@@ -83,6 +83,27 @@
         }
       });
 
+      let buffer = [];
+      const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+      window.addEventListener("keydown", e => {
+        if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+
+        const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        buffer.push(key);
+
+        if (buffer.length > code.length) {
+          buffer.shift();
+        }
+
+        const recent = buffer.slice(-code.length);
+
+        if (recent.join() === code.join()) {
+          location.href = "./Others/terminal.html";
+          buffer.length = 0;
+        }
+      });
+
       const headerEl = document.querySelector('header');
       window.addEventListener('scroll', () => {
         const y = window.scrollY;
@@ -144,10 +165,29 @@
 
       const EN = () => atob(Channel_Code.split('').reverse().join(''));
       const Channel_ID = EN();
-      function followerCounts() {
+      async function followerCounts() {
+        const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR16SGHQq6zDLzf-1t4m5TN8b7ePx4e5yZROR-k45ClZYW3wdA_7IL5_GQFIsoddc_27TEeQnB-HGLv/pub?gid=272102271&single=true&output=csv";
+        let igFollowers = 1700;
+        let tiktokFollowers = 1400;
+        
+        try {
+          const response = await fetch(sheetCsvUrl);
+          if (!response.ok) throw new Error("[ERROR]");
+          const data = await response.text();
+          const rows = data.split(/\r?\n/).map(row => row.split(","));
+          
+          const parsedIg = parseInt(rows[0][1]?.replace(/[^0-9]/g, ''));
+          const parsedTiktok = parseInt(rows[1][1]?.replace(/[^0-9]/g, ''));
+          
+          if (!isNaN(parsedIg)) igFollowers = parsedIg;
+          if (!isNaN(parsedTiktok)) tiktokFollowers = parsedTiktok;
+        } catch (error) {
+          console.warn("[ERROR]", error.message);
+        }
+        
         updateYouTubeStats();
-        animateCount("igCount", 1400);
-        animateCount("tiktokCount", 1375);
+        animateCount("igCount", igFollowers);
+        animateCount("tiktokCount", tiktokFollowers);
       }
 
       function animateCount(id, target) {

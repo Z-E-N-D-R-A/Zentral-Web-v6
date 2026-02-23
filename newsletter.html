@@ -109,25 +109,25 @@
             const resultsSection = document.getElementById("search-results");
             const resultsContainer = document.getElementById("results-container");
             const allNewsBlocks = document.querySelectorAll(".archived-news .news-block");
-            
+
             resultsContainer.innerHTML = "";
-            
+
             if (query === "") {
                 resultsSection.style.display = "none";
                 return;
             }
-            
+
             const matchedNews = Array.from(allNewsBlocks).filter(block => {
                 const title = block.getAttribute("data-title").toLowerCase();
                 const category = block.querySelector(".category").textContent.toLowerCase();
                 return title.includes(query) || category.includes(query);
             });
-            
+
             if (matchedNews.length > 0) {
                 resultsSection.style.display = "block";
                 const titleHeading = resultsSection.querySelector(".section-title");
                 titleHeading.textContent = `Search Results for "${query}"`;
-                
+
                 matchedNews.forEach(block => {
                     const clonedBlock = block.cloneNode(true);
                     resultsContainer.appendChild(clonedBlock);
@@ -136,7 +136,7 @@
                 resultsSection.style.display = "block";
                 const titleHeading = resultsSection.querySelector(".section-title");
                 titleHeading.textContent = `Search Results for "${query}"`;
-                
+
                 const noResult = document.createElement("p");
                 noResult.textContent = "No results found.";
                 noResult.style.textAlign = "center";
@@ -149,6 +149,27 @@
         document.addEventListener('keydown', event => {
             if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
                 event.preventDefault();
+            }
+        });
+
+        let buffer = [];
+        const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+        window.addEventListener("keydown", e => {
+            if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+
+            const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+            buffer.push(key);
+
+            if (buffer.length > code.length) {
+                buffer.shift();
+            }
+
+            const recent = buffer.slice(-code.length);
+
+            if (recent.join() === code.join()) {
+                location.href = "./Others/terminal.html";
+                buffer.length = 0;
             }
         });
 

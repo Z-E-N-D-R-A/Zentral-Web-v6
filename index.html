@@ -99,6 +99,27 @@
       }
     });
 
+    let buffer = [];
+    const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+    window.addEventListener("keydown", e => {
+      if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      buffer.push(key);
+
+      if (buffer.length > code.length) {
+        buffer.shift();
+      }
+
+      const recent = buffer.slice(-code.length);
+
+      if (recent.join() === code.join()) {
+        location.href = "./Others/terminal.html";
+        buffer.length = 0;
+      }
+    });
+
     /* -------- Page Animations -------- */
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {

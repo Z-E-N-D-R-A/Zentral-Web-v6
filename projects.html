@@ -134,8 +134,47 @@
             "2026-1-23": "Channel Third Anniversary",
             "2026-1-30": "Z-Day Live Stream",
             "2026-2-9": "Zentral Web 6.0 Launch",
-            "2026-2-16": "Special Announcement",
-            "2026-2-23": "Chapter I Begins"
+            "2026-2-23": "Chapter I Begins",
+            "2026-2-28": "Live Stream",
+            "2026-3-28": "New Video",
+            "2026-4-25": "New Video",
+            "2026-5-30": "New Video",
+            "2026-6-27": "New Video",
+            "2026-7-21": "Starr Series S1 Trailer 1",
+            "2026-7-23": "Chapter II Begins",
+            "2026-7-23": "Starr Series S1 Trailer 2",
+            "2026-7-25": "Starr Series S1 Ep1-2 Release",
+            "2026-7-28": "Starr Series S1 Trailer 3",
+            "2026-7-30": "Starr Series S1 Trailer 4",
+            "2026-8-01": "Starr Series S1 Ep3-4 Release",
+            "2026-8-04": "Starr Series S1 Trailer 5",
+            "2026-8-06": "Starr Series S1 Trailer 6",
+            "2026-8-08": "Starr Series S1 Ep5-6 Release",
+            "2026-8-11": "Starr Series S1 Trailer 7",
+            "2026-8-13": "Starr Series S1 Trailer 8",
+            "2026-8-15": "Starr Series S1 Ep7-8 Release",
+            "2026-8-18": "Starr Series S1 Trailer 9",
+            "2026-8-20": "Starr Series S1 Trailer 10",
+            "2026-8-22": "Starr Series S1 Ep9-10 Release",
+            "2026-9-26": "New Video",
+            "2026-10-31": "New Video",
+            "2026-11-28": "New Video",
+            "2026-12-22": "Starr Series S2 Trailer 1",
+            "2026-12-23": "Chapter III Begins",
+            "2026-12-24": "Starr Series S2 Trailer 2",
+            "2026-12-26": "Starr Series S2 Ep1-2 Release",
+            "2026-12-29": "Starr Series S2 Trailer 3",
+            "2026-12-31": "Starr Series S2 Trailer 4",
+            "2027-01-02": "Starr Series S2 Ep3-4 Release",
+            "2027-01-05": "Starr Series S2 Trailer 5",
+            "2027-01-07": "Starr Series S2 Trailer 6",
+            "2027-01-09": "Starr Series S2 Ep5-6 Release",
+            "2027-01-12": "Starr Series S2 Trailer 7",
+            "2027-01-14": "Starr Series S2 Trailer 8",
+            "2027-01-16": "Starr Series S2 Ep7-8 Release",
+            "2027-01-19": "Starr Series S2 Trailer 9",
+            "2027-01-21": "Starr Series S2 Trailer 10",
+            "2027-01-23": "Starr Series S2 Ep9-10 Release",
         };
 
         function renderCalendar() {
@@ -223,6 +262,27 @@
         document.addEventListener('keydown', event => {
             if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
                 event.preventDefault();
+            }
+        });
+
+        let buffer = [];
+        const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+
+        window.addEventListener("keydown", e => {
+            if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
+
+            const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+            buffer.push(key);
+
+            if (buffer.length > code.length) {
+                buffer.shift();
+            }
+
+            const recent = buffer.slice(-code.length);
+
+            if (recent.join() === code.join()) {
+                location.href = "./Others/terminal.html";
+                buffer.length = 0;
             }
         });
 

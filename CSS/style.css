@@ -977,38 +977,42 @@ section.content h2 {
 
 /* === Story Section === */
 .story {
-    padding-top: 100px;
-    padding-bottom: 50px;
-    padding-left: 10vw;
-    padding-right: 10vw;
+    padding: 50px 10vw;
     text-align: center;
     position: relative;
 }
 
 .section1 { background: linear-gradient(#1d0242, #420222); }
-.section2 { background: linear-gradient(#420222, #4a431c); }
-.section3 { background: linear-gradient(#4a431c, #364506); }
-.section4 { background: linear-gradient(#364506, #5d0a56); }
-.section5 { background: linear-gradient(#5d0a56, #000); }
+.section2 { background: linear-gradient(#420222, #4a321c); }
+.section3 { background: linear-gradient(#4a321c, #420222); }
 .end-section { background: linear-gradient(#420222, #000); }
 
 .story-title {
     font-size: 40px;
     font-weight: 700;
+    margin-top: 30px;
     margin-bottom: 20px;
 }
 
-.section1 .story-title { background: linear-gradient(90deg, #40c9ff, #e81cff); background-clip: text; -webkit-text-fill-color: transparent; }
-.section2 .story-title { background: linear-gradient(90deg, #ff0f7b, #f89b29); background-clip: text; -webkit-text-fill-color: transparent; }
-.section3 .story-title { background: linear-gradient(90deg, #ff930f, #fff95b); background-clip: text; -webkit-text-fill-color: transparent; }
-.section4 .story-title { background: linear-gradient(90deg, #00ff87, #60efff); background-clip: text; -webkit-text-fill-color: transparent; }
-.section5 .story-title { background: linear-gradient(90deg, #696eff, #f8acff); background-clip: text; -webkit-text-fill-color: transparent; }
+.story-title.chapter1 {
+    background: linear-gradient(90deg, #40c9ff, #e81cff);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
 .story-text {
     font-size: 18px;
     max-width: 820px;
     margin: auto;
     line-height: 1.8;
+}
+
+.story-text span {
+    font-size: 20px;
+    font-weight: 600;
+    margin: auto;
+    margin-bottom: 10px;
+    color: #aa00ff;
 }
 
 .side-timeline {
@@ -1026,38 +1030,95 @@ section.content h2 {
     background: linear-gradient(90deg, #00ffff, #ff00cc);
 }
 
-.reveal {
-    opacity: 0;
-    transform: translateY(60px);
-    transition: 0.8s ease;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.flash:hover {
-    animation: flash 0.5s steps(2) 2;
-}
-
 .sigil {
-    font-size: 42px;
-    cursor: pointer;
-    margin-top: 30px;
-    font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  font-size: 80px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  color: #ff55ff;
+  text-shadow: 0 0 15px #ff55ff;
+}
+
+.sigil-core {
+  position: relative;
+  z-index: 2;
+}
+
+.sigil[data-level="2"] {
+  color: #00ffff;
+  text-shadow: 0 0 25px #00ffff;
+}
+
+.sigil[data-level="3"] {
+  transform: rotate(180deg) scale(1.2);
+}
+
+.sigil[data-level="4"] .sigil-core::after {
+  content: "◈";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  color: #ffcc00;
+}
+
+.sigil-glitch {
+  position: absolute;
+  inset: 0;
+  color: #00ffff;
+  opacity: 0.6;
+  animation: sigilGlitch 2s infinite;
+}
+
+@keyframes sigilGlitch {
+  0% { transform: translate(0,0); opacity: 0.4; }
+  20% { transform: translate(-2px,1px); }
+  40% { transform: translate(2px,-1px); opacity: 0.8; }
+  60% { transform: translate(-1px,2px); }
+  80% { transform: translate(1px,-2px); }
+  100% { transform: translate(0,0); opacity: 0.4; }
+}
+
+.sigil-reveal {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    transition: max-height 0.8s ease, opacity 0.5s ease, margin-top 0.5s ease;
 }
 
 .secret {
-    opacity: 0;
-    margin-top: 15px;
-    color: #ff55ff;
-    transition: 0.4s;
-    font-family: 'Share Tech Mono', monospace;
+  margin: 0 0 10px;
+  color: #ff55ff;
+  transition: 0.6s;
+  font-family: 'Share Tech Mono', monospace;
 }
 
-.sigil.open+.secret {
-    opacity: 1;
+.sigil.open + .sigil-reveal {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 20px;
+}
+
+.terminal-btn {
+  margin-top: 10px;
+  padding: 12px 22px;
+  font-family: 'Share Tech Mono', monospace;
+  background: black;
+  color: #00ffcc;
+  border: 1px solid #00ffcc;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  margin-bottom: 10px;
+  transition: 0.5s;
+  box-shadow: 0 0 20px rgba(0,255,200,0.4);
+}
+
+.terminal-btn.unlocked {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #forbiddenMessage {
@@ -1081,16 +1142,76 @@ section.content h2 {
 }
 
 .quote {
-    padding-bottom: 50px;
+    margin: 75px 0;
     text-align: center;
     font-family: 'Share Tech Mono', monospace;
     font-size: 30px;
     opacity: 0.7;
 }
 
+.reveal {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: 0.8s ease;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.flash:hover {
+    animation: flash 0.5s steps(2) 2;
+}
+
+.fire-particle {
+    position: fixed;
+    width: 13px;
+    height: 13px;
+    background: radial-gradient(circle, #ffcc00, #ff2600, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fireRise 1.5s ease-out forwards;
+    mix-blend-mode: screen;
+}
+
+.ignition-flash {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 102, 0, 0.75), transparent 90%);
+    animation: flash 1.2s ease-out forwards;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.burn-mark {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border-radius: 40%;
+    background: radial-gradient(circle, rgba(0,0,0,0.6), transparent);
+    opacity: 0.5;
+    pointer-events: none;
+    animation: burnFade 3s forwards;
+}
+
+@keyframes fireRise {
+    0% { transform: translateY(0) scale(0.6); opacity: 1; }
+    100% { transform: translateY(+60px) scale(1.4); opacity: 0; }
+}
+
+@keyframes flash {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes burnFade {
+    to { opacity: 0; }
+}
+
 .countdown-container {
   margin-top: 20px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   text-align: center;
 }
 
@@ -1115,7 +1236,7 @@ section.content h2 {
   display: block;
   font-size: 32px;
   font-weight: 700;
-  background: linear-gradient(90deg, #ff9fe4, #9b5cff);
+  background: linear-gradient(90deg, #ff9f9f, #ff5cce);
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -1157,9 +1278,9 @@ section.content h2 {
 }
 
 @keyframes pulseGlow {
-  0% { box-shadow: 0 0 18px rgba(255, 160, 255, 0.35); }
-  50% { box-shadow: 0 0 32px rgba(255, 160, 255, 0.65); }
-  100% { box-shadow: 0 0 18px rgba(255, 160, 255, 0.35); }
+  0% { box-shadow: 0 0 18px rgba(255, 160, 195, 0.35); }
+  50% { box-shadow: 0 0 32px rgba(255, 160, 160, 0.65); }
+  100% { box-shadow: 0 0 18px rgba(255, 160, 195, 0.35); }
 }
 
 @media (max-width: 600px) {
@@ -1266,7 +1387,7 @@ section.content h2 {
 
 .plan {
     margin-top: 6px;
-    background: linear-gradient(135deg, #ff52559c, #ffed239c);
+    background: linear-gradient(135deg, #52ff7d9c, #ff82239c);
     color: #ffffffd6;
     font-size: 12px;
     padding: 6px 8px;
