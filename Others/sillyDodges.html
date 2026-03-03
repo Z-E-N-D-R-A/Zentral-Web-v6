@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zentral-Web | Silly Dodges</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            position: fixed;
+            background: black;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        button {
+            font-family: 'Fredoka One', cursive;
+            background: rgb(0, 200, 255);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            font-size: 18px;
+            padding: 10px 15px;
+        }
+
+        p {
+            color: white;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+<script>
+    let gameReady = false;
+    let state = "menu";
+    let player;
+
+    let shots = [];
+    let bonuses = [];
+    let particles = [];
+    let leaderboard = [];
+
+    let flash = 0;
+    let score = 0;
+    let highScore = 0;
+    let savedName = "";
+    let savedHighScore = 0;
+
+    let playButton;
+    let pauseButton;
+    let leaderboardButton;
+    let backButton;
+
+    let nameInput;
+    let titleText;
+    let devText;
+    let highScoreText;
+    let scoreText;
+    let newScoreText;
+    let leaderboardText;
+
+    let combo = 1;
+    let comboProgress = 0;
+    let comboDecay = 0.0015;
+    let comboThreshold = 100;
+
+    let difficultyTimer = 0;
+    let spawnRate = 50;
+    let bulletSpeedMin = 2;
+    let bulletSpeedMax = 4;
+    let bulletMultiplier = 1;
+
+    class Player {
+        constructor() {
+            this.pos = createVector(width / 2, height / 2);
+            this.trail = [];
+        }
+
+        update() {
+            let hoverVector = createVector(mouseX, mouseY);
+            let direction = p5.Vector.sub(hoverVector, this.pos);
+
+            let hoverMove = direction.div(8);
+            this.pos.add(hoverMove);
+
+            this.pos.x = constrain(this.pos.x, 0, width);
+            this.pos.y = constrain(this.pos.y, 80, height);
+
+            this.trail.push(this.pos.copy());
+            if (this.trail.length > 15) {
+                this.trail.shift();
+            }
+        }
+
+        draw() {
+            for (let i = 0; i < this.trail.length; i++) {
+                let p = this.trail[i];
+                fill(0, 200, 255, i * 10);
+                ellipse(p.x, p.y, 20);
+            }
+
+            fill(0, 200, 255, 80);
+            ellipse(this.pos.x, this.pos.y, 40);
+            fill(0, 200, 255);
+            ellipse(this.pos.x, this.pos.y, 20);
+        }
+    }
+
+    class Shot {
+        constructor() {
+          this.x = width;
+          this.y = random(80, height);
+          this.speed = random(bulletSpeedMin, bulletSpeedMax);
+          this.size = random(8, 14);
+        }
+
+        update() {
+          this.x -= this.speed;
+        }
+
+        draw() {
+          fill(255, 50, 50);
+          ellipse(this.x, this.y, 12);
+        }
+
+        hit(player) {
+          return dist(this.x, this.y, player.pos.x, player.pos.y) < this.size;
+        }
+    }
+
+    class Bonus {
+        constructor() {
+            this.x = random(width);
+            this.y = random(80, height);
+            this.value = floor(random(1, 6));
+        }
+
+        draw() {
+          let size = this.value * 6;
+          noStroke();
+          fill(0, 255, 100, 40);
+          ellipse(this.x, this.y, size * 3);
+
+          fill(0, 255, 100, 80);
+          ellipse(this.x, this.y, size * 2);
+
+          fill(0, 255, 100);
+          ellipse(this.x, this.y, size);
+        }
+
+        collect(player) {
+            return dist(this.x, this.y, player.pos.x, player.pos.y) < this.value * 6;
+        }
+    }
+
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = random(-2, 2);
+            this.vy = random(-2, 2);
+            this.life = 40;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life--;
+        }
+
+        draw() {
+            fill(0, 200, 255, this.life * 6);
+            ellipse(this.x, this.y, 4);
+        }
+    }
+
+    function setup() {
+        canvas = createCanvas(windowWidth, windowHeight);
+        canvas.style("z-index", "0");
+        player = new Player();
+
+        titleText = createP("Silly Dodges");
+        titleText.style('font-size', '48px');
+        titleText.style('font-weight', 'bold');
+
+        devText = createP("Developed by <a href='https://www.zendra.dedyn.io/Others/terminal.html' style='color: white' target='_blank'>KuraWorks</a> ❤️");
+        devText.style('font-size', '16px');
+
+        nameInput = createInput("");
+        nameInput.attribute("placeholder", "Enter Name");
+        nameInput.size(200);
+        styleButton(nameInput);
+        nameInput.input(() => {
+          localStorage.setItem("playerName", nameInput.value());
+        });
+
+        scoreText = createP("");
+        scoreText.style('font-size', '24px');
+        newScoreText = createP("New Score: 0");
+        newScoreText.style('font-size', '24px');
+        highScoreText = createP("High Score: 0");
+        highScoreText.style('font-size', '24px');
+
+        playButton = createButton("PLAY");
+        playButton.size(100, 40);
+        playButton.style("z-index", "10");
+        playButton.mousePressed(startGame);
+        playButton.touchStarted(startGame);
+
+        pauseButton = createButton("PAUSE");
+        pauseButton.size(100, 40);
+        pauseButton.mousePressed(togglePause);
+
+        leaderboardButton = createButton("LEADERBOARD");
+        leaderboardButton.size(160, 40);
+        leaderboardButton.mousePressed(openLeaderboard);
+
+        backButton = createButton("BACK");
+        backButton.size(100, 40);
+        backButton.mousePressed(backToMenu);
+
+        positionUI();
+        loadLocalData();
+        gameReady = true;
+    }
+
+    function positionUI() {
+        titleText.position(width / 2 - 140, height / 2 - 230);
+        devText.position(width / 2 - 100, height / 2 - 160);
+        nameInput.position(width / 2 - 118, height / 2 - 20);
+
+        newScoreText.size(width); 
+        highScoreText.size(width);
+        newScoreText.style('text-align', 'center');
+        highScoreText.style('text-align', 'center');
+        newScoreText.position(0, height / 2 - 100);
+        highScoreText.position(0, height / 2 - 70);
+
+        playButton.position(width / 2 - 60, height / 2 + 50);
+        pauseButton.position(width - 110, 20);
+        leaderboardButton.position(width / 2 - 90, height / 2 + 100);
+        backButton.position(width / 2 - 50, height - 100);
+
+        scoreText.position(20, 20);
+    }
+
+    function styleButton(input) {
+        input.style('border-radius', '15px');
+        input.style('border', '3px solid #00c8ff');
+        input.style('padding', '10px');
+        input.style('font-size', '18px');
+        input.style('outline', 'none');
+        input.style('background', '#0a0a1a');
+        input.style('color', 'white');
+        input.style('text-align', 'center');
+        input.style('font-family', 'Fredoka One, cursive');
+        input.style('box-shadow', '0px 0px 10px #00c8ff');
+        input.style('pointer-events', 'auto');
+    }
+
+    function loadLocalData() {
+        let storedName = localStorage.getItem("playerName");
+        let storedScore = localStorage.getItem("highScore");
+
+        if (storedName) {
+          savedName = storedName;
+          nameInput.value(savedName);
+        }
+
+        if (storedScore) {
+          savedHighScore = int(storedScore);
+          highScore = savedHighScore;
+        }
+    }
+
+    function resetGame() {
+        score = 0;
+        combo = 1;
+        comboProgress = 0;
+        difficultyTimer = 0;
+
+        spawnRate = 50;
+        bulletSpeedMin = 2;
+        bulletSpeedMax = 4;
+        bulletMultiplier = 1;
+
+        shots = [];
+        bonuses = [];
+        particles = [];
+        player = new Player();
+    }
+
+    function startGame() {
+        if (!gameReady) return;
+        resetGame();
+        setTimeout(() => { state = "play" }, 50);
+    }
+
+    function togglePause() {
+        if (state === "play") {
+            state = "pause";
+            pauseButton.html("Resume");
+        }
+        else if (state === "pause") {
+            state = "play";
+            pauseButton.html("Pause");
+        }
+    }
+
+    function openLeaderboard() {
+      state = "leaderboard";
+      leaderboard = "loading";
+      loadLeaderboard();
+    }
+
+    function backToMenu() {
+      state = "menu";
+    }
+
+    function draw() {
+      background(10, 10, 30);
+      drawStars();
+
+      if (state === "menu") drawMenu();
+      if (state === "play") drawGame();
+      if (state === "pause") drawPaused();
+      if (state === "leaderboard") drawLeaderboard();
+
+      drawFlash();
+    }
+
+    function drawStars() {
+        for (let i = 0; i < 50; i++) {
+            fill(255, 255, 255, 50);
+            ellipse((frameCount + i * 50) % width, i * 20 % height, 2);
+        }
+    }
+
+    function drawMenu() {
+        playButton.show();
+        pauseButton.hide();
+
+        titleText.show();
+        devText.show();
+        highScoreText.show();
+        newScoreText.show();
+        scoreText.hide();
+
+        leaderboardButton.show();
+        backButton.hide();
+        nameInput.show();
+
+        highScoreText.html("High Score: " + highScore);
+
+        if (frameCount % 60 === 0) playButton.elt.style.pointerEvents = "auto";
+        nameInput.elt.focus();
+
+        playButton.mousePressed(() => {
+          window.focus();
+          startGame();
+        });
+
+        fill(255);
+        textAlign(CENTER);
+        textSize(50);
+    }
+
+    function drawGame() {
+        playButton.hide();
+        pauseButton.show();
+
+        titleText.hide();
+        devText.hide();
+        highScoreText.hide();
+        newScoreText.hide();
+        scoreText.show();
+
+        leaderboardButton.hide();
+        backButton.hide();
+        nameInput.hide();
+
+        if (frameCount % spawnRate === 0) {
+          let bulletCount = floor(bulletMultiplier);
+          for (let i = 0; i < bulletCount; i++) {
+            shots.push(new Shot());
+          }
+        }
+
+        if (frameCount % 120 === 0) {
+          let bonusCount = max(1, floor(bulletMultiplier / 2));
+          for (let i = 0; i < bonusCount; i++) {
+            bonuses.push(new Bonus());
+          }
+        }
+
+        player.update();
+        player.draw();
+
+        particles.push(new Particle(player.pos.x, player.pos.y));
+
+        for (let p of particles) {
+          p.update();
+          p.draw();
+        }
+
+        particles = particles.filter(p => p.life > 0);
+
+        for (let i = shots.length - 1; i >= 0; i--) {
+            shots[i].update();
+            shots[i].draw();
+
+            if (shots[i].hit(player)) {
+                die();
+            }
+
+            if (shots[i].x < 0) {
+                shots.splice(i, 1);
+            }
+        }
+
+        for (let i = bonuses.length - 1; i >= 0; i--) {
+            bonuses[i].draw();
+
+            if (bonuses[i].collect(player)) {
+                score += floor(bonuses[i].value * combo);
+                bonuses.splice(i, 1);
+                comboProgress += 30 + bulletMultiplier * 5;
+            }
+        }
+
+        difficultyTimer++;
+        comboProgress -= comboDecay * 100;
+        if (comboProgress < 0) comboProgress = 0;
+
+        if (difficultyTimer % 300 === 0) {
+          spawnRate = max(10, spawnRate - 5);
+          bulletSpeedMin += 0.4;
+          bulletSpeedMax += 0.5;
+          bulletMultiplier = Math.min(3.5, bulletMultiplier + 0.2);
+        }
+
+        let newCombo = floor(comboProgress / comboThreshold) + 1;
+        if (newCombo != combo) combo = newCombo;
+        
+        scoreText.html("Score: " + score);
+        drawComboBar();
+    }
+
+    function drawPaused() {
+        player.draw();
+
+        for (let s of shots) {
+            s.draw();
+        }
+
+        for (let b of bonuses) {
+            b.draw();
+        }
+
+        for (let p of particles) {
+            p.draw();
+        }
+
+        fill(0, 0, 0, 150);
+        rect(0, 0, width, height);
+
+        fill(255);
+        textAlign(CENTER);
+        textSize(60);
+        textStyle(BOLD);
+
+        text("PAUSED", width / 2, height / 2);
+        textStyle(NORMAL);
+    }
+
+    function drawComboBar() {
+        let barWidth = 200;
+        let barHeight = 20;
+
+        let x = 20;
+        let y = 55;
+
+        let progress = comboProgress % comboThreshold;
+        let fillAmount = progress / comboThreshold;
+
+        fill(50);
+        rect(x, y, barWidth, barHeight, 8);
+
+        let grad = drawingContext.createLinearGradient(x, y, x + barWidth, y);
+    
+        grad.addColorStop(0, 'rgb(255, 100, 0)');
+        grad.addColorStop(1, 'rgb(255, 255, 0)');
+        drawingContext.fillStyle = grad;
+        rect(x, y, barWidth * fillAmount, barHeight, 8);
+
+        fill(255);
+        textSize(14);
+        textAlign(LEFT, CENTER);
+        text("Combo x" + combo, x + barWidth + 10, y + 10);
+    }
+
+    function die() {
+        flash = 255;
+        state = "menu";
+        
+        let name = nameInput.value();
+        if (name === "") name = "Player";
+        sendScore(name, score);
+
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem("highScore", highScore);
+        }
+
+        newScoreText.show();
+        newScoreText.html("New Score: " + score);
+    }
+
+    function drawFlash() {
+        if (flash > 0) {
+            fill(255, flash);
+            rect(0, 0, width, height);
+            flash -= 10;
+        }
+    }
+
+    function sendScore(name, score) {
+      fetch("https://script.google.com/macros/s/AKfycbyje2iyoyhLDr2MYsNvlLvHVcKS0iogjHe4G1ke0dpTsjhkzAAEXKwJkwUwa0BlksAE_g/exec", {
+        method: "POST",
+        body: JSON.stringify({
+          name: name,
+          score: score
+        })
+      });
+    }
+
+    function loadLeaderboard() {
+        leaderboard = "loading";
+        fetch("https://script.google.com/macros/s/AKfycbyje2iyoyhLDr2MYsNvlLvHVcKS0iogjHe4G1ke0dpTsjhkzAAEXKwJkwUwa0BlksAE_g/exec")
+          .then(res => res.json())
+          .then(data => {
+            data.sort((a, b) => b.score - a.score);
+            leaderboard = data.slice(0, 10);
+          });
+      }
+      
+    function drawLeaderboard() {
+        playButton.hide();
+        pauseButton.hide();
+
+        titleText.hide();
+        devText.hide();
+        highScoreText.hide();
+        newScoreText.hide();
+        scoreText.hide();
+
+        leaderboardButton.hide();
+        backButton.show();
+        nameInput.hide();
+
+        textFont('Fredoka One');
+        fill(255);
+        textAlign(CENTER);
+        textSize(42);
+        text("Leaderboard", width / 2, 80);
+
+        if (leaderboard === "loading") {
+          textSize(24);
+          text("Loading...", width / 2, height / 2);
+          return;
+        }
+
+        let startX = width / 2 - 200;
+        let startY = 140;
+
+        textAlign(LEFT);
+        textSize(22);
+
+        for (let i = 0; i < leaderboard.length && i < 10; i++) {
+          let entry = leaderboard[i];
+          let name = entry.name || "Player";
+          let score = entry.score || 0;
+          let date = entry.date ? new Date(entry.date).toLocaleDateString() : "";
+
+          let medal = "";
+          if (i === 0) medal = "🥇";
+          else if (i === 1) medal = "🥈";
+          else if (i === 2) medal = "🥉";
+          else medal = (i + 1) + ".";
+
+          let y = startY + i * 36;
+
+          fill(255);
+          text(medal, startX, y);
+          text(name, startX + 50, y);
+          text(score, startX + 220, y);
+          fill(180);
+          text(date, startX + 300, y);
+        }
+    }
+
+    function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+        positionUI();
+    }
+
+    document.addEventListener('touchmove', function (e) {
+        if (e.target.tagName !== "INPUT" && e.target.tagName !== "BUTTON") {
+          e.preventDefault();
+        }
+    }, { passive: false });
+
+    window.addEventListener("keydown", function (e) {
+      if (["ArrowUp", "ArrowDown", " "].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+</script>
+</body>
+</html>
