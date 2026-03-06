@@ -706,6 +706,17 @@
         }
     }
 
+    function scrambleBonuses(){
+        const margin = 80;
+
+        for (let b of bonuses){
+            b.x = random(margin, width - margin);
+            b.y = random(margin, height - margin);
+            if (b.vx !== undefined) b.vx = random(-0.5,0.5);
+            if (b.vy !== undefined) b.vy = random(-0.5,0.5);
+        }
+    }
+
     function drawFlash() {
         if (flash > 0) {
             fill(255, flash);
@@ -1012,6 +1023,7 @@
             document.getElementById("pauseBtn2").innerText="▶";
             pauseOverlay.style.display="flex";
         } else if (state === "pause") {
+            scrambleBonuses();
             state = "play";
             document.getElementById("pauseBtn").innerText="⏸";
             document.getElementById("pauseBtn2").innerText="⏸";
