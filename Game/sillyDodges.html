@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zentral-Web | Silly Dodges</title>
+
+    <link href="../Assets/Icon.png" rel="icon">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a1a;
+            font-family: 'Fredoka One', cursive;
+            color: white;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            touch-action: none;
+            overscroll-behavior: none;
+        }
+    
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        #canvasContainer {
+            flex: 1;
+            position: relative;
+        }
+    
+        .uiPanel {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+        }
+    
+        #menuUI {
+            top: 40%;
+            transform: translateY(-40%);
+        }
+    
+        #gameUI, #survivalUI {
+            top: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+    
+        #leaderboardUI, #tutorialUI {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #topBar {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #bottomInfo{
+            position:fixed;
+            bottom:15px;
+            width:100%;
+            text-align:center;
+            font-size:14px;
+            opacity:0.8;
+        }
+        
+        #howToPlay{
+            cursor:pointer;
+            font-size:16px;
+            margin-bottom:4px;
+        }
+        
+        #howToPlay:hover{
+            opacity:1;
+            text-decoration:underline;
+        }
+
+        h1 {
+            font-size: 55px;
+            margin: 10px;
+        }
+
+        h2 {
+            font-size: 40px;
+            margin: 10px;
+        }
+    
+        h3 {
+            font-size: 18px;
+            margin: 10px 10px 30px 10px;
+        }
+
+        .scoreText {
+            font-size: 24px;
+            margin: 5px;
+        }
+
+        #scoreDisplay {
+            font-size: 25px;
+            color: #00c8ff;
+        }
+
+        .playSection {
+            display:flex;
+            justify-content:center;
+            gap:5px;
+        }
+        
+        #modeBtn {
+            font-family: 'Fredoka One', cursive;
+            font-size: 18px;
+            padding: 10px 20px;
+            height: 45px;
+            margin: 5px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            background-color: #1e90ff;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        #modeBtn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    
+        button {
+            font-family: 'Fredoka One', cursive;
+            background: rgb(0, 200, 255);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    
+        input {
+            border-radius: 15px;
+            border: 3px solid #00c8ff;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            font-size: 18px;
+            outline: none;
+            background: #0a0a1a;
+            color: white;
+            text-align: center;
+            font-family: 'Fredoka One', cursive;
+            box-shadow: 0px 0px 10px #00c8ff;
+            pointer-events: auto;
+        }
+
+        #pauseOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+            pointer-events: none;
+        }
+    
+        #pauseBtn, #pauseBtn2 {
+            position: relative;
+            z-index: 10;
+        }
+
+        #backButton{
+            position:fixed;
+            top:15px;
+            left:15px;
+            font-size:28px;
+            background:rgba(0,0,0,0.1);
+            color:white;
+            border:none;
+            padding:8px 14px;
+            border-radius:12px;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        
+        #backButton:hover{
+            background:rgba(255,255,255,0.2);
+        }
+    
+        #comboWrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin-top: 15px;
+        }
+    
+        #comboText {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255, 200, 0, 0.6);
+        }
+    
+        #comboContainer {
+            position: relative;
+            width: 220px;
+            height: 16px;
+            background: #222;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    
+        #comboBar{
+            height:100%;
+            background:linear-gradient(90deg,#ff6a00,#ffe600);
+            box-shadow:0 0 10px #ff6a00,0 0 20px #ffe600;
+            border-radius:6px;
+            transition:width 0.15s linear;
+        }
+    
+        #comboGlow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: comboShine 2s infinite;
+        }
+
+        #leaderboardList {
+            min-height: 400px;
+            margin: 20px;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .leaderboardEntry {
+            width: 500px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; 
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .leaderboardLoading{
+            text-align:center;
+            font-size:20px;
+            padding:30px;
+            opacity:0.8;
+            animation:pulseLoading 1s infinite alternate;
+        }
+        
+        .entry-name {
+            text-align: left;
+        }
+        
+        .entry-score {
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .entry-date {
+            text-align: right;
+            opacity: 0.7;
+        }
+    
+        @keyframes comboShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes pulseLoading {
+            from { opacity:0.4; }
+            to { opacity:1; }
+        }
+    </style>
+</head>
+
+<div id="gameContainer">
+    <div id="canvasContainer"></div>
+
+    <button id="backButton" onclick="window.location.href = '../zentral.html'">&#8592;</button>
+    <div id="menuUI" class="uiPanel">
+        <h1>Silly Dodges</h1>
+        <h3>Developed by KuraWorks ❤️</h3>
+
+        <div class="scoreText">New Score: <span id="newScore">0</span></div>
+        <div class="scoreText">High Score: <span id="highScore">0</span></div>
+
+        <input id="nameInput" placeholder="Enter Name" maxlength="12">
+
+        <div class="playSection">
+            <button id="modeBtn" type="button" onclick="toggleMode()">Classic Mode</button>
+            <button id="playBtn" onclick="startGame()">PLAY</button>
+        </div>
+
+        <button style="margin-top: 8px" onclick="openLeaderboard()">LEADERBOARD</button>
+    </div>
+
+    <div id="bottomInfo">
+        <p id="howToPlay" onclick="showTutorial()"><u>How to Play</u></p>
+        <p>Zentral Arcade of Zentral Web</p>
+    </div>
+
+    <div id="gameUI" style="display:none;">
+        <div id="topBar">
+            <div id="scoreDisplay">Score: <span id="score">0</span></div>
+            <div id="comboWrapper">
+                <div id="comboText">Combo x1</div>
+                <div id="comboContainer">
+                    <div id="comboBar"></div>
+                    <div id="comboGlow"></div>
+                </div>
+            </div>
+            <button id="pauseBtn" onclick="togglePause()">⏸</button>
+        </div>
+    </div>
+
+    <div id="survivalUI" style="display:none;">
+        <div id="topBar">
+            <div id="scoreDisplay">Wave <span id="waveText">1</span></div>
+
+            <div id="comboWrapper">
+                <div id="scoreDisplay">Time: <span id="timeText">0s</span></div>
+            </div>
+            <button id="pauseBtn2" onclick="togglePause()">⏸</button>
+        </div>
+    </div>
+
+    <div id="leaderboardUI" class="uiPanel" style="display:none;">
+        <h2 id="leaderboardTitle">Leaderboard</h2>
+        <div id="leaderboardList">Loading...</div>
+        <button onclick="backToMenu()">Back</button>
+    </div>
+
+    <div id="tutorialUI" class="uiPanel" style="display:none">
+        <h2>How to Play</h2>
+        <p><u>Classic Mode</u></p>
+        <p>Move your blue dot to dodge incoming bullets (red dot).</p>
+        <p>Collect silly particles (green dot) to increase your score.</p>
+        <p>The higher the combo, the more points you get.</p>
+        <p>Game gets progressingly harder with faster and more bullets.</p><br>
+
+        <p><u>Survival Mode</u></p>
+        <p>Bullets (red dot) come in waves.</p>
+        <p>Survive each round by dodging the bullets.</p>
+        <p>More bullets spawn in every round.</p>
+        <p>Stay alive for as long as possible.</p><br>
+
+        <p><u>Controls</u></p>
+        <p>Mobile/Tablet: Drag or tap</p>
+        <p>Laptops/PC: Hovering using mouse</p><br>
+
+        <button onclick="backToMenu()">Back</button>
+    </div>
+
+    <div id="pauseOverlay" style="display:none;">
+        <h1>PAUSED</h1>
+    </div>
+</div>
+
+<body>
+<script>
+    let player;
+    let scoreEl;
+    let waveEl;
+    let timeEl;
+    let comboTextEl;
+
+    let starLayer;
+    let starOffset = 0;
+    let screenShake = 0;
+    let gameReady = false;
+    let state = "menu";
+    let currentMode = "classic";
+
+    let stars = [];
+    let bonuses = [];
+    let particles = [];
+    let shots = [];
+    let shotPool = [];
+    let leaderboard = [];
+
+    let savedName = "";
+    let flash = 0;
+    let score = 0;
+    let highScoreClassic = 0;
+    let highScoreSurvival = 0;
+
+    let combo = 1;
+    let lastCombo = 1;
+    let comboProgress = 0;
+    let comboDecay = 0.15;
+    let comboThreshold = 100;
+
+    let difficultyTimer = 0;
+    let spawnRate = 50;
+    let bulletSpeedMin = 2;
+    let bulletSpeedMax = 4;
+    let bulletMultiplier = 1;
+
+    let wave = 1;
+    let waveState = "warning";
+    let waveTimer = 0;
+    let waveDuration = 420;
+    let spawnQueue = 0;
+    let spawnDelay = 15;
+    let spawnTick = 0;
+    let survivalScore = 0;
+
+    let sfxCollect = new Audio("../Assets/Music/SFX_3.mp3");
+    let sfxWave = new Audio("../Assets/Music/SFX_2.wav");
+    let sfxDie = new Audio("../Assets/Music/SFX_1.mp3");
+    let musicMenu = new Audio("../Assets/Music/OST_2.mp3");
+    let musicGame = new Audio("../Assets/Music/OST_1.mp3");
+    musicMenu.loop = true;
+    musicGame.loop = true;
+
+    const menuUI = document.getElementById("menuUI");
+    const gameUI = document.getElementById("gameUI");
+    const survivalUI = document.getElementById("survivalUI");
+    const leaderboardUI = document.getElementById("leaderboardUI");
+    const tutorialUI = document.getElementById("tutorialUI");
+    const nameInput = document.getElementById('nameInput');
+    const bottomInfo = document.getElementById('bottomInfo');
+    const backButton = document.getElementById("backButton");
+
+    class Player {
+        constructor() {
+            this.pos = createVector(width / 2, height / 2);
+            this.trail = [];
+        }
+
+        update() {
+            let hoverVector = createVector(mouseX, mouseY);
+            let direction = p5.Vector.sub(hoverVector, this.pos);
+
+            let hoverMove = direction.div(8);
+            this.pos.add(hoverMove);
+
+            this.pos.x = constrain(this.pos.x, 0, width);
+            this.pos.y = constrain(this.pos.y, 80, height);
+
+            this.trail.push({ x: this.pos.x, y: this.pos.y });
+            if (this.trail.length > 15) {
+                this.trail.shift();
+            }
+        }
+
+        draw() {
+            noStroke();
+
+            for (let i = 0; i < this.trail.length; i++) {
+                let p = this.trail[i];
+                fill(0, 200, 255, i * 10);
+                circle(p.x, p.y, 16);
+            }
+
+            fill(0, 200, 255, 80);
+            circle(this.pos.x, this.pos.y, 32);
+
+            fill(0, 200, 255);
+            circle(this.pos.x, this.pos.y, 18);
+        }
+    }
+
+    class Shot {
+        constructor() {
+            this.active = false;
+            this.x = 0;
+            this.y = 0;
+            this.speed = 0;
+            this.size = 10;
+        }
+
+        spawn() {
+            this.active = true;
+            this.x = width;
+            this.y = random(80, height);
+            this.speed = random(bulletSpeedMin, bulletSpeedMax);
+            this.size = random(8, 14);
+        }
+
+        update() {
+            this.x -= this.speed * (deltaTime / 16.67);
+
+            if (this.x < -20) {
+                this.active = false;
+            }
+        }
+
+        draw() {
+            fill(255, 50, 50);
+            ellipse(this.x, this.y, 12);
+        }
+
+        hit(player) {
+            let dx = this.x - player.pos.x;
+            let dy = this.y - player.pos.y;
+            return dx * dx + dy * dy < this.size * this.size;
+        }
+    }
+
+    class Bonus {
+        constructor() {
+            this.x = random(width);
+            this.y = random(80, height);
+            this.value = floor(random(1, 6));
+        }
+
+        draw() {
+            let size = this.value * 6;
+            noStroke();
+            fill(0, 255, 100, 40);
+            ellipse(this.x, this.y, size * 3);
+
+            fill(0, 255, 100, 80);
+            ellipse(this.x, this.y, size * 2);
+
+            fill(0, 255, 100);
+            ellipse(this.x, this.y, size);
+        }
+
+        collect(player) {
+            return dist(this.x, this.y, player.pos.x, player.pos.y) < this.value * 6;
+        }
+    }
+
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = random(-2, 2);
+            this.vy = random(-2, 2);
+            this.life = 25;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life--;
+        }
+
+        draw() {
+            fill(0, 200, 255, this.life * 6);
+            ellipse(this.x, this.y, 4);
+        }
+    }
+
+    function setup() {
+        pixelDensity(1);
+        frameRate(50);
+        noSmooth();
+        loadLocalData();
+
+        canvas = createCanvas(window.innerWidth, window.innerHeight);
+        canvas.parent("canvasContainer");
+        player = new Player();
+
+        scoreEl = document.getElementById("score");
+        waveEl = document.getElementById("waveText");
+        timeEl = document.getElementById("timeText");
+        comboTextEl = document.getElementById("comboText");
+
+        starLayer = createGraphics(width, height);
+        starLayer.noStroke();
+        starLayer.fill(255,255,255,80);
+        
+        for (let i=0;i<120;i++) {
+            starLayer.circle(
+                random(width),
+                random(height),
+                random(1,3)
+            );
+        }
+
+        for (let i = 0; i < 150; i++) shotPool.push(new Shot());
+        gameReady = true;
+
+        musicMenu.volume = 0.4;
+        musicGame.volume = 0.4;
+    }
+
+    function loadLocalData(){
+        let storedName = localStorage.getItem("playerName");
+        let classicScore = localStorage.getItem("highScoreClassic");
+        let survivalScoreLocal = localStorage.getItem("highScoreSurvival");
+        
+        if (storedName) {
+            savedName = storedName;
+            document.getElementById("nameInput").value = savedName;
+        }
+        
+        if (classicScore) {
+            highScoreClassic = int(classicScore);
+        }
+        
+        if (survivalScoreLocal) {
+            highScoreSurvival = int(survivalScoreLocal);
+        }
+    }
+
+    function showMenu() {
+        menuUI.style.display="block";
+        backButton.style.display="block";
+        bottomInfo.style.display="block";
+        gameUI.style.display="none";
+        survivalUI.style.display="none";
+        leaderboardUI.style.display="none";
+        tutorialUI.style.display="none";
+        state = "menu";
+    }
+    
+    function showGame() {
+        menuUI.style.display="none";
+        backButton.style.display="none";
+        bottomInfo.style.display="none";
+        gameUI.style.display="block";
+        survivalUI.style.display="none";
+        leaderboardUI.style.display="none";
+        tutorialUI.style.display="none";
+        state = "play";
+    }
+
+    function showSurvival() {
+        menuUI.style.display="none";
+        backButton.style.display="none";
+        bottomInfo.style.display="none";
+        gameUI.style.display="none";
+        survivalUI.style.display="block";
+        leaderboardUI.style.display="none";
+        tutorialUI.style.display="none";
+        state = "play";
+    }
+    
+    function showLeaderboard(){
+        menuUI.style.display="none";
+        backButton.style.display="none";
+        bottomInfo.style.display="none";
+        gameUI.style.display="none";
+        survivalUI.style.display="none";
+        leaderboardUI.style.display="block";
+        tutorialUI.style.display="none";
+        state = "leaderboard";
+    }
+
+    function showTutorial(){
+        menuUI.style.display="none";
+        backButton.style.display="none";
+        bottomInfo.style.display="none";
+        gameUI.style.display="none";
+        survivalUI.style.display="none";
+        leaderboardUI.style.display="none";
+        tutorialUI.style.display="block";
+        state = "tutorial";
+    }
+
+    function toggleMode() {
+        const btn = document.getElementById("modeBtn");
+        currentMode = (currentMode === "classic") ? "survival" : "classic";
+        btn.innerText = currentMode === "classic" ? "Classic Mode" : "Survival Mode";
+        btn.style.backgroundColor = currentMode === "survival" ? "#ff4757" : "#1e90ff";
+        document.getElementById("newScore").innerHTML = "survival" ? "0s" : "0";
+    }
+
+    function formatTime(seconds) {
+        seconds = Math.floor(seconds);
+        let m = Math.floor(seconds / 60);
+        let s = seconds % 60;
+        
+        if(m === 0) return s + "s";
+        return m + "m " + s + "s";
+    }
+
+    function spawnShot() {
+        for (let s of shotPool) {
+            if (!s.active) {
+                s.spawn();
+                shots.push(s);
+                return;
+            }
+        }
+    }
+
+    function drawFlash() {
+        if (flash > 0) {
+            fill(255, flash);
+            rect(0, 0, width, height);
+            flash -= 10;
+        }
+    }
+
+    function startGame() {
+        if (!gameReady) return;
+        document.body.style.overflow = "hidden";
+        resetGame();
+
+        musicMenu.pause();
+        musicGame.currentTime = 0;
+
+        if (currentMode === "survival") {
+            showSurvival();
+            startWave();
+        } else {
+            showGame();
+        }
+
+        setTimeout(() => {
+            musicGame.play();
+        }, 1000);
+    }
+
+    function resetGame() {
+        score = 0;
+        combo = 1;
+        lastCombo = 1;
+        comboProgress = 0;
+        difficultyTimer = 0;
+
+        spawnRate = 50;
+        bulletSpeedMin = 2;
+        bulletSpeedMax = 4;
+        bulletMultiplier = 1;
+
+        wave = 1;
+        waveTimer = 0;
+        survivalScore = 0;
+
+        shots = [];
+        bonuses = [];
+        particles = [];
+        player = new Player();
+    }
+
+    function draw() {
+        background(10, 10, 30);
+        drawStars();
+
+        if (state === "menu") drawMenu();
+        else if (state === "play") 
+            if (currentMode === "survival") drawSurvivalGame();
+            else drawGame();
+        else if (state === "pause") drawPaused();
+        else if (state === "leaderboard") drawLeaderboard();
+
+        drawFlash();
+    }
+
+    function drawStars(){
+        starOffset -= 0.5;
+        if (starOffset <= -width) starOffset = 0;
+        image(starLayer, starOffset, 0);
+        image(starLayer, starOffset + width, 0);
+    }
+
+    function drawMenu() {
+        showMenu();
+        if (currentMode === "survival") document.getElementById("highScore").innerText = formatTime(highScoreSurvival);
+        else document.getElementById("highScore").innerText = highScoreClassic;
+    }
+
+    function drawGame() {
+        if (shots.length > 120) shots.length = 120;
+        if (particles.length > 80) particles.length = 80;
+
+        if (screenShake>0){
+            translate(random(-screenShake,screenShake),random(-screenShake,screenShake));
+            screenShake*=0.85;
+        }
+
+        if (frameCount % spawnRate === 0) {
+            let bulletCount = floor(bulletMultiplier);
+            for (let i = 0; i < bulletCount; i++) {
+                if (shots.length < 120) spawnShot();
+            }
+        }
+
+        if (frameCount % 120 === 0) {
+            let bonusCount = max(1, floor(bulletMultiplier / 2));
+            for (let i = 0; i < bonusCount; i++) {
+                if (bonuses.length < 20) bonuses.push(new Bonus());
+            }
+        }
+
+        player.update();
+        player.draw();
+
+        if (frameCount % 3 === 0){
+            if (particles.length < 120) {
+                particles.push(new Particle(player.pos.x, player.pos.y));
+            }
+        }
+        
+        if (particles.length > 120){
+            particles.shift();
+        }
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            particles[i].draw();
+            if (particles[i].life <= 0) particles.splice(i,1);
+        }
+
+        for (let i = shots.length - 1; i >= 0; i--) {
+            let s = shots[i];
+            
+            if (!s.active) {
+                shots.splice(i,1);
+                continue;
+            }
+            
+            s.update();
+            s.draw();
+            if (s.hit(player)) die();
+        }
+
+        for (let i = bonuses.length - 1; i >= 0; i--) {
+            bonuses[i].draw();
+
+            if (bonuses[i].collect(player)) {
+                score += floor(bonuses[i].value * combo);
+                bonuses.splice(i, 1);
+                comboProgress += 35 + bulletMultiplier * 5;
+                comboProgress = Math.min(comboProgress, comboThreshold * 10);
+                sfxCollect.currentTime = 0;
+                sfxCollect.play();
+            }
+        }
+
+        difficultyTimer++;
+        if (difficultyTimer % 500 === 0) {
+            spawnRate = max(10, spawnRate - 5);
+            bulletSpeedMin += 0.3;
+            bulletSpeedMax += 0.4;
+            bulletMultiplier = Math.min(3, bulletMultiplier + 0.1);
+        }
+
+        comboProgress -= comboDecay;
+        if (comboProgress < 0) comboProgress = 0;
+        let newCombo = Math.floor(comboProgress / comboThreshold) + 1;
+        combo = Math.max(1, newCombo);
+
+        if (combo > lastCombo) {
+            screenShake = 10;
+            document.getElementById("comboText").style.transform = "scale(1.4)";
+            setTimeout(()=>{document.getElementById("comboText").style.transform="scale(1)"},120);
+        }
+        lastCombo = combo;
+
+        scoreEl.innerText = score;
+        updateComboBar();
+    }
+
+    function startWave() {
+        waveState = "warning";
+        waveTimer = 0;
+        waveFlash = 180;
+        
+        bulletSpeedMin = 2 + wave * 0.7;
+        bulletSpeedMax = 4 + wave * 0.9;
+        spawnQueue = 6 + wave * 5;
+
+        sfxWave.currentTime = 0;
+        sfxWave.play();
+    }
+    
+    function drawWaveWarning(){
+        let t = waveTimer;
+        let alpha = constrain(t * 6, 0, 255);
+        let scalePulse = 1 + sin(frameCount * 0.08) * 0.05;
+        
+        push();
+        translate(width/2, height/2 - 10);
+        scale(scalePulse);
+        textAlign(CENTER, CENTER);
+        
+        for (let i=0;i<4;i++){
+            fill(255,80,80,alpha * 0.15);
+            textSize(70 + i*6);
+            text("WAVE " + wave, 0, 0);
+        }
+        
+        fill(255,220,80,alpha);
+        textSize(70);
+        text("WAVE " + wave, 0, 0);
+        pop();
+        
+        let subPulse = 200 + sin(frameCount*0.12)*55;
+        fill(255,subPulse);
+        textSize(22);
+        textAlign(CENTER,CENTER);
+        text("⚠ Incoming Wave ⚠", width/2, height/2 + 50);
+    }
+
+    function handleWaveSpawning(){
+        spawnTick++;
+        if (spawnQueue > 0 && spawnTick >= spawnDelay){
+            spawnShot();
+            spawnQueue--;
+            spawnTick = 0;
+        }
+        
+        if (spawnQueue === 0) waveState = "fighting";
+    }
+    
+    function drawSurvivalGame(){
+        player.update();
+        player.draw();
+
+        if (frameCount % 3 === 0 && particles.length < 80){
+            particles.push(new Particle(player.pos.x, player.pos.y));
+        }
+        
+        for (let i = particles.length - 1; i >= 0; i--){
+            particles[i].update();
+            particles[i].draw();
+            
+            if (particles[i].life <= 0) particles.splice(i,1);
+        }
+        
+        for (let i = shots.length - 1; i >= 0; i--) {
+            let s = shots[i];
+            
+            if (!s.active) {
+                shots.splice(i,1);
+                continue;
+            }
+            
+            s.update();
+            s.draw();
+            
+            if (s.hit(player)) dieSurvival();
+        }
+        
+        if (waveState === "warning") {
+            drawWaveWarning();
+            waveTimer++;
+            
+            if (waveTimer > 140) {
+                waveState = "spawning";
+                 waveTimer = 0;
+            }
+            
+            return;
+        }
+        
+        if (waveState === "spawning") {
+            handleWaveSpawning();
+        }
+        
+        if (waveState === "fighting") {
+            waveTimer++;
+            
+            if (waveTimer > waveDuration) waveState = "clearing";
+        }
+
+        if (waveState === "clearing") {
+            let activeBullets = shots.some(s => s.active);
+            
+            if (!activeBullets) {
+                wave++;
+                startWave();
+            }
+        }
+        
+        survivalScore += deltaTime / 1000;
+        waveEl.innerText = wave;
+        timeEl.innerText = formatTime(survivalScore);
+    }
+
+    function drawPaused(){
+        player.draw();
+        
+        for(let s of shots) s.draw();
+        for(let b of bonuses) b.draw();
+        for(let p of particles) p.draw();
+        
+        push();
+        fill(0,0,0,170);
+        rect(0,0,width,height);
+        pop();
+    }
+
+    function togglePause() {
+        if (state === "play") {
+            state = "pause";
+            document.getElementById("pauseBtn").innerText="▶";
+            document.getElementById("pauseBtn2").innerText="▶";
+            pauseOverlay.style.display="flex";
+        } else if (state === "pause") {
+            state = "play";
+            document.getElementById("pauseBtn").innerText="⏸";
+            document.getElementById("pauseBtn2").innerText="⏸";
+            pauseOverlay.style.display="none";
+        }
+    }
+
+    function updateComboBar(){
+       let progress = comboProgress % comboThreshold;
+       let percent = (progress / comboThreshold) * 100;
+       document.getElementById("comboBar").style.width = percent + "%";
+       document.getElementById("comboText").innerText = "COMBO x" + combo;
+
+       if(combo >= 4) document.getElementById("comboText").style.color = "#ffff00";
+       else document.getElementById("comboText").style.color = "white";
+    }
+
+    function die() {
+        flash = 255;
+        state = "menu";
+
+        sfxDie.currentTime = 0;
+        sfxDie.play();
+        musicGame.pause();
+
+        let name = document.getElementById("nameInput").value || "Player";
+        sendScore(name, score, "classic");
+
+        document.getElementById("newScore").innerText = score;
+        if (score > highScoreClassic) {
+            highScoreClassic = score;
+            localStorage.setItem("highScoreClassic", score);
+        }
+
+        setTimeout(() => {
+            musicMenu.play();
+        }, 500);
+    }
+
+    function dieSurvival(){
+        flash = 255;
+        state = "menu";
+
+        sfxDie.currentTime = 0;
+        sfxDie.play();
+        musicGame.pause();
+        
+        let name = document.getElementById("nameInput").value || "Player";
+        let finalScore = Math.floor(survivalScore);
+        sendScore(name, finalScore, "survival");
+        
+        document.getElementById("newScore").innerText = formatTime(finalScore);
+        if (finalScore > highScoreSurvival) {
+            highScoreSurvival = finalScore;
+            localStorage.setItem("highScoreSurvival", finalScore);
+        }
+        
+        setTimeout(() => {
+            musicMenu.play();
+        }, 500);
+    }
+
+    function backToMenu() {
+        state = "menu";
+        showMenu();
+    }
+
+    function sendScore(name, score, mode) {
+        fetch("https://script.google.com/macros/s/AKfycbyje2iyoyhLDr2MYsNvlLvHVcKS0iogjHe4G1ke0dpTsjhkzAAEXKwJkwUwa0BlksAE_g/exec", {
+            method: "POST",
+            body: JSON.stringify({
+                name: name,
+                score: score,
+                mode: mode
+            })
+        });
+    }
+
+    async function openLeaderboard(){
+        showLeaderboard();
+        leaderboard = [];
+
+        const list = document.getElementById("leaderboardList");
+        const title = document.getElementById("leaderboardTitle");
+
+        title.innerHTML = (currentMode === "survival") ? "Survival Leaderboard" : "Classic Leaderboard";
+        list.innerHTML = "";
+        list.innerHTML = `<div class="leaderboardLoading">Loading...</div>`;
+        await new Promise(r => setTimeout(r, 50));
+        
+        try {
+            const response = await fetch("https://script.google.com/macros/s/AKfycbyje2iyoyhLDr2MYsNvlLvHVcKS0iogjHe4G1ke0dpTsjhkzAAEXKwJkwUwa0BlksAE_g/exec?mode=" + currentMode);
+            const data = await response.json();
+            data.sort((a,b)=>b.score-a.score);
+            leaderboard = data.slice(0,12);
+            drawLeaderboard();
+        } catch(e) {
+            console.log("Error loading data:", e);
+            list.innerHTML = "Failed to load.";
+        }
+    }
+
+    function drawLeaderboard() {
+        if (!leaderboard || leaderboard.length === 0) return; 
+        let html = "";
+        leaderboard.forEach((entry, i) => {
+            let medal = (i === 0) ? "🥇 " : (i === 1) ? "🥈 " : (i === 2) ? "🥉 " : (i + 1) + ". ";
+            let date = entry.date ? new Date(entry.date).toLocaleDateString() : "";
+            let scoreDisplay = currentMode === "survival" ? formatTime(entry.score) : entry.score;
+            
+            html += `<div class="leaderboardEntry">
+                    <span class="entry-name">${medal}${entry.name}</span>
+                    <span class="entry-score">${scoreDisplay}</span>
+                    <span class="entry-date">${date}</span></div>`;
+        });
+        
+        document.getElementById("leaderboardList").innerHTML = html;
+    }
+
+    function windowResized(){
+        resizeCanvas(window.innerWidth, window.innerHeight);
+    }
+
+    nameInput.addEventListener('input', () => {
+        localStorage.setItem("playerName", nameInput.value);
+    });
+
+    document.addEventListener("keydown", e => {
+        if (e.key === "p" || e.key === "P") togglePause();
+        if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=')) e.preventDefault();
+    });
+
+    document.addEventListener('touchmove', function (e) {
+        if (state === "play") {
+            if (e.target.tagName !== "INPUT" && e.target.tagName !== "BUTTON") {
+                e.preventDefault();
+            }
+        }
+    }, { passive: false });
+
+    document.addEventListener('wheel', (e) => {
+        if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+
+    window.addEventListener('click', () => {
+        const isPlayButton = event.target.id === 'playBtn';
+        if (!isPlayButton && musicMenu.paused)
+        musicMenu.play().catch(e => console.log("Audio still blocked:", e));
+    }, { once: true });
+
+    window.addEventListener("keydown", function (e) {
+        if (["ArrowUp", "ArrowDown", " "].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>
