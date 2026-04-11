@@ -16,19 +16,32 @@
         <span>Zendra クレイジー</span>
       </div>
       <nav class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="Videos.html" class="active"><b>Videos</b></a>
-        <a href="zentral.html">Zentral</a>
-        <div class="dropdown">
-          <button class="dropbtn">More ▾</button>
-          <div class="dropdown-content">
-            <a href="projects.html">Projects</a>
-            <a href="newsletter.html">Newsletter</a>
-            <a href="others.html">Others</a>
-          </div>
+      <div class="mobile-header">MENU</div>
+      <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="videos.html"><i class="fa-solid fa-play"></i> <b>Videos</b></a>
+      <div class="dropdown">
+        <a href="zentral.html" class="dropbtn">
+          <span><i class="fa-solid fa-star"></i> Zentral</span>
+          <i class="fa-solid fa-chevron-down small-arrow"></i>
+        </a>
+        <div class="dropdown-content">
+          <a href="./Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+          <a href="./Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
         </div>
-      </nav>
-          <div class="hamburger">
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">
+          <span><i class="fa-solid fa-ellipsis"></i> More</span>
+          <i class="fa-solid fa-chevron-down small-arrow"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
+          <a href="newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+          <a href="others.html"><i class="fa-solid fa-box"></i> Others</a>
+        </div>
+      </div>
+    </nav>
+    <div class="hamburger">
       <span></span>
       <span></span>
       <span></span>
@@ -37,22 +50,26 @@
   
     <section class="stats-section">
       <div class="count-container">
-        <div class="platform ig">
-          <h3>Instagram</h3>
-          <div id="igCount">0</div>
-          <a href="https://www.instagram.com/zendra_brawl/" target="_blank" class="follow-btn ig-btn">Follow</a>
-        </div>
-        <div class="platform yt"><span>
-          <h3><span>YouTube</span></h3>
+        <a href="https://www.instagram.com/zendra_brawl/" target="_blank" class="platform ig">
+            <i class="fa-brands fa-instagram platform-icon"></i>
+            <h3>Instagram</h3>
+            <div id="igCount">0</div>
+            <div class="follow-btn ig-btn">Follow</div>
+        </a>
+    
+        <a href="https://www.youtube.com/channel/UCaWAxGQH0nU3w5PXDppmcvQ/?sub_confirmation=1" target="_blank" class="platform yt">
+          <i class="fa-brands fa-youtube platform-icon"></i>
+          <h3>YouTube</h3>
           <div id="ytCount">0</div>
-          <a href="https://www.youtube.com/channel/UCaWAxGQH0nU3w5PXDppmcvQ/?sub_confirmation=1" target="_blank" class="follow-btn yt-btn">Subscribe</a>
-          </span>
-        </div>
-        <div class="platform tk">
+          <div class="follow-btn yt-btn">Subscribe</div>
+        </a>
+    
+        <a href="http://www.tiktok.com/@zendra_brawl" target="_blank" class="platform tk">
+          <i class="fa-brands fa-tiktok platform-icon"></i>
           <h3>TikTok</h3>
           <div id="tiktokCount">0</div>
-          <a href="http://www.tiktok.com/@zendra_brawl" target="_blank" class="follow-btn tk-btn">Follow</a>
-        </div>
+          <div class="follow-btn tk-btn">Follow</div>
+        </a>
       </div>
     </section>
 
@@ -76,99 +93,15 @@
     </footer>
   
     <script>
-      document.addEventListener('contextmenu', event => event.preventDefault());
-      document.addEventListener('keydown', event => {
-        if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
-          event.preventDefault();
-        }
-      });
-
-      let buffer = [];
-      const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
-
-      window.addEventListener("keydown", e => {
-        if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
-
-        const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-        buffer.push(key);
-
-        if (buffer.length > code.length) {
-          buffer.shift();
-        }
-
-        const recent = buffer.slice(-code.length);
-
-        if (recent.join() === code.join()) {
-          location.href = "./Others/terminal.html";
-          buffer.length = 0;
-        }
-      });
-
-      const headerEl = document.querySelector('header');
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY;
-        const maxOpacity = 0.45;
-        const maxBlur = 12;
-        const pct = Math.min(y / 300, 1);
-        headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
-        headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
-
-        if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
-      });
-
-      const dropdown = document.querySelector('.dropdown');
-      const dropbtn = dropdown.querySelector('.dropbtn');
-      const dropdownContent = dropdown.querySelector('.dropdown-content');
-      let isDropdownOpen = false;
-
-      dropbtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        isDropdownOpen = !isDropdownOpen;
-        dropdown.classList.toggle('show', isDropdownOpen);
-      });
-      dropdown.addEventListener('mouseenter', () => {
-        dropdown.classList.add('show');
-        isDropdownOpen = true;
-      });
-      dropdown.addEventListener('mouseleave', (e) => {
-        const rect = dropdownContent.getBoundingClientRect();
-        const buffer = 60;
-        const checkMouse = (ev) => {
-          if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
-            dropdown.classList.remove('show');
-            isDropdownOpen = false;
-            window.removeEventListener('mousemove', checkMouse);
-          }
-        };
-        window.addEventListener('mousemove', checkMouse);
-      });
-
-      window.addEventListener('scroll', () => {
-        dropdown.classList.remove('show');
-        isDropdownOpen = false;
-      });
-      document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) {
-          dropdown.classList.remove('show');
-          isDropdownOpen = false;
-        }
-      });
-
-      const hamburger = document.querySelector('.hamburger');
-      const navLinks = document.querySelector('.nav-links');
       const Channel_Key = "UCaWAxGQH0nU3w5PXDppmcvQ";
       const Channel_Code = "rN1NSZ2SDNWWONnez1CRVhXZx9kb5FXNINWQutme0NkQ5NVY6lUQ";
-      hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-      });
 
       const EN = () => atob(Channel_Code.split('').reverse().join(''));
       const Channel_ID = EN();
       async function followerCounts() {
         const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR16SGHQq6zDLzf-1t4m5TN8b7ePx4e5yZROR-k45ClZYW3wdA_7IL5_GQFIsoddc_27TEeQnB-HGLv/pub?gid=272102271&single=true&output=csv";
-        let igFollowers = 1700;
-        let tiktokFollowers = 1400;
+        let igFollowers = 1900;
+        let tiktokFollowers = 1500;
         
         try {
           const response = await fetch(sheetCsvUrl);
@@ -213,7 +146,7 @@
           const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${Channel_Key}&key=${Channel_ID}`);
           const data = await res.json();
           if (!data.items || !data.items.length) {
-            animateCount("ytCount", 1000);
+            animateCount("ytCount", 1100);
             return;
           }
 
@@ -226,7 +159,7 @@
       
       async function suggestedContent() {
         const videoId = "jDHrCU9Q0ME";
-        const playlistId = "PLE9_yXA2umvKX27H9yC5u4xE8aQ0wXH4L";
+        const playlistId = "PLE9_yXA2umvJ3jMtCrFkfGFss7hevxAQa";
         const section = document.getElementById("suggestedSection");
         section.innerHTML = "";
 
@@ -249,10 +182,14 @@
             <h2>Suggested Video</h2>
             <div class="suggested-thumbnail" data-url="${videoUrl}">
               <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${v.snippet.title}">
-              <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
+              <div class="play-overlay">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                  <i class="fa-solid fa-circle-play"></i><span style="font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">Watch Now</span>
+                </div>
+              </div>
             </div>
             <div class="suggested-info">
-              <h3>${v.snippet.title}</h3>
+              <h3>${(v.snippet.title).replace(/#\w+/g, '').trim().replace(/\s+/g, ' ')}</h3>
               <p>Uploaded ${timeAgo(v.snippet.publishedAt)} • Video</p>
             </div>
           </div>`;
@@ -262,7 +199,7 @@
         if (playlistData.items && playlistData.items.length) {
           const p = playlistData.items[0];
           const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
-          const playlistThumb = "https://img.youtube.com/vi/rQo1wFpkcmc/hqdefault.jpg";
+          const playlistThumb = p.snippet.thumbnails.high.url || "https://youtube.com/H-ycsHnFlY4/hqdefault.jpg";
           const playlistHTML = `
           <div class="suggested-content">
             <h2>Suggested Playlist</h2>
@@ -270,7 +207,11 @@
               <div class="playlist-stack first"></div>
               <div class="playlist-stack second"></div>
               <img src="${playlistThumb}" alt="${p.snippet.title}">
-              <div class="play-overlay"><i class="fa-solid fa-play"></i></div>
+              <div class="play-overlay">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                  <i class="fa-solid fa-circle-play"></i><span style="font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;">Watch Now</span>
+                </div>
+              </div>
             </div>
             <div class="suggested-info">
               <h3>${p.snippet.title}</h3>
@@ -309,6 +250,7 @@
           const data = await res.json();
           if (!data.items || !data.items.length) {
             document.getElementById("videos-title").innerHTML = "Unable to load videos. Please try again later.";
+            document.getElementById("videoGrid").style.minHeight = "100px";
             document.getElementById("videos-title").style.fontSize = "15px";
             return;
           }
@@ -328,7 +270,7 @@
           
           for (const item of videoItems) {
             const videoId = item.id.videoId;
-            const title = item.snippet.title;
+            const title = (item.snippet.title).replace(/#\w+/g, '').trim().replace(/\s+/g, ' ');
             const thumbnail = item.snippet.thumbnails.medium.url;
             const publishedAt = item.snippet.publishedAt;
             const views = statsMap[videoId]?.viewCount || 0;
@@ -368,5 +310,6 @@
         recentContent();
       });
     </script>
+    <script src="script.js"></script>
   </body>
 </html>

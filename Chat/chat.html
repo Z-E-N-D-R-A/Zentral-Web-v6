@@ -24,15 +24,28 @@
       <span>Zendra クレイジー</span>
     </div>
     <nav class="nav-links">
-      <a href="../index.html">Home</a>
-      <a href="../videos.html">Videos</a>
-      <a href="../zentral.html"><b>Zentral</b></a>
+      <div class="mobile-header">MENU</div>
+      <a href="../index.html"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
       <div class="dropdown">
-        <button class="dropbtn">More ▾</button>
+        <a href="../zentral.html" class="dropbtn">
+          <span><i class="fa-solid fa-star"></i> Zentral</span>
+          <i class="fa-solid fa-chevron-down small-arrow"></i>
+        </a>
         <div class="dropdown-content">
-          <a href="../projects.html">Projects</a>
-          <a href="../newsletter.html">Newsletter</a>
-          <a href="../others.html">Others</a>
+          <a href="../Chat/chat.html"><i class="fa-solid fa-comment"></i> <b>Zentral Chat</b></a>
+          <a href="../Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn">
+          <span><i class="fa-solid fa-ellipsis"></i> More</span>
+          <i class="fa-solid fa-chevron-down small-arrow"></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="../projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
+          <a href="../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+          <a href="../others.html"><i class="fa-solid fa-box"></i> Others</a>
         </div>
       </div>
     </nav>
@@ -43,10 +56,16 @@
     </div>
   </header>
 
-  <div class="chat-wrapper">
+  <div id="chat-wrapper" class="chat-wrapper">
     <button id="toggleSidebar" class="sidebar-toggle">
-      <div class="fa-solid fa fa-bars"></div>
+      <div class="fas fa-ellipsis-h"></div>
     </button>
+
+    <div id="portrait-lock-overlay">
+      <div class="icon">🔄</div>
+      <h2>Please Rotate Your Device</h2>
+      <p>This chat is best experienced in portrait mode.</p>
+    </div>
 
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-top">
@@ -87,6 +106,8 @@
     <div id="backdrop" class="backdrop"></div>
 
     <main id="chat-area" class="chat-area">
+      <div id="topAlertBar" class="top-alert hidden"></div>
+
       <div id="newMsgIndicator" class="new-msg-indicator hidden">
         <span id="newMsgText">↓ 0 New Messages ↓</span>
       </div>
@@ -94,12 +115,14 @@
       <div class="messages-scroll">
         <div id="messages"></div>
       </div>
-      
+
+      <div id="gif-picker-container" class="gif-picker-container hidden"></div>
       <button id="jumpToLatestBtn" class="jump-to-latest"> ↓ </button>
       <div class="indicator-row" id="indicatorRow">
         <div id="typingIndicator" class="typing-indicator"></div>
         <div id="charLimitIndicator" class="char-limit-indicator"></div>
       </div>
+      <div id="mentionDropdown" class="mention-dropdown hidden"></div>
 
       <div id="reply-bar" class="hidden">
         <div class="reply-preview">
@@ -110,7 +133,40 @@
       </div>
       
       <div class="input-bar" id="input-bar">
+        <button id="commandBtn">
+          <div class="fa-solid fas fa-plus"></div>
+        </button>
+
+        <div id="commandMenu" class="command-menu">
+          <div class="command-menu-header">Commands</div>
+          <div id="commandMenuList" class="command-menu-list"></div>
+        </div>
+
         <textarea id="messageInput" placeholder="Type message..."></textarea>
+
+        <button id="emojiBtn">
+          <div class="fa-solid far fa-grin-beam"></div>
+        </button>
+
+        <div id="emojiMenu" class="emoji-menu">
+          <div class="emoji-header">
+            <input type="text" id="emojiSearch" placeholder="Search emoji..." />
+          </div>
+        
+          <div class="emoji-body" id="emojiBody"></div>
+        
+          <div class="emoji-footer">
+            <button data-category="Smileys"><i class="fas fa-smile"></i></button>
+            <button data-category="People"><i class="fas fa-user"></i></button>
+            <button data-category="Animals"><i class="fas fa-paw"></i></button>
+            <button data-category="Food"><i class="fas fa-hamburger"></i></button>
+            <button data-category="Travel"><i class="fas fa-plane"></i></button>
+            <button data-category="Activities"><i class="fas fa-gamepad"></i></button>
+            <button data-category="Objects"><i class="fas fa-lightbulb"></i></button>
+            <button data-category="Symbols"><i class="fas fa-heart"></i></button>
+            <button data-category="Text Faces"><i class="fas fa-star"></i></button>
+          </div>
+        </div>
         
         <button id="sendBtn">
           <div class="fa-solid fas fa-paper-plane"></div> Send
@@ -124,24 +180,38 @@
   </div>
 
   <div id="mobile-action-sheet" class="mobile-action-sheet">
-    <div class="sheet-option" data-action="reply">
-      <div class="fa-solid fas fa-reply"></div> Reply
+    <div class="sheet-preview">
+      <div class="preview-name"></div>
+      <div class="preview-text"></div>
     </div>
-    <div class="sheet-option" data-action="edit">
-      <div class="fa-solid fas fa-edit"></div> Edit
+  
+    <div class="sheet-divider"></div>
+    <div class="sheet-options">
+      <div class="sheet-option" data-action="reply">
+        <i class="fa-solid fa-reply"></i><span>Reply</span>
+      </div>
+  
+      <div class="sheet-option" data-action="edit">
+        <i class="fa-solid fa-edit"></i><span>Edit</span>
+      </div>
+  
+      <div class="sheet-option" data-action="react">
+        <i class="fa-regular fa-face-smile"></i><span>React</span>
+      </div>
+  
+      <div class="sheet-option" data-action="copy">
+        <i class="fa-solid fa-copy"></i><span>Copy</span>
+      </div>
+  
+      <div class="sheet-option danger" data-action="delete">
+        <i class="fa-regular fa-trash-can"></i><span>Delete</span>
+      </div>
+  
+      <div class="sheet-option danger" data-action="report">
+        <i class="fa-solid fa-flag"></i><span>Report</span>
+      </div>
     </div>
-    <div class="sheet-option" data-action="react">
-      <div class="fa-solid far fa-grin-squint"></div> React
-    </div>
-    <div class="sheet-option" data-action="copy">
-      <div class="fa-solid fas fa-copy"></div> Copy
-    </div>
-    <div class="sheet-option" data-action="delete">
-      <div class="fa-solid far fa-trash-alt"></div> Delete
-    </div>
-    <div class="sheet-option" data-action="report">
-      <div class="fa-solid fas fa-exclamation-triangle"></div> Report
-    </div>
+  
     <div class="sheet-cancel">Cancel</div>
   </div>
 
@@ -151,14 +221,13 @@
     <span class="react">💀</span>
     <span class="react">😭</span>
     <span class="react">😂</span>
-    <span class="react">🔥</span>
+    <span class="react react-more"><i class="fas fa-plus"></i></span>
   </div>
   <div id="reaction-tooltip" class="reaction-tooltip hidden"></div>
   <div id="badge-tooltip" class="tooltip hidden"></div>
   
   <div id="prompt" class="prompt">
     <div class="prompt-container">
-  
       <h3 class="prompt-header">Welcome to Zentral Chat</h3>
   
       <div class="prompt-section">
@@ -175,7 +244,7 @@
   
       <div class="prompt-divider"><span>OR</span></div>
   
-      <button id="prompt-google" class="google-btn">
+      <button id="prompt-google" class="prompt-google">
         <svg xmlns="http://www.w3.org" viewBox="0 0 48 48" width="20px" height="20px">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
           <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
@@ -198,10 +267,7 @@
         <h3 class="prompt-header">Almost There 🚀</h3>
     
         <div class="prompt-title"><b>Choose Your Display Name</b></div>
-        <div class="prompt-description">
-          Your Google account is connected.<br>
-          Pick the name others will see in chat.
-        </div>
+        <div class="prompt-description">Pick the name others will see in chat.</div>
     
         <input id="google-username-input" maxlength="30" />
         <div id="google-username-error" class="prompt-error"></div>
@@ -211,9 +277,14 @@
 
   <div id="settingsModal" class="settings-modal hidden">
     <div class="settings-modal-content">
-      <h3>User Settings <span style="font-size: 16px;">(@<span id="accountUsername">—</span>)</span></h3>
+      <h3>User Settings</h3>
   
       <div class="setting-item account-setting" style="padding-top: 10px;">
+        <div class="account-item">
+          <span class="account-title">Username</span>
+          <span class="account-title">@<span id="accountUsername">—</span></span>
+        </div>
+
         <div class="account-item badge-row">
           <span class="account-title">Badge</span>
       
@@ -267,12 +338,12 @@
   
           <button class="carousel-arrow right" id="themeNext">❯</button>
         </div>
+        <div id="themeStatus" class="theme-status">Stray Kids Everywhere All Around the World!</div>
       </div>
 
       <div class="setting-item" style="flex-direction: column; border-bottom: 0px;">
+        <span style="margin-bottom: 5px;">Google Account</span>
         <div class="google-setting">
-          <span>Google Account</span>
-      
           <div id="googleActionBtn" class="google-btn">
             <svg xmlns="http://www.w3.org" viewBox="0 0 48 48" width="20px" height="20px">
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
@@ -320,9 +391,20 @@
     </div>
   </div>
 
+  <div id="intro-overlay">
+    <video id="intro-video" autoplay muted playsinline preload="auto">
+      <source src="../Assets/Intro.mp4" type="video/mp4">
+    </video>
+  </div>
+
   <div id="banned-screen" class="hidden">
-    <h1>🚫 You are banned</h1>
-    <p>This account has been permanently banned.</p>
+    <div class="banned-content">
+      <div class="glitch-wrapper">
+        <h1 class="banned-glitch" data-text="ACCESS DENIED">ACCESS DENIED</h1>
+      </div>
+      <div class="banned-icon"><i class="fas fa-user-slash"></i></div>
+      <p class="banned-message">Your account has been flagged and restricted from <span>Zentralverse</span>.</p>
+    </div>
   </div>
 
   <div id="mtn-screen" style="display: none;">
@@ -330,73 +412,35 @@
     <p style="margin-top: 15px;">We are currently fixing and improving Zentral-Chat server.<br>Please check back in later. Sorry for the inconveniences.</p>
   </div>
 
-  <div id="backdrop" class="backdrop"></div>
-
-  <script src="chat.js"></script>
   <script>
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.addEventListener('keydown', event => {
-      if (event.key === 'F12' ||  (event.ctrlKey && event.shiftKey && event.key === 'I') ||  (event.ctrlKey && event.key === 'u')) {
-        event.preventDefault();
-      }
-    });
+    var path = "../";
+    const overlay = document.getElementById('intro-overlay');
+    const video = document.getElementById('intro-video');
 
-    const headerEl = document.querySelector('header');
-    window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      const maxOpacity = 0.45;
-      const maxBlur = 12;
-      const pct = Math.min(y / 300, 1);
-      headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
-      headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
+    function revealSite() {
+      video.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 1200);
+      }, 1000);
+    }
 
-      if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
-    });
-
-    const dropdown = document.querySelector('.dropdown');
-    const dropbtn = dropdown.querySelector('.dropbtn');
-    const dropdownContent = dropdown.querySelector('.dropdown-content');
-    let isDropdownOpen = false;
-
-    dropbtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      isDropdownOpen = !isDropdownOpen;
-      dropdown.classList.toggle('show', isDropdownOpen);
-    });
-    dropdown.addEventListener('mouseenter', () => {
-      dropdown.classList.add('show');
-      isDropdownOpen = true;
-    });
-    dropdown.addEventListener('mouseleave', (e) => {
-      const rect = dropdownContent.getBoundingClientRect();
-      const buffer = 60;
-      const checkMouse = (ev) => {
-        if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
-          dropdown.classList.remove('show');
-          isDropdownOpen = false;
-          window.removeEventListener('mousemove', checkMouse);
+    if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
+      overlay.style.display = 'none';
+    } else {
+      video.ontimeupdate = function () {
+        if (video.duration - video.currentTime <= 1.2) {
+          video.ontimeupdate = null;
+          revealSite();
         }
       };
-      window.addEventListener('mousemove', checkMouse);
-    });
 
-    window.addEventListener('scroll', () => {
-      dropdown.classList.remove('show');
-      isDropdownOpen = false;
-    });
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
-        isDropdownOpen = false;
-      }
-    });
-
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    hamburger.addEventListener('click', () => {
-      hamburger.classList.toggle('active');
-      navLinks.classList.toggle('active');
-    });
+      video.onended = () => { if (overlay.style.display !== 'none') revealSite(); };
+    }
   </script>
+  <script src="chat.js"></script>
+  <script src="../script.js"></script>
   </body>
 </html>

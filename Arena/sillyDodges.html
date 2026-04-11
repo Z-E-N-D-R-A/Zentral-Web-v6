@@ -24,6 +24,27 @@
             overscroll-behavior: none;
         }
     
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgb(16, 16, 16);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s ease;
+        }
+    
+        #intro-video {
+            width: 60%;
+            max-width: 800px;
+            height: auto;
+            transition: opacity 0.8s ease;
+        }
+    
         #gameContainer {
             width: 100vw;
             height: 100vh;
@@ -303,7 +324,7 @@
 <div id="gameContainer">
     <div id="canvasContainer"></div>
 
-    <button id="backButton" onclick="window.location.href = '../zentral.html'">&#8592;</button>
+    <button id="backButton" onclick="window.location.href = '../others.html'">&#8592;</button>
     <div id="menuUI" class="uiPanel">
         <h1>Silly Dodges</h1>
         <h3>Developed by KuraWorks ❤️</h3>
@@ -323,7 +344,7 @@
 
     <div id="bottomInfo">
         <p id="howToPlay" onclick="showTutorial()"><u>How to Play</u></p>
-        <p>Zentral Arcade of Zentral Web</p>
+        <p>2026 Zentral-Web | Powered by KuraWorks</p>
     </div>
 
     <div id="gameUI" style="display:none;">
@@ -383,7 +404,13 @@
     </div>
 </div>
 
+<div id="intro-overlay">
+    <video id="intro-video" autoplay muted playsinline preload="auto">
+        <source src="../Assets/Intro.mp4" type="video/mp4">
+    </video>
+</div>
 <body>
+
 <script>
     let player;
     let scoreEl;
@@ -439,6 +466,7 @@
     let musicGame = new Audio("../Assets/Music/OST_1.mp3");
     musicMenu.loop = true;
     musicGame.loop = true;
+    sfxCollect.volume = 0.2;
 
     const menuUI = document.getElementById("menuUI");
     const gameUI = document.getElementById("gameUI");
@@ -448,6 +476,36 @@
     const nameInput = document.getElementById('nameInput');
     const bottomInfo = document.getElementById('bottomInfo');
     const backButton = document.getElementById("backButton");
+
+    const overlay = document.getElementById('intro-overlay');
+    const video = document.getElementById('intro-video');
+    const mainContent = document.getElementById('gameContainer');
+    var path = "../";
+
+    function revealSite() {
+        mainContent.style.display = 'block';
+        video.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 1200);
+        }, 1000);
+    }
+
+    if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
+        overlay.style.display = 'none';
+        mainContent.style.display = 'block';
+    } else {
+        video.ontimeupdate = function () {
+            if (video.duration - video.currentTime <= 1.2) {
+                video.ontimeupdate = null;
+                revealSite();
+            }
+        };
+
+        video.onended = () => { if (overlay.style.display !== 'none') revealSite(); };
+    }
 
     class Player {
         constructor() {
@@ -601,8 +659,8 @@
         for (let i = 0; i < 150; i++) shotPool.push(new Shot());
         gameReady = true;
 
-        musicMenu.volume = 0.4;
-        musicGame.volume = 0.4;
+        musicMenu.volume = 0.3;
+        musicGame.volume = 0.3;
     }
 
     function loadLocalData(){
@@ -682,9 +740,9 @@
     function toggleMode() {
         const btn = document.getElementById("modeBtn");
         currentMode = (currentMode === "classic") ? "survival" : "classic";
-        btn.innerText = currentMode === "classic" ? "Classic Mode" : "Survival Mode";
+        btn.innerText = (currentMode === "classic") ? "Classic Mode" : "Survival Mode";
         btn.style.backgroundColor = currentMode === "survival" ? "#ff4757" : "#1e90ff";
-        document.getElementById("newScore").innerHTML = "survival" ? "0s" : "0";
+        document.getElementById("newScore").innerHTML = (currentMode === "survival") ? "0s" : "0";
     }
 
     function formatTime(seconds) {

@@ -18,15 +18,28 @@
             <span>Zendra クレイジー</span>
         </div>
         <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="videos.html">Videos</a>
-            <a href="zentral.html"><b>Zentral</b></a>
+            <div class="mobile-header">MENU</div>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="videos.html"><i class="fa-solid fa-play"></i> Videos</a>
             <div class="dropdown">
-                <button class="dropbtn">More ▾</button>
+                <a href="zentral.html" class="dropbtn">
+                    <span><i class="fa-solid fa-star"></i> <b>Zentral</b></span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </a>
                 <div class="dropdown-content">
-                    <a href="projects.html">Projects</a>
-                    <a href="newsletter.html">Newsletter</a>
-                    <a href="others.html">Others</a>
+                    <a href="./Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="./Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> More</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
+                    <a href="newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="others.html"><i class="fa-solid fa-box"></i> Others</a>
                 </div>
             </div>
         </nav>
@@ -49,55 +62,35 @@
                 <p>Connect instantly with fans around the world. Chat live, level up, and share your euphoria!</p>
                 <a href="Chat/chat.html" class="fancy-btn">Chat Now</a>
             </div>
-
+        
             <div class="fancy-card arcade-card">
                 <div class="glow"></div>
                 <i class="fa-solid fa-gamepad"></i>
-                <h2>Zentral Arcade</h2>
-                <p>Challenge yourself in Zentral arcade games and compete in the global leaderboard!</p>
+                <h2>Zentral Arena</h2>
+                <p>Challenge your friends in Zentral Arena with various classic minigames!</p>
                 <a class="fancy-btn">Coming Soon</a>
             </div>
-        </div>
-    </section>
-    
-    <div class="section-divider"></div>
-    <div class="side-timeline"><div class="side-progress"></div></div>
-    
-    <div id="forbiddenMessage"><h3></h3><p></p></div>
 
-    <!-- <section class="story section1">
-        <h2 class="story-title">Chapter I — Stellar Ignition</h2>
-        <p class="story-text" id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">Ignition begins in</p>
-        <div class="countdown-container">
-            <div class="countdown-timer" id="countdown">
-                <div class="time-box">
-                    <span id="days">00</span>
-                    <small>DAYS</small>
-                </div>
-                <div class="time-box">
-                    <span id="hours">00</span>
-                    <small>HOURS</small>
-                </div>
-                <div class="time-box">
-                    <span id="minutes">00</span>
-                    <small>MIN</small>
-                </div>
-                <div class="time-box">
-                    <span id="seconds">00</span>
-                    <small>SEC</small>
+            <div class="fancy-card wide" onclick="window.location.href='Core/core.html'">
+                <div class="glow"></div>
+                <div class="wide-content">
+                    <i class="fa-solid fa-burn"></i>
+                    <div class="text-group">
+                        <h2>Zentral Core</h2>
+                        <p>Broadcast your current vibe. Share your status and sync your favorite tracks with the Zentralverse.</p>
+                    </div>
+                    <a href="Core/core.html" class="fancy-btn">Post Now</a>
                 </div>
             </div>
         </div>
-        <p class="story-text" style="font-size: 11px; letter-spacing: 3px; opacity: 0.6;">February 23 • 10:00 AM JST</p>
     </section>
-
-    <section class="story end-section">
-        <div class="quote flash">“Be crazy. Stay crazy.”</div>
-    </section> -->
     
-    <section class="story section1 reveal">
+    <div class="side-timeline"><div class="side-progress"></div></div>
+    <div id="forbiddenMessage"><h3></h3><p></p></div>
+
+    <div class="story section1">
         <h2 class="story-title chapter1">Chapter I — Stellar Ignition</h2>
-        <p class="story-text">
+        <div class="story-text">
             <span>The Guardian in the Woods</span><br>
             Long before the roads were paved and the train lines stitched cities together, there was a small mountain village tucked into
             the forests east of Okayama. It did not appear on most maps. Travelers who passed nearby often missed it entirely, as if the
@@ -115,11 +108,11 @@
             Some called him a kitsune spirit, others a wandering guardian. Children left small offerings of rice at the forest’s edge. Farmers bowed toward
             the hills before planting season. Over centuries, the story became tradition. Then into rumor. Then into something whispered during festivals under
             lantern light.
-        </p>
-    </section>
+        </div>
+    </div>
     
-    <section class="story section2 reveal" style="padding-top: 0">
-        <p class="story-text">
+    <div class="story section2 reveal">
+        <div class="story-text">
             <span>The Blue Moon</span><br>
             Centuries passed. Wooden homes became reinforced structures. Electricity hummed softly through the valley. The world beyond the mountains moved faster each year.
             And then the Earth began to tremble. Cups rattled. Birds scattered from the trees. Within moments, the shaking grew violent. The village split in sound and dust.
@@ -141,8 +134,7 @@
                 <div class="secret">THE BLUE MOON UNLOCKED.</div>
                 <button class="terminal-btn" id="terminalBtn"> ▶ ACCESS TERMINAL </button>
             </div>
-        </p>
-        <p class="story-text">
+ 
             That same night, not far from the valley, someone else wandered beneath the trembling trees. ゼンダ ・クレイジー (Zenda Kureiji). Lost. He wasn't from the village. He hadn’t
             grown up hearing the legend. He hadn’t bowed to the forest before harvest season. He was simply in the wrong place at the wrong time — caught in the earthquake while traveling
             near the mountains. The roads split. His sense of direction vanished. Dust and fear filled the air. He ran. Not toward safety, just away from collapse. <br><br>
@@ -150,11 +142,11 @@
             When exhaustion finally overtook Zenda, he stumbled into a clearing lit by blue light. The moon above him was not normal. And the fox standing ahead of him was not ordinary.
             Kura was not surprised to see him. He did not retreat. He simply waited. Zenda was not meant to find the village. But he had. And Kura, who belonged to no one, stepped closer.
             The path back to the valley seemed to unfold naturally.
-        </p>
-    </section>
+        </div>
+    </div>
     
-    <section class="story section3 reveal">
-        <p class="story-text">
+    <div class="story section3 reveal">
+        <div class="story-text">
             <span>The Birth of Zentrals</span><br>
             Zenda did not claim to control Kura. He was simply the outsider who arrived when the sky turned blue, the one Kura decided to remain near. And the villagers, who had once whispered
             legends by lantern light, began writing new ones. They started calling themselves something different, not just residents or survivors. They became the <b>Zentrals</b>. The word
@@ -170,12 +162,12 @@
             that legends are not meant to fade, that guardians will always stay.
             And somewhere, in the quiet between tremors and moonlight, a fox with faintly glowing fur still walks the ridgeline. 
             Not because he must. But because he chooses to. And once Kura chooses you — You are never truly lost again.
-        </p>
-    </section>
+        </div>
+    </div>
 
     <section class="story end-section reveal">
         <h2 class="story-title chapter1">Chapter II — The Red Giant</h2>
-        <p class="story-text" id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">expansion begins in</p>
+        <p id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">expansion begins in</p>
         <div class="countdown-container">
             <div class="countdown-timer" id="countdown">
                 <div class="time-box">
@@ -196,7 +188,7 @@
                 </div>
             </div>
         </div>
-        <p class="story-text" style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; margin-bottom: 50px;">July 23 2026 • 10:00 AM JST</p>
+        <p style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; margin-bottom: 50px;">July 23 2026 • 10:00 AM JST</p>
         <div class="quote flash">“Be crazy. Stay crazy.”</div>
     </section>
     
@@ -289,6 +281,7 @@
             window.location.href = "./Others/terminal.html";
         };
 
+        (() => {
         const sequences = {
             message: {
                 code: ["z", "e", "n", "d", "r", "a"],
@@ -301,10 +294,6 @@
             ignition: {
                 code: ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"],
                 action: () => showIgnition()
-            },
-            konami: {
-                code: ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"],
-                action: () => location.href = "./Others/terminal.html"
             }
         };
 
@@ -329,6 +318,7 @@
                 }
             });
         });
+        })();
 
         function showMessage(title, text) {
             const msg = document.getElementById("forbiddenMessage");
@@ -404,70 +394,7 @@
             const height = document.body.scrollHeight - window.innerHeight;
             progress.style.width = (scrolled / height) * 100 + "%";
         });
-
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', event => {
-            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
-                event.preventDefault();
-            }
-        });
-
-        const headerEl = document.querySelector('header');
-        window.addEventListener('scroll', () => {
-            const y = window.scrollY;
-            const maxOpacity = 0.45;
-            const maxBlur = 12;
-            const pct = Math.min(y / 300, 1);
-            headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
-            headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
-
-            if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
-        });
-
-        const dropdown = document.querySelector('.dropdown');
-        const dropbtn = dropdown.querySelector('.dropbtn');
-        const dropdownContent = dropdown.querySelector('.dropdown-content');
-        let isDropdownOpen = false;
-
-        dropbtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            isDropdownOpen = !isDropdownOpen;
-            dropdown.classList.toggle('show', isDropdownOpen);
-        });
-        dropdown.addEventListener('mouseenter', () => {
-            dropdown.classList.add('show');
-            isDropdownOpen = true;
-        });
-        dropdown.addEventListener('mouseleave', (e) => {
-            const rect = dropdownContent.getBoundingClientRect();
-            const buffer = 60;
-            const checkMouse = (ev) => {
-                if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
-                    dropdown.classList.remove('show');
-                    isDropdownOpen = false;
-                    window.removeEventListener('mousemove', checkMouse);
-                }
-            };
-            window.addEventListener('mousemove', checkMouse);
-        });
-
-        window.addEventListener('scroll', () => {
-            dropdown.classList.remove('show');
-            isDropdownOpen = false;
-        });
-        document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target)) {
-                dropdown.classList.remove('show');
-                isDropdownOpen = false;
-            }
-        });
-
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
     </script>
+    <script src="script.js"></script>
 </body>
 </html>

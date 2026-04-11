@@ -17,15 +17,28 @@
             <span>Zendra クレイジー</span>
         </div>
         <nav class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="videos.html">Videos</a>
-            <a href="zentral.html">Zentral</a>
+            <div class="mobile-header">MENU</div>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="videos.html"><i class="fa-solid fa-play"></i> Videos</a>
             <div class="dropdown">
-                <button class="dropbtn">More ▾</button>
+                <a href="zentral.html" class="dropbtn">
+                    <span><i class="fa-solid fa-star"></i> Zentral</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </a>
                 <div class="dropdown-content">
-                    <a href="projects.html">Projects</a>
-                    <a href="newsletter.html"><b>Newsletter</b></a>
-                    <a href="others.html">Others</a>
+                    <a href="./Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="./Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> More</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
+                    <a href="newsletter.html"><i class="fa-solid fa-envelope"></i> <b>Newsletter</b></a>
+                    <a href="others.html"><i class="fa-solid fa-box"></i> Others</a>
                 </div>
             </div>
         </nav>
@@ -62,6 +75,15 @@
                 <span class="arrow">→</span>
             </div> -->
 
+            <div class="news-block" data-title="Zentral-Web v6.1 Update - Membership, Zentral Core, 2 New Games, New Ways to Interact, and MORE!" onclick="window.location.href='Others/News/news4.html'">
+                <div class="news-meta">
+                    <span class="category">Announcement</span>
+                    <span class="date">• Apr 10, 2026</span>
+                </div>
+                <h3 class="news-title">Zentral-Web v6.1 Update - Membership, Zentral Core, 2 New Games, New Ways to Interact, and MORE!</h3>
+                <span class="arrow">→</span>
+            </div>
+
             <div class="news-block" data-title="Zentral-Chat Emergency Maintenance (v6.0.1)" onclick="window.location.href='Others/News/news3.html'">
                 <div class="news-meta">
                     <span class="category">Update</span>
@@ -71,12 +93,12 @@
                 <span class="arrow">→</span>
             </div>
     
-            <div class="news-block" data-title="New Era Beginning Soon!!? Zentral-Web v6 Launch, 24-hours Live Stream, and MORE!!!" onclick="window.location.href='Others/News/news2.html'">
+            <div class="news-block" data-title="New Era Beginning Soon!!? Zentral-Web v6 Launch, 24-hours Live Stream, and MORE." onclick="window.location.href='Others/News/news2.html'">
                 <div class="news-meta">
                     <span class="category">Announcement</span>
                     <span class="date">• Jan 23, 2026</span>
                 </div>
-                <h3 class="news-title">New Era Beginning Soon!!? Zentral-Web v6 Launch, 24-hours Live Stream, and MORE!!!</h3>
+                <h3 class="news-title">New Era Beginning Soon!!? Zentral-Web v6 Launch, 24-hours Live Stream, and MORE.</h3>
                 <span class="arrow">→</span>
             </div>
 
@@ -85,7 +107,7 @@
                     <span class="category">Announcement</span>
                     <span class="date">• Jun 23, 2024</span>
                 </div>
-                <h3 class="news-title">New Channel Update, Removal of Design Store, Massive Update to Zen and MORE!</h3>
+                <h3 class="news-title">New Channel Update, Removal of Design Store, Massive Update to Zen.</h3>
                 <span class="arrow">→</span>
             </div>
         </div>
@@ -144,91 +166,7 @@
                 resultsContainer.appendChild(noResult);
             }
         }
-
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', event => {
-            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
-                event.preventDefault();
-            }
-        });
-
-        let buffer = [];
-        const code = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
-
-        window.addEventListener("keydown", e => {
-            if (["INPUT", "TEXTAREA"].includes(e.target.tagName)) return;
-
-            const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-            buffer.push(key);
-
-            if (buffer.length > code.length) {
-                buffer.shift();
-            }
-
-            const recent = buffer.slice(-code.length);
-
-            if (recent.join() === code.join()) {
-                location.href = "./Others/terminal.html";
-                buffer.length = 0;
-            }
-        });
-
-        const headerEl = document.querySelector('header');
-        window.addEventListener('scroll', () => {
-            const y = window.scrollY;
-            const maxOpacity = 0.45;
-            const maxBlur = 12;
-            const pct = Math.min(y / 300, 1);
-            headerEl.style.background = `rgba(0,0,0,${(pct * maxOpacity).toFixed(3)})`;
-            headerEl.style.backdropFilter = `blur(${(pct * maxBlur).toFixed(2)}px)`;
-
-            if (y > 10) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled');
-        });
-
-        const dropdown = document.querySelector('.dropdown');
-        const dropbtn = dropdown.querySelector('.dropbtn');
-        const dropdownContent = dropdown.querySelector('.dropdown-content');
-        let isDropdownOpen = false;
-
-        dropbtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            isDropdownOpen = !isDropdownOpen;
-            dropdown.classList.toggle('show', isDropdownOpen);
-        });
-        dropdown.addEventListener('mouseenter', () => {
-            dropdown.classList.add('show');
-            isDropdownOpen = true;
-        });
-        dropdown.addEventListener('mouseleave', (e) => {
-            const rect = dropdownContent.getBoundingClientRect();
-            const buffer = 60;
-            const checkMouse = (ev) => {
-                if (ev.clientX < rect.left - buffer || ev.clientX > rect.right + buffer || ev.clientY < rect.top - buffer || ev.clientY > rect.bottom + buffer) {
-                    dropdown.classList.remove('show');
-                    isDropdownOpen = false;
-                    window.removeEventListener('mousemove', checkMouse);
-                }
-            };
-            window.addEventListener('mousemove', checkMouse);
-        });
-
-        window.addEventListener('scroll', () => {
-            dropdown.classList.remove('show');
-            isDropdownOpen = false;
-        });
-        document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target)) {
-                dropdown.classList.remove('show');
-                isDropdownOpen = false;
-            }
-        });
-
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
     </script>
+    <script src="script.js"></script>
 </body>
 </html>

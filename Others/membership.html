@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
+    <title>Zentral-Web | Membership</title>
+
+    <link href="../Assets/Icon.png" rel="icon">
+    <link href="../CSS/style.css" rel="stylesheet">
+    <link href="../CSS/others.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .section { margin-top: 80px; }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../Assets/Logo.png" alt="Logo">
+            <span>Zendra クレイジー</span>
+        </div>
+        <nav class="nav-links">
+            <div class="mobile-header">MENU</div>
+            <a href="../index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
+            <div class="dropdown">
+                <a href="../zentral.html" class="dropbtn">
+                    <span><i class="fa-solid fa-star"></i> <b>Zentral</b></span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a href="../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="../Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> More</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="../projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
+                    <a href="../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="../others.html"><i class="fa-solid fa-box"></i> Others</a>
+                </div>
+            </div>
+        </nav>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="ms-bg"></div>
+    <canvas id="particles"></canvas>
+
+    <div class="ms-container">
+        <h1><span class="ms-header">Membership</span> is Earned</h1>
+        <p class="ms-subheader">Not bought. Not unlocked. Only achieved.</p>
+        <div class="ms-text">Only a select few make it.</div>
+
+        <div class="section visible">
+            <h2>Perks of Zentral Membership</h2>
+
+            <div class="ms-cards">
+                <div class="ms-card">
+                    <h3>Exclusive Access</h3>
+                    <p>Unlock hidden features and private content unavailable to regular users.</p>
+                </div>
+
+                <div class="ms-card">
+                    <h3>Custom Badges</h3>
+                    <p>Stand out with a unique identity that signals achievement and recognition.</p>
+                </div>
+
+                <div class="ms-card">
+                    <h3>Early Releases</h3>
+                    <p>Access new updates, features, and contents before everyone else.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section visible">
+            <h2>How to Become a Zentral Member</h2>
+
+            <div class="ms-cards">
+                <div class="ms-card">
+                    <h3>Win Events</h3>
+                    <p>Compete in special events where only top performers earn membership.</p>
+                </div>
+
+                <div class="ms-card">
+                    <h3>Giveaways</h3>
+                    <p>Participate in exclusive giveaways where membership is rewarded.</p>
+                </div>
+
+                <div class="ms-card">
+                    <h3>Be Recognized</h3>
+                    <p>Outstanding contributions and activity may earn you a spot.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <a href="../zentral.html" class="ms-button">Start Your Journey</a>
+        </div>
+        
+        <div class="section faq-section">
+            <h2 class="section-title">Common <span>Inquiries</span></h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How can I obtain the membership?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>Social Giveaways: Participate in recurring giveaway events hosted across all our official social channels.<br>
+                        Exclusive Events: Join our live streams or community events designed to open up new membership slots.
+                        Contribution: Boost the Zentralverse by promoting our content or providing game-changing feedback and ideas.
+                    </p>
+                </div>
+            </div>
+        
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Can I buy membership?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>No. Membership cannot be purchased under any circumstance. It can only be earned through events or recognition.</p>
+                </div>
+            </div>
+        
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How rare is membership?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>Only a small percentage of Zentrals who demonstrate loyalty and activity earn this rank.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How do I increase my chances?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>Stay active in the Zentral Chat, regularly play in Zentral Arena, and keep your Core status updated regularly.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What are the actual perks of being a Member?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>Members gain access to the Premium Zentral Core Feed, the ability to equip custom rare badges, and exclusive access to private pre-released contents.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Is Membership permanent once earned?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>Usually, yes. However, maintaining your status requires staying "synced" with the community. Extreme inactivity or protocol violations can lead to a status reset.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Do I need a Google-linked account to become a Member?</span>
+                    <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                </div>
+                <div class="faq-answer">
+                    <p>While not strictly required, we highly recommand linking your Google account to secure the account.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
+        </div>
+        2026 Zentral-Web | Powered by KuraWorks
+    </footer>
+
+    <script>
+        var path = "../"; 
+
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        for (let i = 0; i < 80; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 2,
+                dx: (Math.random() - 0.5) * 0.5,
+                dy: (Math.random() - 0.5) * 0.5
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+
+            particles.forEach(p => {
+                p.x += p.dx;
+                p.y += p.dy;
+
+                if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        const sections=document.querySelectorAll('.section');
+        window.addEventListener('scroll',()=>{
+            sections.forEach(sec=>{
+                const rect=sec.getBoundingClientRect();
+                if(rect.top<window.innerHeight-100){sec.classList.add('visible')}
+            })
+        });
+
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item) otherItem.classList.remove('active');
+                });
+
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+    <script src="../script.js"></script>
+</body>
+</html>
