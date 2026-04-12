@@ -100,10 +100,109 @@
             transition: opacity 0.8s ease;
         }
     
+        .leaderboard-card {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 2px solid var(--gold);
+            border-radius: 15px;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+    
+        .leaderboard-header {
+            text-align: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+    
+        .gold-text {
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            margin: 0;
+        }
+    
+        .rank-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+    
+        .rank-row:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+    
+        .rank-row:nth-child(1) {
+            border-left: 4px solid #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+    
+        .rank-row:nth-child(2) {
+            border-left: 4px solid #c0c0c0;
+        }
+    
+        .rank-row:nth-child(3) {
+            border-left: 4px solid #cd7f32;
+        }
+    
+        .rank-number {
+            font-weight: bold;
+            color: var(--gold);
+            width: 30px;
+        }
+    
+        .rank-id {
+            flex-grow: 1;
+            color: #ccc;
+            font-family: 'Courier New', monospace;
+        }
+    
+        .rank-balance {
+            color: #fff;
+            font-weight: bold;
+        }
+    
+        .user-rank-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #444;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #888;
+        }
         .result-msg {
             margin-top: 15px;
             color: var(--gold);
             font-family: 'Courier New', monospace;
+        }
+
+        #username-section {
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #username-input {
+            padding: 8px;
+            border-radius: 4px;
+            border: none;
+        }
+
+        .save-btn {
+            padding: 8px 15px;
+            cursor: pointer;
+            background: gold;
+            border: none;
+            font-size: 12px;
+            border-radius: 4px;
+            font-weight: bold;
         }
     
         .wallet {
@@ -162,7 +261,7 @@
             transform: none;
         }
     
-        .tab-btn.active {
+        .tab-btn.active, .tab-btn:active {
             background: linear-gradient(var(--gold), var(--dark-gold));
             color: #000;
             font-weight: bold;
@@ -1075,10 +1174,11 @@
     <div id="bonus"></div>
 
     <nav class="game-tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'slots')">🎰 SLOTS</button>
-        <button class="tab-btn" onclick="openTab(event, 'blackjack')">♠️ BLACKJACK</button>
+        <button class="tab-btn" onclick="openTab(event, 'slots')">🎰 SLOTS</button>
         <button class="tab-btn" onclick="openTab(event, 'roulette')">🎡 ROULETTE</button>
         <button class="tab-btn" onclick="openTab(event, 'dice')">🎲 DICE DUEL</button>
+        <button class="tab-btn" onclick="openTab(event, 'blackjack')">♠️ BLACKJACK</button>
+        <button class="tab-btn" onclick="openTab(event, 'leaderboard')">🏆 LEADERBOARD</button>
     </nav>
 
     <div id="slots" class="tab-content active-content">
@@ -1130,57 +1230,6 @@
         </div>
     </div>
 
-    <div id="blackjack" class="tab-content">
-        <div class="game-wrapper">
-            <div class="blackjack-table">
-                <div class="dealer-area">
-                    <div class="hand-label">DEALER HAND <span id="dealer-score"></span></div>
-                    <div id="dealer-cards" class="card-row"></div>
-                </div>
-
-                <div class="table-branding">
-                    <div class="center-logo">ZENTRAL CASINO</div>
-                    <div class="table-rules">6 Decks • Blackjack Pays 3 to 2</div>
-                    <div class="betting-circle" id="bj-bet-slot">
-                        <span id="bj-active-bet-text">PLACE BET</span>
-                    </div>
-                </div>
-
-                <div class="player-area">
-                    <div id="player-cards" class="card-row"></div>
-                    <div class="hand-label">YOUR HAND <span id="player-score"></span></div>
-                    <div id="bj-msg" class="bj-msg" style="display: none;"></div>
-                    <div id="bj-payout" class="bj-payout-msg"></div>
-
-                    <div class="bj-controls">
-                        <div id="bj-action-btns" style="display:none;">
-                            <button id="hit-btn" onclick="hit()">HIT</button>
-                            <button id="double-btn" onclick="doubleDown()">DOUBLE</button>
-                            <button id="stand-btn" onclick="stand()">STAND</button>
-                        </div>
-
-                        <div id="bj-result-btns" style="display:none;">
-                            <button class="deal-btn" onclick="clearTableForNextRound()">PLAY AGAIN</button>
-                        </div>
-
-                        <div id="bj-bet-btns">
-                            <div class="bj-chip-row">
-                                <div class="bj-chip red" data-amount="10">10</div>
-                                <div class="bj-chip blue" data-amount="25">25</div>
-                                <div class="bj-chip green" data-amount="50">50</div>
-                                <div class="bj-chip white" data-amount="100">100</div>
-                                <div class="bj-chip gold" data-amount="500">500</div>
-                                <div class="bj-chip-extend purple" id="bj-all-in">ALL IN</div>
-                            </div>
-                            <div class="reset-btn" onclick="resetBJBet()" style="background: #441010">CLEAR BET</div>
-                            <button id="deal-btn" onclick="startBJGame()" class="deal-btn">DEAL CARDS</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="roulette" class="tab-content">
         <div class="game-wrapper">
             <div class="roulette-wrapper">
@@ -1218,8 +1267,7 @@
 
                     <div id="bet-display">
                         CURRENT STAKE: $<span id="roulette-bet-amount">0</span>
-                        <span id="reset-roulette-btn" class="reset-btn" onclick="resetRouletteBet()"
-                            style="display:none; max-width: 50px;">RESET</span>
+                        <span id="reset-roulette-btn" class="reset-btn" onclick="resetRouletteBet()" style="display:none; max-width: 50px;">RESET</span>
                     </div>
                     <button id="roulette-spin-btn" class="spin-btn" onclick="spinRoulette()">SPIN ROULETTE</button>
                     <div id="roulette-msg" class="result-msg"></div>
@@ -1303,6 +1351,79 @@
         </div>
     </div>
 
+    <div id="blackjack" class="tab-content">
+        <div class="game-wrapper">
+            <div class="blackjack-table">
+                <div class="dealer-area">
+                    <div class="hand-label">DEALER HAND <span id="dealer-score"></span></div>
+                    <div id="dealer-cards" class="card-row"></div>
+                </div>
+
+                <div class="table-branding">
+                    <div class="center-logo">ZENTRAL CASINO</div>
+                    <div class="table-rules">6 Decks • Blackjack Pays 3 to 2</div>
+                    <div class="betting-circle" id="bj-bet-slot">
+                        <span id="bj-active-bet-text">PLACE BET</span>
+                    </div>
+                </div>
+
+                <div class="player-area">
+                    <div id="player-cards" class="card-row"></div>
+                    <div class="hand-label">YOUR HAND <span id="player-score"></span></div>
+                    <div id="bj-msg" class="bj-msg" style="display: none;"></div>
+                    <div id="bj-payout" class="bj-payout-msg"></div>
+
+                    <div class="bj-controls">
+                        <div id="bj-action-btns" style="display:none;">
+                            <button id="hit-btn" onclick="hit()">HIT</button>
+                            <button id="double-btn" onclick="doubleDown()">DOUBLE</button>
+                            <button id="stand-btn" onclick="stand()">STAND</button>
+                        </div>
+
+                        <div id="bj-result-btns" style="display:none;">
+                            <button class="deal-btn" onclick="clearTableForNextRound()">PLAY AGAIN</button>
+                        </div>
+
+                        <div id="bj-bet-btns">
+                            <div class="bj-chip-row">
+                                <div class="bj-chip red" data-amount="10">10</div>
+                                <div class="bj-chip blue" data-amount="25">25</div>
+                                <div class="bj-chip green" data-amount="50">50</div>
+                                <div class="bj-chip white" data-amount="100">100</div>
+                                <div class="bj-chip gold" data-amount="500">500</div>
+                                <div class="bj-chip-extend purple" id="bj-all-in">ALL IN</div>
+                            </div>
+                            <div class="reset-btn" onclick="resetBJBet()" style="background: #441010">CLEAR BET</div>
+                            <button id="deal-btn" onclick="startBJGame()" class="deal-btn">DEAL CARDS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboard" class="tab-content">
+        <div class="leaderboard-card">
+            <div class="leaderboard-header">
+                <h1 class="gold-text">WORLD RANKINGS</h1>
+            </div>
+    
+            <div id="leaderboard-list">
+                <div class="loading-spinner">Fetching rankings...</div>
+            </div>
+    
+            <div class="user-rank-footer">
+                <span>YOUR ID: <strong id="display-userid">------</strong></span>
+                <span id="display-user-balance">$0</span>
+            </div>
+
+            <div id="username-section">
+                <input type="text" id="username-input" placeholder="Enter Username" maxlength="15">
+                <button onclick="saveUsername()" class="save-btn">SET NAME</button>
+            </div>
+        </div>
+    </div>
+
     <div id="daily-popup" class="bonus-popup" style="display:none;">
         <div class="popup-content">
             <div class="shimmer"></div>
@@ -1348,26 +1469,26 @@
     const video = document.getElementById('intro-video');
 
     function revealSite() {
-      video.style.opacity = '0';
-      setTimeout(() => {
-        overlay.style.opacity = '0';
+        video.style.opacity = '0';
         setTimeout(() => {
-          overlay.style.display = 'none';
-        }, 1200);
-      }, 1000);
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 1200);
+        }, 1000);
     }
 
     if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
-      overlay.style.display = 'none';
+        overlay.style.display = 'none';
     } else {
-      video.ontimeupdate = function () {
-        if (video.duration - video.currentTime <= 1.2) {
-          video.ontimeupdate = null;
-          revealSite();
-        }
-      };
+        video.ontimeupdate = function () {
+            if (video.duration - video.currentTime <= 1.2) {
+                video.ontimeupdate = null;
+                revealSite();
+            }
+        };
 
-      video.onended = () => { if (overlay.style.display !== 'none') revealSite(); };
+        video.onended = () => { if (overlay.style.display !== 'none') revealSite(); };
     }
 
     const slotMessage = document.getElementById('msg');
@@ -1381,6 +1502,15 @@
 
     const savedBalance = localStorage.getItem('casino_balance');
     let balance = (savedBalance !== null) ? parseFloat(savedBalance) : 5000;
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW5mmrs2ERxM8SBWAoZapJ7ibq_PQWodzYxBKRwzcvmMRPI5r7n0k1wIMut3QITBx7-g/exec";
+
+    let userId = localStorage.getItem('casino_user_id');
+    if (!userId) {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        userId = '';
+        for (let i = 0; i < 6; i++) userId += chars.charAt(Math.floor(Math.random() * chars.length));
+        localStorage.setItem('casino_user_id', userId);
+    }
 
     function openTab(evt, gameName) {
         const contents = document.querySelectorAll(".tab-content");
@@ -1389,13 +1519,72 @@
         const buttons = document.querySelectorAll(".tab-btn");
         buttons.forEach(btn => btn.classList.remove("active"));
 
-        document.getElementById(gameName).classList.add("active-content");
-        evt.currentTarget.classList.add("active");
+        const targetContent = document.getElementById(gameName);
+        if (targetContent) targetContent.classList.add("active-content");
+        if (evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+
+        if (gameName === "leaderboard") loadLeaderboard();
+
+        localStorage.setItem('last_opened_tab', gameName);
     }
 
     function updateWallet() {
         document.getElementById('wallet').innerText = balance.toLocaleString();
         localStorage.setItem('casino_balance', balance);
+
+        const savedName = localStorage.getItem('casino_username') || "";
+
+        fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: 'no-cors',
+            body: JSON.stringify({
+                type: "leaderboard",
+                userId: userId,
+                balance: balance,
+                username: savedName
+            })
+        });
+    }
+
+    function saveUsername() {
+        const name = document.getElementById('username-input').value.trim();
+        if (name) {
+            localStorage.setItem('casino_username', name);
+            updateWallet();
+            alert("Username updated!");
+            loadLeaderboard();
+        }
+    }
+
+    async function loadLeaderboard() {
+        const listContainer = document.getElementById('leaderboard-list');
+        const savedName = localStorage.getItem('casino_username');
+        if(savedName) document.getElementById('username-input').value = savedName;
+
+        document.getElementById('display-userid').innerText = userId;
+        document.getElementById('display-user-balance').innerText = `$${balance.toLocaleString()}`;
+
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const topUsers = await response.json();
+            listContainer.innerHTML = '';
+
+            topUsers.forEach((user, index) => {
+                const row = document.createElement('div');
+                row.className = 'rank-row';
+
+                const displayName = user.username ? user.username : `@${user.userId}`;
+            
+                row.innerHTML = `
+                <div class="rank-number">#${index + 1}</div>
+                <div class="rank-id">${displayName}</div>
+                <div class="rank-balance">$${user.balance.toLocaleString()}</div>`;
+                
+                listContainer.appendChild(row);
+            });
+        } catch (error) {
+            listContainer.innerHTML = '<div style="color:red">Failed to load rankings.</div>';
+        }
     }
 
     function checkDailyReward() {
@@ -1850,21 +2039,18 @@
 
     // Roulette
     let rouletteBetAmount = parseFloat(localStorage.getItem('casino_roulette_bet')) || 0;
-    let rouletteRotation = 0;
     let selectedChip = 100;
-    let bets = {};
+    let bets = JSON.parse(localStorage.getItem('casino_bets')) || {};
     let isSpinning = false;
 
     let ballAngle = 0;
-    let ballVel = 0;
     let wheelAngle = 0;
     let wheelVel = 0;
     let ballRadius = 150;
     let targetResult = 0;
     let targetIndex = 0
-    let pocketAngle = (Math.PI * 2) / 37
-    let targetWorldAngle = 0
-    let locking = false
+    let spinProgress = 0;
+    let pocketAngle = (Math.PI * 2) / 37;
 
     const rouletteOrder = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26]
     const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
@@ -1900,6 +2086,7 @@
     function resetRouletteBet() {
         balance += rouletteBetAmount;
         rouletteBetAmount = 0;
+        localStorage.removeItem('casino_bets');
         document.querySelectorAll(".bet").forEach(el => { el.classList.remove("bet-active") });
         updateRoulette();
     }
@@ -1927,11 +2114,35 @@
         for (let i = 1; i <= 36; i++) {
             let cell = document.createElement("div")
             cell.className = "bet " + (redNumbers.includes(i) ? "redP" : "blackP")
+            if (bets[i]) cell.classList.add("bet-active");
             cell.innerText = i
             cell.dataset.bet = i
             grid.appendChild(cell)
         }
+
+        document.querySelectorAll('.bet').forEach(el => {
+            if (bets[el.dataset.bet]) el.classList.add("bet-active");
+        });
     }
+
+    grid.onclick = (event) => {
+        const el = event.target.closest('.bet');
+        if (!el || isSpinning) return;
+        
+        let type = el.dataset.bet;
+        if (balance >= selectedChip) {
+            balance -= selectedChip;
+            bets[type] = (bets[type] || 0) + selectedChip;
+            rouletteBetAmount += selectedChip;
+            updateRoulette();
+            el.classList.add("bet-active");
+            el.style.filter = "brightness(1.5)";
+            localStorage.setItem('casino_bets', JSON.stringify(bets));
+            setTimeout(() => el.style.filter = "none", 100);
+        } else {
+            setRouletteMsg("Insufficient Credits!", "#f00");
+        }
+    };
 
     document.querySelectorAll(".bet").forEach(el => {
         el.onclick = () => {
@@ -1942,9 +2153,10 @@
                 balance -= selectedChip;
                 bets[type] = (bets[type] || 0) + selectedChip;
                 rouletteBetAmount += selectedChip;
-                el.classList.add("bet-active");
                 updateRoulette();
+                el.classList.add("bet-active");
                 el.style.filter = "brightness(1.5)";
+                localStorage.setItem('casino_bets', JSON.stringify(bets));
                 setTimeout(() => el.style.filter = "none", 100);
             } else {
                 setRouletteMsg("Insufficient Credits!", "#f00");
@@ -1953,61 +2165,53 @@
     });
 
     function spinRoulette() {
-        if (Object.keys(bets).length === 0)
-            return setRouletteMsg("Place a bet first!")
+        if (Object.keys(bets).length === 0) return setRouletteMsg("Place a bet first!")
+        if (isSpinning) return;
+        isSpinning = true;
 
-        if (isSpinning) return
-        isSpinning = true
+        document.getElementById('reset-roulette-btn').style.display = 'none';
+        document.getElementById('roulette-spin-btn').disabled = true;
 
-        document.getElementById('reset-roulette-btn').style.display = 'none'
-        document.getElementById('roulette-spin-btn').disabled = true
+        targetIndex = Math.floor(Math.random() * 37);
+        console.log(targetIndex);
+        targetResult = rouletteOrder[targetIndex];
 
-        targetIndex = Math.floor(Math.random() * 37)
-        targetResult = rouletteOrder[targetIndex]
+        spinProgress = 0;
+        wheelVel = 0.02;
+        ballRadius = 145;
 
-        ballVel = 0.15
-        wheelVel = 0.04
-        ballRadius = 145
-        ballAngle = Math.random() * Math.PI * 2
-
-        locking = false
-
-        requestAnimationFrame(updateRoulettePhysics)
+        const pocketOffset = (targetIndex * pocketAngle) - (Math.PI / 2);
+        ballAngle = (wheelAngle + pocketOffset) + Math.PI;
+        requestAnimationFrame(updateRoulettePhysics);
     }
 
     function updateRoulettePhysics() {
-        ballAngle += ballVel
-        wheelAngle += wheelVel
-        ballVel *= 0.99
-        wheelVel *= 0.995
+        spinProgress += 0.005; 
+        wheelAngle += wheelVel;
+        const wheelDeg = wheelAngle * 180 / Math.PI;
+        document.getElementById("roulette-wheel").style.transform = `translate(-50%, -50%) rotate(${wheelDeg}deg)`;
 
-        if (ballVel < 0.06 && ballRadius > 118) ballRadius -= 0.6
+        const totalRotation = Math.PI * 11; 
+        const ease = 1 - Math.pow(1 - spinProgress, 4);
+    
+        const pocketOffset = (targetIndex * pocketAngle) - (Math.PI / 2);
+        const startAngle = (wheelAngle + pocketOffset) + Math.PI;
+        ballAngle = startAngle + (totalRotation * ease);
 
-        const wheelDeg = wheelAngle * 180 / Math.PI
-        document.getElementById("roulette-wheel").style.transform = `translate(-50%, -50%) rotate(${wheelDeg}deg)`
-
-        const x = Math.cos(ballAngle) * ballRadius
-        const y = Math.sin(ballAngle) * ballRadius
-        document.getElementById("roulette-ball").style.transform = `translate(${x}px,${y}px)`
-
-        if (ballRadius <= 118 && !locking) {
-            locking = true
-            const pocketCenter = targetIndex * pocketAngle + pocketAngle / 2
-            targetWorldAngle = wheelAngle + pocketCenter
+        if (spinProgress > 0.6) {
+            if (ballRadius > 118) ballRadius -= 1.5;
         }
 
-        if (locking) {
-            let diff = targetWorldAngle - ballAngle
-            diff = Math.atan2(Math.sin(diff), Math.cos(diff))
-            ballAngle += diff * 0.05
+        const x = Math.cos(ballAngle) * ballRadius;
+        const y = Math.sin(ballAngle) * ballRadius;
+        document.getElementById("roulette-ball").style.transform = `translate(${x}px,${y}px)`;
+
+        if (spinProgress >= 1) {
+            finishRouletteSpin(targetResult);
+            return;
         }
 
-        if (locking && ballVel < 0.01) {
-            finishRouletteSpin(targetResult)
-            return
-        }
-
-        requestAnimationFrame(updateRoulettePhysics)
+        requestAnimationFrame(updateRoulettePhysics);
     }
 
     function finishRouletteSpin(result) {
@@ -2184,7 +2388,7 @@
 
         const startBetting = () => {
             diceBet(amount);
-            betInterval = setInterval(() => diceBet(amount), 400);
+            betInterval = setInterval(() => diceBet(amount), 300);
         };
 
         const stopBetting = () => {
@@ -2211,7 +2415,16 @@
             updateWallet();
         }
     });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const lastTab = localStorage.getItem('last_opened_tab') || 'slots';
+        openTab(null, lastTab);
+    
+        const buttons = document.querySelectorAll(".tab-btn");
+        buttons.forEach(btn => {
+            if (btn.getAttribute('onclick').includes(lastTab)) btn.classList.add("active");
+        });
+    });
 </script>
 </body>
-
 </html>
