@@ -1497,6 +1497,7 @@
     const paytable = { '7️⃣': { three: 30, two: 1.2 }, '💎': { three: 15, two: 0.8 }, '🔔': { three: 10, two: 0.6 }, '🍒': { three: 5, two: 0.4 }, '🍋': { three: 2, two: 0.2 } };
     const symbols = Object.keys(paytable);
 
+    let updateTimeout;
     let betInterval;
     let slotBetAmount = parseFloat(localStorage.getItem('casino_slot_bet')) || 0;
 
@@ -1531,19 +1532,22 @@
     function updateWallet() {
         document.getElementById('wallet').innerText = balance.toLocaleString();
         localStorage.setItem('casino_balance', balance);
+        clearTimeout(updateTimeout);
 
-        const savedName = localStorage.getItem('casino_username') || "";
-
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: 'no-cors',
-            body: JSON.stringify({
-                type: "leaderboard",
-                userId: userId,
-                balance: balance,
-                username: savedName
-            })
-        });
+        updateTimeout = setTimeout(() => {
+            const savedName = localStorage.getItem('casino_username') || "";
+        
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    type: "leaderboard",
+                    userId: userId,
+                    balance: balance,
+                    username: savedName
+                })
+            });
+        }, 2000); 
     }
 
     function saveUsername() {
@@ -2168,6 +2172,7 @@
         if (Object.keys(bets).length === 0) return setRouletteMsg("Place a bet first!")
         if (isSpinning) return;
         isSpinning = true;
+        setRouletteMsg("");
 
         document.getElementById('reset-roulette-btn').style.display = 'none';
         document.getElementById('roulette-spin-btn').disabled = true;
@@ -2246,6 +2251,7 @@
         isSpinning = false;
         bets = {};
         rouletteBetAmount = 0;
+        localStorage.removeItem('casino_bets');
         document.getElementById('roulette-spin-btn').disabled = false;
         updateRoulette();
     }
