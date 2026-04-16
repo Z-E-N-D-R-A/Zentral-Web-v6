@@ -67,35 +67,10 @@ let settingsUpdate = false;
 let settingsOpened = false
 let selectedTrackData = null;
 
-usersRef.on("value", (snap) => { allUsers = snap.val() || {}; });
 window.addEventListener('load', () => {
     const lastTab = localStorage.getItem('zentral_feed') || 'members';
     switchFeed(null, lastTab);
     loadDraft();
-});
-
-firebase.database().ref('status').on('value', (snapshot) => {
-    const data = snapshot.val() || {};
-    const membersFeed = document.getElementById('membersFeed');
-    const guestsFeed = document.getElementById('guestsFeed');
-
-    membersFeed.innerHTML = "";
-    guestsFeed.innerHTML = "";
-
-    const statusArray = Object.values(data).sort((a, b) => {
-        const isAMine = (user && a.userId === user.uid);
-        const isBMine = (user && b.userId === user.uid);
-
-        if (isAMine) return -1;
-        if (isBMine) return 1;
-        return b.timestamp - a.timestamp;
-    });
-
-    statusArray.forEach(item => {
-        const card = createStatusCard(item);
-        if (item.isMember) membersFeed.appendChild(card);
-        else guestsFeed.appendChild(card);
-    });
 });
 
 function getEquippedBadge(badges) {
@@ -440,6 +415,28 @@ function timeAgo(timestamp) {
     return 'just now';
 }
 
+function renderStatuses(data) {
+    const membersFeed = document.getElementById('membersFeed');
+    const guestsFeed = document.getElementById('guestsFeed');
+
+    membersFeed.innerHTML = "";
+    guestsFeed.innerHTML = "";
+
+    const statusArray = Object.values(data).sort((a, b) => {
+        const isAMine = (user && a.userId === user.uid);
+        const isBMine = (user && b.userId === user.uid);
+        if (isAMine) return -1;
+        if (isBMine) return 1;
+        return b.timestamp - a.timestamp;
+    });
+
+    statusArray.forEach(item => {
+        const card = createStatusCard(item);
+        if (item.isMember) membersFeed.appendChild(card);
+        else guestsFeed.appendChild(card);
+    });
+}
+
 /* USER JOIN */
 firebase.auth().onAuthStateChanged(async (u) => {
   if (!u) {
@@ -456,6 +453,16 @@ firebase.auth().onAuthStateChanged(async (u) => {
   accountId = u.uid;
   authReady = true;
   console.log("[AUTH] Logged in:", accountId, "Anonymous:", u.isAnonymous);
+
+  usersRef.on('value', (snap) => {
+    allUsers = snap.val() || {};
+    firebase.database().ref('status').once('value', (s) => renderStatuses(s.val() || {}));
+  });
+
+  firebase.database().ref('status').on('value', (snapshot) => {
+    const data = snapshot.val() || {};
+    renderStatuses(data);
+  });
 
   usersRef.child(accountId).on("value", snap => {
       const data = snap.val();
