@@ -22,23 +22,25 @@
             <a href="../index.html"><i class="fa-solid fa-house"></i> Home</a>
             <a href="../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
             <div class="dropdown">
-                <a href="../zentral.html" class="dropbtn">
+                <div class="dropbtn">
                     <span><i class="fa-solid fa-star"></i> Zentral</span>
                     <i class="fa-solid fa-chevron-down small-arrow"></i>
-                </a>
+                </div>
                 <div class="dropdown-content">
                     <a href="../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
-                    <a href="../Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
+                    <a href="../Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
+                    <a href="../zentral.html"><i class="fa-solid fa-book-open"></i> Learn More</a>
                 </div>
             </div>
             <div class="dropdown">
-                <button class="dropbtn">
-                    <span><i class="fa-solid fa-ellipsis"></i> More</span>
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> <b>More</b></span>
                     <i class="fa-solid fa-chevron-down small-arrow"></i>
-                </button>
+                </div>
                 <div class="dropdown-content">
                     <a href="../projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
                     <a href="../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="membership.html"><i class="fa-solid fa-star"></i> Membership</a>
                     <a href="../others.html"><i class="fa-solid fa-box"></i> <b>Others</b></a>
                 </div>
             </div>
@@ -55,8 +57,8 @@
             <div class="form-box">
                 <div class="form-header">
                     <h1>ZENTRAL FEEDBACK</h1>
-                    <p>Zentral-Web • Others <br><br>
-                    Provide suggestions and feedbacks for us to improve our services. Your ideas are revolutionary for us!</p>
+                    <p>Your ideas are revolutionary for us!<br>
+                    Provide feedbacks and ideas for us to improve our services.</p>
                 </div>
     
                 <div class="form-body" id="feedbackForm">
@@ -65,9 +67,11 @@
     
                     <div class="form-question"><span>This feedback is for...</span></div>
                     <div class="options">
-                        <label><input type="radio" name="fb_target" value="Website"> Website</label>
-                        <label><input type="radio" name="fb_target" value="Channel"> Channel</label>
-                        <label><input type="radio" name="fb_target" value="Zentral-Chat"> Zentral-Chat</label>
+                        <label><input type="radio" name="fb_target" value="Channel"> Social Platforms</label>
+                        <label><input type="radio" name="fb_target" value="Website"> Zentral-Web</label>
+                        <label><input type="radio" name="fb_target" value="Zentral-Chat"> Zentral Chat</label>
+                        <label><input type="radio" name="fb_target" value="Zentral-Arena"> Zentral Arena</label>
+                        <label><input type="radio" name="fb_target" value="Zentral-Core"> Zentral Core</label>
                         <label><input type="radio" name="fb_target" value="Other"> Other</label>
                     </div>
     
@@ -111,11 +115,13 @@
     
     <script>
         var path = "../";
-        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #054d49, #050008)");
+        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #0a2e2b, #050008);");
         document.documentElement.style.setProperty("--form-title", "#63e8ff");
         document.documentElement.style.setProperty("--form-question", "#b5ffff");
-        document.documentElement.style.setProperty("--form-btn", "linear-gradient(0deg, #2f93c1, #2fc190)");
-        document.documentElement.style.setProperty("--form-btnHover", "rgba(90, 252, 255, 0.75)");
+        document.documentElement.style.setProperty("--form-btn", "linear-gradient(45deg, #2f93c1, #2fc190)");
+        document.documentElement.style.setProperty("--form-btnHover", "rgba(99, 232, 255, 0.4)");
+        document.documentElement.style.setProperty("--accent", "#2fc190");
+        document.documentElement.style.setProperty("--glass", "rgba(255, 255, 255, 0.05)");
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW5mmrs2ERxM8SBWAoZapJ7ibq_PQWodzYxBKRwzcvmMRPI5r7n0k1wIMut3QITBx7-g/exec";
 
         async function submitFeedback() {

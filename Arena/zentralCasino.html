@@ -14,8 +14,10 @@
         :root {
             --gold: #d4af37;
             --dark-gold: #aa841e;
+            --gold-glow: rgba(212, 175, 55, 0.4);
             --felt-green: #062c18;
             --glass: rgba(255, 255, 255, 0.1);
+            --dark-bg: rgba(15, 15, 15, 0.95);
         }
     
         body {
@@ -225,8 +227,7 @@
     
         .game-wrapper {
             background: linear-gradient(145deg, #222, #050505);
-            padding: 12px;
-            width: 80dvw;
+            max-width: 1000px;
             margin: 20px auto;
             border-radius: 30px;
             border: 4px solid var(--dark-gold);
@@ -282,7 +283,7 @@
             padding: 30px 30px 15px 30px;
             border-radius: 20px;
             border: 1px solid #333;
-            width: 300px;
+            width: 350px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -298,11 +299,12 @@
         }
     
         #chips,
+        #roulette-chips,
         #dice-chips {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin: 20px 0;
+            margin: 10px 0;
             justify-items: center;
         }
     
@@ -328,31 +330,19 @@
             box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
             transition: 0.2s;
         }
-    
-        .red {
-            background: #b30000;
+
+        .bj-chip,
+        .bj-chip-extend {
+            width: 50px;
+            height: 50px;
         }
     
-        .blue {
-            background: #003399;
-        }
-    
-        .green {
-            background: #006600;
-        }
-    
-        .white {
-            background: #1f1f1f;
-        }
-    
-        .gold {
-            background: #aa841e;
-        }
-    
-        .purple {
-            background: #701eaa;
-            font-size: 14px;
-        }
+        .red { background: #b30000; }
+        .blue { background: #003399; }
+        .green { background: #006600; }
+        .white { background: #1f1f1f; }
+        .gold { background: #aa841e; }
+        .purple { background: #701eaa; font-size: 14px; }
     
         .chip:hover,
         .bj-chip:hover,
@@ -409,13 +399,14 @@
     
         .popup-content {
             background: radial-gradient(circle, #2c2c2c 0%, #000 100%);
-            padding: 50px;
+            padding: 40px;
             border: 4px solid var(--gold);
             border-radius: 30px;
             text-align: center;
             box-shadow: 0 0 50px var(--gold-glow);
             position: relative;
             overflow: hidden;
+            margin: 30px;
             animation: popupScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
     
@@ -435,10 +426,11 @@
         }
     
         .daily-bonus-amount {
-            font-size: 80px;
+            font-size: clamp(4rem, 8vw, 6rem);
             font-weight: bold;
             color: #fff;
-            margin: 20px 0;
+            margin: 20px auto;
+            text-align: center;
             background: linear-gradient(to bottom, #fff 20%, var(--gold) 100%);
             background-clip: text;
             -webkit-background-clip: text;
@@ -521,52 +513,100 @@
             color: #000;
             transform: scale(1.1);
         }
-    
+
         .info-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
             z-index: 2100;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-    
+
         .info-content {
-            background: #111;
-            padding: 30px;
-            border: 1px solid #333;
-            border-radius: 15px;
-            max-width: 500px;
+            background: var(--dark-bg);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            max-width: 450px;
             width: 90%;
             position: relative;
-            text-align: left;
-            font-family: "Poppins", sans-serif;
+            box-shadow: 0 0 30px var(--gold-glow);
+            animation: modalSlideUp 0.4s ease-out;
+            overflow: hidden;
         }
-    
+
+        .info-header {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .info-header h2 {
+            margin: 0;
+            letter-spacing: 2px;
+            font-size: 1.5rem;
+        }
+
+        .gold-text { color: var(--gold); }
+        .info-body { padding: 25px; color: #ccc; line-height: 1.6; }
+
+        .tagline {
+            color: var(--gold);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
         .warning-box {
-            margin-top: 20px;
+            margin-top: 25px;
             padding: 15px;
-            background: #200;
-            border-left: 4px solid #f00;
-            border-radius: 5px;
+            background: rgba(255, 0, 0, 0.05);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            border-radius: 12px;
         }
-    
+
+        .warning-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ff4d4d;
+            margin-bottom: 10px;
+        }
+        .warning-header h3 { margin: 0; font-size: 1rem; }
+
         .warning-list {
             margin: 10px 0;
-            padding-left: 20px;
+            padding-left: 18px;
+            font-size: 0.9rem;
+            color: #aaa;
         }
-    
+        .warning-list li { margin-bottom: 8px; }
+        .warning-list a { color: var(--gold); text-decoration: none; font-weight: bold; }
+
         .close-info {
             position: absolute;
             top: 15px;
-            right: 20px;
-            font-size: 28px;
-            color: #888;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 2rem;
             cursor: pointer;
+            transition: 0.2s;
+        }
+        .close-info:hover { color: #fff; transform: rotate(90deg); }
+
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     
         /* ==== SLOTS ==== */
@@ -623,6 +663,7 @@
             perspective: 1200px;
             width: 100%;
             box-sizing: border-box;
+            margin: 0 auto;
         }
     
         .machine-wrapper {
@@ -868,11 +909,22 @@
             display: flex;
             gap: 15px;
             justify-content: center;
+            align-items: center;
         }
     
         .bj-controls button {
             padding: 10px 25px;
+            max-width: 300px;
             font-size: 16px;
+        }
+
+        #bj-action-btns, 
+        #bj-result-btns, 
+        #bj-bet-btns {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
     
         @keyframes dealIn {
@@ -1063,6 +1115,10 @@
             gap: 40px;
             perspective: 1000px;
         }
+
+        .side-label {
+            text-align: center;
+        }
     
         .dice-box {
             display: flex;
@@ -1108,7 +1164,7 @@
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 5px;
             text-align: center;
             transition: 0.5s;
         }
@@ -1141,9 +1197,14 @@
                 padding: 10px;
             }
     
+            .dice-duel-container,
             .casino-floor {
                 flex-direction: column;
                 gap: 30px;
+            }
+
+            .duel-arena {
+                gap: 20px;
             }
     
             .machine-wrapper {
@@ -1151,7 +1212,7 @@
             }
     
             .betting-station {
-                width: 90%;
+                width: 100%;
                 box-sizing: border-box;
             }
     
@@ -1210,11 +1271,11 @@
                 <div class="betting-station">
                     <div class="station-header">PLACE YOUR BETS</div>
                     <div id="chips">
-                        <div class="chip red" data-amount="10">10</div>
-                        <div class="chip blue" data-amount="25">25</div>
-                        <div class="chip green" data-amount="50">50</div>
-                        <div class="chip white" data-amount="100">100</div>
-                        <div class="chip gold" data-amount="500">500</div>
+                        <div class="chip red" data-amount="25">25</div>
+                        <div class="chip blue" data-amount="50">50</div>
+                        <div class="chip green" data-amount="100">100</div>
+                        <div class="chip white" data-amount="500">500</div>
+                        <div class="chip gold" data-amount="1000">1000</div>
                         <div class="chip-extend purple" id="all-in">ALL IN</div>
                     </div>
 
@@ -1241,7 +1302,7 @@
                     <div id="roulette-ball"></div>
                 </div>
 
-                <div class="betting-station" style="width: 350px;">
+                <div class="betting-station">
                     <div class="station-header">PLACE YOUR BETS</div>
                     <div class="roulette-table">
                         <div class="outside-bets">
@@ -1258,11 +1319,12 @@
                     </div>
 
                     <div id="roulette-chips">
-                        <div class="roulette-chip green" data-amount="50">50</div>
-                        <div class="roulette-chip white" data-amount="100" style="border: 4px solid white">100</div>
-                        <div class="roulette-chip gold" data-amount="500">500</div>
+                        <div class="roulette-chip red" data-amount="25">25</div>
+                        <div class="roulette-chip blue" data-amount="50">50</div>
+                        <div class="roulette-chip green" data-amount="100" style="border: 4px solid white">100</div>
+                        <div class="roulette-chip white" data-amount="500">500</div>
+                        <div class="roulette-chip gold" data-amount="1000">1000</div>
                         <div class="roulette-chip-extend purple" id="roulette-all-in">ALL IN</div>
-                        
                     </div>
 
                     <div id="bet-display">
@@ -1332,11 +1394,11 @@
                 <div class="betting-station">
                     <div class="station-header">PLACE YOUR BETS</div>
                     <div id="dice-chips">
-                        <div class="dice-chip red" data-amount="10">10</div>
-                        <div class="dice-chip blue" data-amount="25">25</div>
-                        <div class="dice-chip green" data-amount="50">50</div>
-                        <div class="dice-chip white" data-amount="100">100</div>
-                        <div class="dice-chip gold" data-amount="500">500</div>
+                        <div class="dice-chip red" data-amount="25">25</div>
+                        <div class="dice-chip blue" data-amount="50">50</div>
+                        <div class="dice-chip green" data-amount="100">100</div>
+                        <div class="dice-chip white" data-amount="500">500</div>
+                        <div class="dice-chip gold" data-amount="1000">1000</div>
                         <div class="dice-chip-extend purple" id="dice-all-in">ALL IN</div>
                     </div>
 
@@ -1386,11 +1448,11 @@
 
                         <div id="bj-bet-btns">
                             <div class="bj-chip-row">
-                                <div class="bj-chip red" data-amount="10">10</div>
-                                <div class="bj-chip blue" data-amount="25">25</div>
-                                <div class="bj-chip green" data-amount="50">50</div>
-                                <div class="bj-chip white" data-amount="100">100</div>
-                                <div class="bj-chip gold" data-amount="500">500</div>
+                                <div class="bj-chip red" data-amount="25">25</div>
+                                <div class="bj-chip blue" data-amount="50">50</div>
+                                <div class="bj-chip green" data-amount="100">100</div>
+                                <div class="bj-chip white" data-amount="500">500</div>
+                                <div class="bj-chip gold" data-amount="1000">1000</div>
                                 <div class="bj-chip-extend purple" id="bj-all-in">ALL IN</div>
                             </div>
                             <div class="reset-btn" onclick="resetBJBet()" style="background: #441010">CLEAR BET</div>
@@ -1438,20 +1500,27 @@
 
     <div id="info-popup" class="info-modal" style="display:none;">
         <div class="info-content">
-            <span class="close-info" onclick="toggleInfoPopup()">&times;</span>
-            <h2 style="text-align: center">About Zentral Casino Hub</h2>
-            <p>Zentral Casino Hub is a minigame developed by KuraWorks to <strong>simulate casino environment</strong> for entertainment purposes only. No real money is ever wagered or won here.</p>
-
-            <div class="warning-box">
-                <h3>⚠️ RESPONSIBLE GAMING WARNING</h3>
-                <p>Gambling is meant to be fun, but it can become addictive. We urge all users to play responsibly and
-                    never treat gambling as a way to make money.</p>
-                <ul class="warning-list">
-                    <li>Never gamble more than you can afford to lose.</li>
-                    <li>Think before you bet, never gamble while stressed or upset.</li>
-                    <li>If you or someone you know is struggling with gambling, please seek help from professional
-                    organizations like <a href="https://www.ncpgambling.org" target="_blank" style="color:#0f0;">NCPG</a>.</li>
-                </ul>
+            <div class="info-header">
+                <h2>ZENTRAL <span class="gold-text">CASINO HUB</span></h2>
+                <div class="close-info" onclick="toggleInfoPopup()">&times;</div>
+            </div>
+    
+            <div class="info-body">
+                <p class="tagline">Premium Casino Simulation</p>
+                <p>Experience the thrill of the tables in a risk-free environment. Zentral Hub is a pure simulation designed for entertainment; <strong>no real currency is used or won.</strong></p>
+    
+                <div class="warning-box">
+                    <div class="warning-header">
+                        <span class="warning-icon">⚠</span>
+                        <h3>PLAY SMART</h3>
+                    </div>
+                    <p>Gaming should be legendary, not a liability. Keep it fun by staying in control.</p>
+                    <ul class="warning-list">
+                        <li>Set your limits before you start.</li>
+                        <li>Play for the game, not for the gain.</li>
+                        <li>If the fun stops, stop. Reach out to <a href="https://www.ncpgambling.org" target="_blank">NCPG</a> for support.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -2008,7 +2077,7 @@
             document.getElementById('dealer-cards').innerHTML = '';
             document.getElementById('bj-active-bet-text').innerText = "PLACE BET";
             document.getElementById('bj-result-btns').style.display = 'none';
-            document.getElementById('bj-bet-btns').style.display = 'block';
+            document.getElementById('bj-bet-btns').style.display = 'flex';
             playerScoreSpan.innerText = `(?)`;
             dealerScoreSpan.innerText = `(?)`
             document.getElementById('bj-payout').style.display = "none";
@@ -2430,6 +2499,13 @@
         buttons.forEach(btn => {
             if (btn.getAttribute('onclick').includes(lastTab)) btn.classList.add("active");
         });
+    });
+
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', event => {
+        if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I') || (event.ctrlKey && event.key === 'u')) {
+            event.preventDefault();
+        }
     });
 </script>
 </body>

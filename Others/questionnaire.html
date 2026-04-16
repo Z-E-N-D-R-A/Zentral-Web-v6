@@ -5,7 +5,7 @@
     <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
     <title>Zentral-Web | Questionnaire</title>
 
-    <link href=".../Assets/Icon.png" rel="icon">
+    <link href="../Assets/Icon.png" rel="icon">
     <link href="../CSS/style.css" rel="stylesheet">
     <link href="../CSS/others.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -22,23 +22,25 @@
             <a href="../index.html"><i class="fa-solid fa-house"></i> Home</a>
             <a href="../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
             <div class="dropdown">
-                <a href="../zentral.html" class="dropbtn">
+                <div class="dropbtn">
                     <span><i class="fa-solid fa-star"></i> Zentral</span>
                     <i class="fa-solid fa-chevron-down small-arrow"></i>
-                </a>
+                </div>
                 <div class="dropdown-content">
                     <a href="../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
-                    <a href="../Core/core.html"><i class="fa-solid fa-share"></i> Zentral Core</a>
+                    <a href="../Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
+                    <a href="../zentral.html"><i class="fa-solid fa-book-open"></i> Learn More</a>
                 </div>
             </div>
             <div class="dropdown">
-                <button class="dropbtn">
-                    <span><i class="fa-solid fa-ellipsis"></i> More</span>
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> <b>More</b></span>
                     <i class="fa-solid fa-chevron-down small-arrow"></i>
-                </button>
+                </div>
                 <div class="dropdown-content">
                     <a href="../projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
                     <a href="../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="membership.html"><i class="fa-solid fa-star"></i> Membership</a>
                     <a href="../others.html"><i class="fa-solid fa-box"></i> <b>Others</b></a>
                 </div>
             </div>
@@ -55,9 +57,7 @@
             <div class="form-box">
                 <div class="form-header">
                     <h1>ZENTRAL QUESTIONNAIRE</h1>
-                    <p>Zentral-Web • Others <br><br>
-                        Please take a couple minutes to fill in this questionnaire. By learning more about your experiences
-                        with our channel and website, we will further improve and continue to provide better services.</p>
+                    <p>By learning more about your experiences with our channel and website, we will further improve and continue to provide better services.</p>
                 </div>
     
                 <div class="form-tabs">
@@ -93,7 +93,7 @@
     
                         <div class="form-question"><span>Where did you learn about Zentral-Web?</span></div>
                         <div class="options">
-                            <label><input type="radio" name="w_q5" value="Social Media"> Social Media (e.g. YouTube, Instagram)</label>
+                            <label><input type="radio" name="w_q5" value="Social Media"> Social Media</label>
                             <label><input type="radio" name="w_q5" value="Friends/Family"> Friends and Family</label>
                             <label><input type="radio" name="w_q5" value="Others"> Others</label>
                             <label><input type="radio" name="w_q5" value="Not sure"> Not sure</label>
@@ -103,7 +103,7 @@
                         <div class="options">
                             <label><input type="checkbox" name="w_q6" value="Games"> Interactive Games</label>
                             <label><input type="checkbox" name="w_q6" value="Posts"> Community Posts</label>
-                            <label><input type="checkbox" name="w_q6" value="Settings"> Settings (e.g. Light/Dark Mode)</label>
+                            <label><input type="checkbox" name="w_q6" value="Settings"> Settings & Customizations</label>
                             <label class="other-option"><input type="checkbox" name="w_q6" value="Other">Other</label>
                             <input type="text" class="other-input" placeholder="Please specify..." data-for="w_q6" hidden>
                         </div>
@@ -214,12 +214,14 @@
     </footer>
     
     <script>
-        var path = "../"; 
-        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #001f62, #050008)");
-        document.documentElement.style.setProperty("--form-title", "#6380ff");
-        document.documentElement.style.setProperty("--form-question", "#93abff");
-        document.documentElement.style.setProperty("--form-btn", "linear-gradient(0deg, #759eff, #2f51c1)");
-        document.documentElement.style.setProperty("--form-btnHover", "rgba(90, 120, 255, 0.75)");
+        var path = "../";
+        document.documentElement.style.setProperty("--form-bg", "radial-gradient(circle at center, #001233, #020005)");
+        document.documentElement.style.setProperty("--form-title", "#00d9ff");
+        document.documentElement.style.setProperty("--form-question", "#7da1ff");
+        document.documentElement.style.setProperty("--form-btn", "linear-gradient(135deg, #0051ff, #7000ff)");
+        document.documentElement.style.setProperty("--form-btnHover", "rgba(0, 217, 255, 0.6)");
+        document.documentElement.style.setProperty("--accent", "#00d9ff");
+        document.documentElement.style.setProperty("--glass", "rgba(0, 81, 255, 0.08)");
 
         let activeTab = "website";
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyW5mmrs2ERxM8SBWAoZapJ7ibq_PQWodzYxBKRwzcvmMRPI5r7n0k1wIMut3QITBx7-g/exec";

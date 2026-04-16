@@ -37,7 +37,7 @@ dropdowns.forEach(dropdown => {
     dropbtn.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('show'); });
-        if (window.innerWidth > 850) dropdown.classList.toggle('show');
+        dropdown.classList.toggle('show');
     });
 
     dropdown.addEventListener('mouseenter', () => {

@@ -1387,7 +1387,7 @@ const commandDefinitions = [
 
         const validBattles = data.items
          .filter(b => b.battle && b.battle.mode && gameModes[b.battle.mode])
-         .slice(0, 3);
+         .slice(0, 1);
 
         return {
           type: "brawl_log",
@@ -4997,7 +4997,7 @@ function mobileActionMenuHandler(action, msgEl) {
       startReply(msgEl);
       break;
     case "edit":
-      if (isMe && canModifyMessage(msgData)) {
+      if (canModify) {
         beginEditMessage(id);
       }
       break;
@@ -5031,13 +5031,16 @@ function openMobileActionMenu(msgEl) {
   if (!msgData) return;
 
   const isMe = msgData.senderId === accountId;
+  const isRequester = msgData.requestedBy === accountId;
+
   const canModify = isMe && canModifyMessage(msgData);
+  const canDelete = (isMe && canModifyMessage(msgData)) || isRequester;
 
   previewName.textContent = msgData.name || "User";
   previewText.textContent = msgData.text;
 
   sheet.querySelector('[data-action="edit"]').style.display = canModify ? "flex" : "none";
-  sheet.querySelector('[data-action="delete"]').style.display = canModify ? "flex" : "none";
+  sheet.querySelector('[data-action="delete"]').style.display = canDelete ? "flex" : "none";
   sheet.querySelector('[data-action="report"]').style.display = isMe ? "none" : "flex";
 
   sheet.classList.add("open");

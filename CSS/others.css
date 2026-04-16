@@ -7,8 +7,10 @@
     --form-bg: radial-gradient(circle at center, #001f62, #050008);
     --form-title: #6380ff;
     --form-question: #93abff;
-    --form-btn: linear-gradient(0deg, #759eff, #2f51c1);
-    --form-btnHover: rgba(90, 120, 255, 0.75);
+    --form-btn: linear-gradient(45deg, #2f93c1, #2fc190);
+    --form-btnHover: rgba(99, 232, 255, 0.4);
+    --accent: #2fc190;
+    --glass: rgba(255, 255, 255, 0.05);
 }
 
 .news {
@@ -503,7 +505,11 @@ li {
 .form {
     background: var(--form-bg);
     color: #fff;
-    min-height: 82dvh;
+    min-height: 82vh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .form-wrapper {
@@ -513,51 +519,63 @@ li {
 }
 
 .form-box {
-    background: rgba(20, 10, 30, 0.85);
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 15, 25, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(99, 232, 255, 0.2);
+    width: 90%;
+    max-width: 550px;
     width: 85vw;
-    max-width: 650px;
-    min-width: 350px;
-    box-shadow: 0 0 40px rgba(140, 90, 255, 0.25);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 232, 255, 0.1);
+    overflow: hidden;
 }
 
 .form-header {
-    padding: 28px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 40px 40px 0;
+    text-align: center;
+    background: linear-gradient(to bottom, rgba(99, 232, 255, 0.05), transparent);
 }
 
 .form-header h1 {
-    margin: 0;
-    font-size: 22px;
-    letter-spacing: 2px;
+    font-size: 28px;
+    letter-spacing: 4px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
     color: var(--form-title);
+    text-shadow: 0 0 15px rgba(99, 232, 255, 0.5);
 }
 
 .form-header p {
-    margin-top: 6px;
-    font-size: 13px;
-    opacity: 0.6;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #8faeb3;
 }
 
 .form-tabs {
     display: flex;
-    border-bottom: 5px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 2px solid rgba(99, 232, 255, 0.1);
+    margin-top: 18px;
 }
 
 .tab {
     flex: 1;
-    padding: 14px;
-    background: none;
+    padding: 18px;
+    background: transparent;
     border: none;
-    color: #aaa;
+    color: rgba(255, 255, 255, 0.4);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: 0.3s ease;
+    border-bottom: 3px solid transparent;
 }
 
 .tab.active {
-    color: #fff;
-    background: rgba(76, 103, 255, 0.12);
+    color: var(--form-title);
+    background: linear-gradient(to top, rgba(99, 232, 255, 0.1), transparent);
+    border-bottom: 3px solid var(--form-title);
 }
 
 .form-section {
@@ -570,7 +588,7 @@ li {
 }
 
 .form-body {
-    padding: 0 35px 30px;
+    padding: 0 40px 40px;
     display: flex;
     flex-direction: column;
 }
@@ -579,12 +597,17 @@ li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 28px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin: 15px 0;
 }
 
 .form-question {
-    display: block;
-    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
     color: var(--form-question);
 }
 
@@ -594,42 +617,50 @@ li {
     margin-bottom: 10px;
 }
 
-input,
-textarea {
-    width: 100%;
-    margin-top: 6px;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    background: rgba(255, 255, 255, 0.08);
+input, textarea {
     color: #fff;
+    width: 100%;
+    padding: 10px;
     font-size: 14px;
+    border-radius: 8px;
+    background: var(--glass);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--form-title);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(99, 232, 255, 0.2);
 }
 
 .stars {
     display: flex;
-    gap: 1dvw;
+    gap: 8px;
     cursor: pointer;
     margin-top: 0;
 }
 
 .star {
     font-size: 22px;
-    opacity: 0.4;
-    transition: transform 0.15s, opacity 0.15s;
+    color: rgba(255, 255, 255, 0.2);
+    transition: 0.2s;
+    cursor: pointer;
 }
 
+
 .star.active {
-    opacity: 1;
-    transform: scale(1.15);
-    color: #ffffff;
+    color: #ffcc00;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
 }
 
 .options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-right: 35px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .options label {
@@ -639,6 +670,14 @@ textarea {
     align-items: center;
     font-size: 14px;
     cursor: pointer;
+    padding: 12px;
+    background: var(--glass);
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+
+.options label:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .options input {
@@ -651,7 +690,7 @@ textarea {
     margin-top: 8px;
     padding: 8px 10px;
     border-radius: 8px;
-    border: none;
+    border-left: 3px solid var(--accent);
     background: rgba(255, 255, 255, 0.08);
     color: #fff;
     font-size: 13px;
@@ -672,6 +711,10 @@ textarea {
     font-size: 13px;
     opacity: 0.85;
     cursor: pointer;
+    padding: 15px;
+    background: rgba(47, 193, 144, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(47, 193, 144, 0.1);
 }
 
 .consent input {
@@ -699,21 +742,25 @@ textarea {
 }
 
 .form-button {
-    margin: 0px auto;
+    margin-top: 10px;
     width: 70%;
-    border-radius: 14px;
-    padding: 10px 22px;
-    border: none;
-    background: var(--form-btn);
-    color: #fff;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: bold;
     font-size: 14px;;
-    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: var(--form-btn);
+    box-shadow: 0 4px 15px rgba(47, 193, 144, 0.3);
+    transition: 0.4s;
     text-align: center;
+    align-self: center;
 }
 
 .form-button:hover {
-    box-shadow: 0 0 15px var(--form-btnHover);
-    transition: all 0.35s ease-in
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--form-btnHover);
+    filter: brightness(1.1);
 }
 
 .thank-you {
