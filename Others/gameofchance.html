@@ -281,7 +281,7 @@
             
             <div id="math-s1" class="math-box">
                 <strong>STAGE 1 EXPECTATION</strong><br>
-                P(Pass) = P(H ∩ Red) + P(T ∩ Blk)<br>
+                P(Pass) = P(H ∩ Red) + P(T ∩ Black)<br>
                 = (0.5 × 26/52) + (0.5 × 26/52)<br>
                 = 0.500 (50.0%)
             </div>
@@ -386,10 +386,14 @@
                 updateStage2Math();
                 const stage2 = document.getElementById("stage-2");
                 stage2.classList.add("active");
-                
-                setTimeout(() => {
+
+                if (!isAutoRunning) {
+                    setTimeout(() => {
+                        stage2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 1500);
+                } else {
                     stage2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 1500);
+                }
 
                 return true;
             } else {
@@ -449,10 +453,14 @@
                 updateStage3MathAwaiting();
                 const stage3 = document.getElementById("stage-3");
                 stage3.classList.add("active");
-                
-                setTimeout(() => {
+
+                if (!isAutoRunning) {
+                    setTimeout(() => {
+                        stage3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 1500);
+                } else {
                     stage3.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 1500);
+                }
 
                 return true;
             } else {
@@ -531,7 +539,7 @@
             }
 
             if (passed) {
-                msgEl.innerText = `🎉 WINNER! Hit ${conditionText}`;
+                msgEl.innerText = `🎉 WIN (${conditionText})`;
                 msgEl.style.color = "var(--success)";
                 mathEl.classList.add("success");
                 document.getElementById("btn-reset").style.display = "block";
