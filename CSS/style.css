@@ -2512,6 +2512,7 @@ section.content h2 {
 }
 
 .milestone-card {
+    color: white;
     margin-top: 40px;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
