@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
+  <title>Zentral-Web | Project Zen</title>
+
+  <link href="../../Assets/Icon.png" rel="icon">
+  <link href="../../CSS/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark-void: #040108;
+            --bg-cosmic-glow: radial-gradient(circle at 50% 20%, #200438 0%, #090212 60%, #020005 100%);
+            --glass-panel-bg: rgba(13, 6, 22, 0.7);
+            --accent-orchid: #b663ff;
+            --accent-crimson: #ff4766;
+            --accent-amber: #ffaa00;
+            --text-primary: #ffffff;
+            --text-secondary: #c9bed6;
+            --border-light: rgba(255, 255, 255, 0.06);
+            --border-glow: rgba(182, 99, 255, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark-void);
+            background-image: var(--bg-cosmic-glow);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .zen-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 80px 20px 40px 20px;
+        }
+
+        .status-banner {
+            display: flex;
+            gap: 20px;
+            background: rgba(255, 71, 102, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 71, 102, 0.25);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 38px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 71, 102, 0.05);
+        }
+
+        .status-icon {
+            font-size: 28px;
+            color: var(--accent-crimson);
+            text-shadow: 0 0 15px rgba(255, 71, 102, 0.4);
+            display: flex;
+            align-items: flex-start;
+            margin-top: 2px;
+        }
+
+        .status-text h3 {
+            margin: 0 0 6px 0;
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: var(--accent-crimson);
+            font-weight: 800;
+        }
+
+        .status-text p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e5dfea;
+        }
+
+        .zen-hero {
+            position: relative;
+            text-align: center;
+            padding: 40px 0 20px 0;
+        }
+
+        .glitch-title {
+            margin: 0;
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #ffffff 20%, #d5b0ff 60%, var(--accent-orchid) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+        }
+
+        .zen-panel {
+            background: var(--glass-panel-bg);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border-radius: 24px;
+            border: 1px solid var(--border-light);
+            outline: 1px solid rgba(255, 255, 255, 0.02);
+            padding: 40px;
+            margin-bottom: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.03);
+            transform: translateZ(0);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 16px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            background: linear-gradient(90deg, #fff, #f0e6ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .core-icon {
+            font-size: 18px;
+            color: var(--accent-orchid);
+            text-shadow: 0 0 10px var(--accent-orchid);
+        }
+
+        .origin-section p {
+            font-size: 15.5px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin: 0 0 16px 0;
+        }
+
+        .origin-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .update-showcase {
+            background: linear-gradient(180deg, rgba(20, 10, 32, 0.8) 0%, rgba(10, 5, 18, 0.8) 100%);
+            border-color: var(--border-glow);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(182, 99, 255, 0.05);
+        }
+
+        .update-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(182, 99, 255, 0.12);
+            border: 1px solid rgba(182, 99, 255, 0.3);
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #dfb3ff;
+            margin-bottom: 20px;
+        }
+
+        .section-main-title {
+            margin: 0 0 14px 0;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .section-lead-text {
+            margin: 0 0 40px 0;
+            font-size: 15px;
+            line-height: 1.75;
+            color: var(--text-secondary);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 24px;
+            transition: var(--transition-smooth);
+        }
+
+        .feature-card:hover {
+            background: rgba(182, 99, 255, 0.03);
+            border-color: rgba(182, 99, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            font-size: 20px;
+            color: var(--accent-orchid);
+            margin-bottom: 14px;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .feature-card p {
+            margin: 0;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #a499b0;
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/1.8;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .carousel-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .slide-caption {
+            width: 100%;
+            padding: 30px 20px;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            backdrop-filter: blur(2px);
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            backdrop-filter: blur(8px);
+            transition: var(--transition-smooth);
+            z-index: 5;
+        }
+
+        .carousel-btn:hover {
+            background: var(--accent-orchid);
+            border-color: var(--accent-orchid);
+            box-shadow: 0 0 15px var(--accent-orchid);
+        }
+
+        .carousel-btn.prev {
+            left: 16px;
+        }
+
+        .carousel-btn.next {
+            right: 16px;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+
+        .carousel-dots .dot {
+            width: 7px;
+            height: 7px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .carousel-dots .dot.active {
+            background: var(--accent-orchid);
+            width: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px var(--accent-orchid);
+        }
+
+        .patch-date-meta {
+            margin: -10px 0 10px 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-orchid);
+            opacity: 0.85;
+        }
+
+        .accordion-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .accordion-item {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 60px;
+            transition: border-color 0.25s ease, background-color 0.25s ease;
+        }
+
+        .accordion-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .accordion-item.open {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(182, 99, 255, 0.2);
+            max-height: none;
+        }
+
+        .accordion-trigger {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 20px 24px;
+            color: #f1eaff;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .accordion-trigger span {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .accordion-trigger span i {
+            color: var(--accent-orchid);
+            font-size: 14px;
+        }
+
+        .accordion-trigger .chevron {
+            font-size: 12px;
+            opacity: 0.4;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .accordion-item.open .chevron {
+            transform: rotate(180deg);
+            opacity: 1;
+            color: var(--accent-orchid);
+        }
+
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            opacity: 0;
+            will-change: grid-template-rows, opacity;
+            transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+
+        .content-wrapper {
+            overflow: hidden;
+            padding: 0 24px 24px 48px;
+        }
+
+        .patch-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .patch-list li {
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .patch-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .patch-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 9px;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-orchid);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent-orchid);
+        }
+
+        .patch-list.deprecated li::before {
+            background: var(--accent-crimson);
+            box-shadow: 0 0 6px var(--accent-crimson);
+        }
+
+        .patch-sub-block {
+            margin-bottom: 24px;
+        }
+
+        .patch-sub-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .patch-sub-block h4 {
+            margin: 0 0 8px 0;
+            font-size: 14.5px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .patch-sub-block p {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        code {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 6px;
+            border-radius: 6px;
+            color: #ffb3c1;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .metric-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+        }
+
+        .metric-old {
+            color: rgba(255, 71, 102, 0.8);
+            text-decoration: line-through;
+            font-weight: 600;
+        }
+
+        .metric-new {
+            color: #00ffaa;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 170, 0.2);
+        }
+
+        .patch-list.metric-list li i {
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        .patch-community-cta {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .patch-community-cta strong {
+            color: var(--accent-orchid);
+        }
+
+        @media (max-width: 768px) {
+            .zen-container { padding: 24px 16px 60px 16px; }
+            .glitch-title { font-size: 38px; letter-spacing: 4px; }
+            .zen-panel { padding: 24px; }
+            .feature-grid { grid-template-columns: 1fr; gap: 14px; }
+            .carousel-container { height: 260px; }
+            .content-wrapper { padding: 0 16px 20px 20px; }
+            .accordion-trigger { padding: 16px; font-size: 14px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../../Assets/Logo.png" alt="Logo">
+            <span>Zendra クレイジー</span>
+        </div>
+        <nav class="nav-links">
+            <div class="mobile-header">MENU</div>
+            <a href="../../index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-star"></i> Zentral</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="../../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="../../Arena/arena.html"><i class="fa-solid fa-gamepad"></i> Zentral Arena</a>
+                    <a href="../../Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
+                    <a href="../../zentral.html"><i class="fa-solid fa-book-open"></i> Learn More</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> <b>More</b></span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="../../projects.html"><i class="fa-solid fa-layer-group"></i> <b>Projects</b></a>
+                    <a href="../../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="../membership.html"><i class="fa-solid fa-star"></i> Membership</a>
+                    <a href="../../others.html"><i class="fa-solid fa-box"></i> Others</a>
+                </div>
+            </div>
+        </nav>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="zen-container">
+        <div class="status-banner">
+            <div class="status-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="status-text">
+                <h3>IMPORTANT NOTICE</h3>
+                <p>Project Zen development was officially terminated on <strong>January 18th, 2025</strong> due to a lack of core development resources and unstable server architecture. All Zen infrastructure will remain offline until further notice. Thank you deeply for your understanding and support.</p>
+            </div>
+        </div>
+
+        <header class="zen-hero">
+            <h1 class="glitch-title">PROJECT ZEN</h1>
+        </header>
+
+        <section class="zen-panel origin-section">
+            <div class="panel-header">
+                <i class="fa-solid fa-brain core-icon"></i>
+                <h2>Origin of Zen</h2>
+            </div>
+            <p>Zen is a powerful artificial intelligence designed to serve as an adaptable digital assistant. Equipped with advanced multi-tier features and unparalleled ecosystem flexibility, Zen aimed to revolutionize how users navigate daily scheduling tasks and complex programmatic challenges.</p>
+            <p>Whether managing complex priorities, orchestrating community channels, or engaging in meaningful situational dialogue, Zen was engineered to seamlessly integrate into your workflow, providing robust performance and reliable companionship every step of the way.</p>
+        </section>
+
+        <section class="zen-panel update-showcase">
+            <div class="update-badge">November 23rd, 2024</div>
+            <h2 class="section-main-title">ZEN RIRODO • VERSION 6</h2>
+            <p class="section-lead-text">Generation 6 of Zendra Bot pushed past baseline limitations to completely revolutionize your community experience—delivered entirely for free. With a massive architectural overhaul to the system economy and advanced modules, Zen Rirodo was built to elevate your server infrastructure.</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <h3>Leveling System</h3>
+                    <p>Drive community engagement with custom XP mechanics. Features bonus roles, custom channel multipliers, and automated role rewards tailored to your community environment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon"><i class="fa-solid fa-code"></i></div>
+                    <h3>Developer Program</h3>
+                    <p>An exclusive framework allowing power users to interact with experimental command blocks, evaluate staging code, and shape structural platform updates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon"><i class="fa-solid fa-terminal"></i></div>
+                    <h3>Prefix Integration</h3>
+                    <p>Maintained robust deployment versatility by supplementing slash commands with legacy prefix support, utilizing <code>!</code> as the default server engine initialization key.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>Settings & Auto-Mod</h3>
+                    <p>Granular dashboard configuration parameters powering 4 automated safety layers: Word Censoring, Link Filtering, Spam Detection, and Intelligent Automatic Slowmode tuning.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon"><i class="fa-solid fa-id-card"></i></div>
+                    <h3>Profile System</h3>
+                    <p>Express yourself using fully modular profile nodes. Display customized biographies, event titles, and unlockable economic progression achievement badges.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon"><i class="fa-solid fa-coins"></i></div>
+                    <h3>Economy Ecosystem</h3>
+                    <p>Massive balancing reworks introducing 3 new tier classifications: Zodiac item events, openable Zen/Ultra containment boxes, and progressive crafting fusions.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="zen-panel carousel-section">
+            <div class="panel-header">
+                <i class="fa-solid fa-images core-icon"></i>
+                <h2>Interface Showcase</h2>
+            </div>
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_1.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_2.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_3.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_4.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_5.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_6.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_7.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_8.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_9.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_10.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_11.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_12.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_13.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_14.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_15.png') center/cover no-repeat;"></div>
+                    <div class="carousel-slide" style="background: url('../../Assets/Zen/Zen_16.png') center/cover no-repeat;"></div>
+                </div>
+                <button class="carousel-btn prev" id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="carousel-btn next" id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                <div class="carousel-dots" id="carouselDots"></div>
+            </div>
+        </section>
+
+        <section class="zen-panel patch-notes-section">
+            <div class="panel-header">
+                <i class="fa-solid fa-file-lines core-icon"></i>
+                <h2>Patch Notes</h2>
+            </div>
+            <div class="accordion-group">
+                <div class="accordion-item">
+                    <button class="accordion-trigger">
+                        <span><i class="fa-solid fa-circle-plus"></i> Zen Rirodo Update 6.0 (November 23, 2024)</span>
+                        <i class="fa-solid fa-chevron-down chevron"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="content-wrapper">
+                            <div class="patch-sub-block">
+                                <h4>New Features & Command Engines</h4>
+                                <ul class="patch-list">
+                                    <li>Added new structural guide routine command: <code>/tips</code></li>
+                                    <li>Added native localized translation matrix engine: <code>/translation</code></li>
+                                    <li>Added core interactive systems access module: <code>/dashboard</code></li>
+                                    <li>Added individual identity customization registry: <code>/profile</code></li>
+                                    <li>Added localized server control schema: <code>/settings</code></li>
+                                    <li>Added automated parameter security system: <code>/settings automod</code></li>
+                                    <li>Added dynamic retention and activity rewards tracking: <code>/leveling</code></li>
+                                    <li>Added feature testing deployment program: <code>/developer</code></li>
+                                    <li>Added localized engagement minigames framework: <code>/minigame</code></li>
+                                    <li>Added automated DM notify option to all Moderation System actions</li>
+                                    <li>Added localized channel exclusion parameters to standard Message System tracking</li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Prefix Commands Integration</h4>
+                                <p>Broadened command layer inputs to support text triggers. Access parameters via server prefix followed directly by target identifier (found via <code>/help</code> or managed via <code>/dashboard</code>). Global baseline initialization prefix defaults to <code>!</code>.</p>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Economy Mechanics Restructuring</h4>
+                                <ul class="patch-list">
+                                    <li><strong>Box Containment Rework:</strong> Implemented <em>Zen Box</em> (drops 2,000–3,500 Zeni + 3 Common/Rare/Epic items) and <em>Ultra Box</em> (drops 8,500–10,000 Zeni + guaranteed Ultra/Zodiac tier item). Obtainable via performance quests, milestones, events, or via <code>/economy open</code>.</li>
+                                    <li><strong>Crafting & Fusion Pipelines:</strong> Users can synthesize assets into high-tier Fusion items via <code>/economy craft</code>. Standard variants require 3 material items + 1 Fusion Token; Mega Fusion options require 5 items + 1 Mega Fusion Token. View structural item paths via <code>/economy item-info</code>.</li>
+                                    <li><strong>Badges & Profile Titles:</strong> Earn badges by unlocking rarity collection tiers or achieving milestone goals. Badges generate periodic passive Zeni payments, fully replacing legacy role income structures (claimable via <code>/economy collect</code> or managed inside the market via <code>/economy buy</code>).</li>
+                                    <li><strong>Milestone Progression Tracking:</strong> Added progress tracking metrics driven purely by total Zeni earnings. Advancing milestone layers unlocks specialized tools, badge assets, and dynamic currency bundles without losing progression due to economy losses. Check via <code>/economy milestone</code>.</li>
+                                    <li><strong>Item Class Adjustments:</strong> Added Ultra, Zodiac (time-locked to specific calendar cycles), and Fusion categories. Unlocking items populates user tracking logs accessible via <code>/economy collections</code>.</li>
+                                    <li><strong>Quests & Cooperative Events:</strong> Implemented 5 specialized quest frameworks containing 5 progressive performance stages checked via <code>/economy quests</code>. Added 4 global Community Events rotating on a 2-week cycle tracked through <code>/economy event</code>.</li>
+                                    <li><strong>Store Management Update:</strong> Store profiles display rotating daily freebies and custom bundle drops resetting every 24 hours. Purchase or claim using product keys via <code>/economy buy</code>.</li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Removed Features & Deprecated Blocks</h4>
+                                <ul class="patch-list deprecated">
+                                    <li>Removed audience tracking node: <code>subscribers</code> command</li>
+                                    <li>Removed background countdown alert tool: <code>timer</code> command</li>
+                                    <li>Removed Matrix generation service hook: <code>QR-code</code> command</li>
+                                    <li>Removed daily community poll engagement module: <code>question-of-the-day</code> command</li>
+                                    <li>Removed flat text clipboard buffer storage: <code>note</code> command</li>
+                                    <li>Removed user telemetry status visibility component from the baseline AFK system</li>
+                                    <li>Removed long-interval cycle claims (Weekly/Monthly collect hooks) from the Economy framework</li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Zen Economy Balance Configuration Changes</h4>
+                                <ul class="patch-list metric-list">
+                                    <li><span class="metric-label">Crime command asset drop rates</span> <span class="metric-old">7%</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">15%</span></li>
+                                    <li><span class="metric-label">Beg command asset drop rates</span> <span class="metric-old">2%</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">7%</span></li>
+                                    <li><span class="metric-label">Hunt command asset drop rates</span> <span class="metric-old">60%</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">70%</span></li>
+                                    <li><span class="metric-label">Beg command execution cooldown interval</span> <span class="metric-old">10s</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">15s</span></li>
+                                    <li><span class="metric-label">Donate parameter command cooldown reset</span> <span class="metric-old">0s</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">1 hr</span></li>
+                                    <li><span class="metric-label">Trade parameter command cooldown reset</span> <span class="metric-old">0s</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">1 wk</span></li>
+                                    <li><span class="metric-label">Blackjack simulation task cooldown window</span> <span class="metric-old">0s</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">60s</span></li>
+                                    <li><span class="metric-label">Crime routine simulation fine threshold cap</span> <span class="metric-old">5%</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">6.5%</span></li>
+                                    <li><span class="metric-label">Beg success configuration baseline math probability</span> <span class="metric-old">88%</span> <i class="fa-solid fa-arrow-right"></i> <span class="metric-new">80%</span></li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Operational Bug Fixes & Refinements</h4>
+                                <ul class="patch-list">
+                                    <li>Resolved timing-loop calculation bugs inside standard Economy cooldown processes</li>
+                                    <li>Patched loop logic in <code>donate</code> and <code>trade</code> commands that permitted self-interaction exploits</li>
+                                    <li>Corrected internal evaluation engine errors failing to close blackjack instances upon achieving exactly 21</li>
+                                    <li>Fixed tracking interface stutter loops on heavy database inventories; implemented a global 30-second inventory safety command buffer</li>
+                                    <li>Configured Moderation System error responses to load reliably as secure ephemeral data blocks</li>
+                                    <li>Fixed message rate limits failing to register correctly across rapid text bursts</li>
+                                    <li>Resolved fatal routing failures thrown during the execution of the Message Reset script</li>
+                                    <li>Injected fresh text selections into the core <code>quotes</code> repository matrix</li>
+                                    <li>Upgraded AFK module to report precise elapsed timeframe parameters when returning or mentioned</li>
+                                    <li>Modified <code>truthordare</code> module to automatically open via Truth selection upon initial run</li>
+                                    <li>Updated <code>truthordare</code> system output logs to show exactly which variant path the user selected</li>
+                                    <li>Consolidated standalone system purge utilities directly into the centralized Moderation engine block</li>
+                                    <li>Merged legacy games (<code>higherorlower</code>, <code>rockpaperscissors</code>, and <code>tictactoe</code>) into the Minigames module</li>
+                                    <li>Renamed <code>/emoji</code> directory mapping hook directly to <code>/emoji-ids</code> for systematic naming parity</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-trigger">
+                        <span><i class="fa-solid fa-circle-plus"></i> Zen Tanjo Update 5.2 (June 24, 2024)</span>
+                        <i class="fa-solid fa-chevron-down chevron"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="content-wrapper">
+                            <div class="patch-sub-block">
+                                <h4>New Features and Commands</h4>
+                                <ul class="patch-list">
+                                    <li>Added new giveaway system: <code>/giveaway</code></li>
+                                    <li>Added new ticket system: <code>/ticket</code></li>
+                                    <li>Added new message system: <code>/messages</code></li>
+                                    <li>Added new Zen economy system</li>
+                                    <li>Added new /subscribers, /morsecode-encode, /morsecode-decode commands</li>
+                                    <li>Added new position and mentionable fields to /role info</li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>New System Reworks</h4>
+                                <h5 style="margin-top: 10px; margin-bottom: 5px;">Reworked afk system</h5>
+                                <ul class="patch-list">
+                                    <li>Sending a message while in AFK status will automatically exit status</li>
+                                    <li><code>/afk view</code> will now show how long you have been in AFK status</li>
+                                    <li>A message will be sent when pinging a person with AFK status on</li>
+                                </ul>
+                                <h5 style="margin-top: 10px; margin-bottom: 5px;">Reworked moderation system</h5>
+                                <ul class="patch-list">
+                                    <li>Combined <code>/kick</code>, <code>/ban</code>, and <code>/timeout</code> commands into moderation subcommands</li>
+                                    <li>Added new /moderation timeout-remove command</li>
+                                    <li>Added new warning system (/warn) to moderation command</li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Removed Commands and Other Fixes</h4>
+                                <ul class="patch-list">
+                                    <li>Removed AFK force remove command</li>
+                                    <li>Removed application command</li>
+                                    <li>Removed timestamps command</li>
+                                    <li>Fixed <code>/server</code> info displaying wrong amount of roles</li>
+                                    <li>Fixed <code>/emoji</code> crashing when used in a server without emojis</li>
+                                    <li>Updated <code>/info</code> user command to include number of messages sent</li>
+                                    <li>Renamed <code>/link</code> command to /zendra command</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-trigger">
+                        <span><i class="fa-solid fa-circle-plus"></i> Zen Tanjo Update 5.1 (June 11, 2024)</span>
+                        <i class="fa-solid fa-chevron-down chevron"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="content-wrapper">
+                            <div class="patch-sub-block">
+                                <h4>Removed Commands and Other Fixes</h4>
+                                <ul class="patch-list deprecated">
+                                    <li>Added page system to <code>/emoji</code> to message flooding</li>
+                                    <li>Fixed issue with displaying emoji IDs when using <code>/emoji</code></li>
+                                    <li>Removed <code>/bot-suggestion</code> command</li>
+                                    <li>Removed unnecessary packages from the bot</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <button class="accordion-trigger">
+                        <span><i class="fa-solid fa-circle-plus"></i> Zen Tanjo Update 5.0 (May 06, 2024)</span>
+                        <i class="fa-solid fa-chevron-down chevron"></i>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="content-wrapper">
+                            <div class="patch-sub-block">
+                                <h4>New Features & Commands</h4>
+                                <ul class="patch-list">
+                                    <li>Added new category - Utility</li>
+                                    <li>Added note system (/note)</li>
+                                    <li>Added slowmode system: <code>/slowmode</code></li>
+                                    <li>Added application system: <code>/application</code></li>
+                                    <li>Added bot suggestion command : <code>/bot-suggestion</code></li>
+                                    <li>Added tweet command: <code>/tweet</code></li>
+                                    <li>Added avatar command: <code>/avatar</code></li>
+                                    <li>Added tic tac toe command: <code>/tic-tac-toe</code></li>
+                                    <li>Added emoji ID command: <code>/emoji</code></li>
+                                    <li>Added update patch notes command: <code>/updates</code></li>
+                                    <li>Added ascii text command: <code>/ascii</code></li>
+                                </ul>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Removed Features and Commands</h4>
+                                <ul class="patch-list deprecated">
+                                    <li>Removed invite leaderboard command</li>
+                                    <li>Removed emoji list command</li>
+                                    <li>Removed url lookup command</li>
+                                    <li>Removed view command command</li>
+                                    <li>Removed spellchecking command</li>
+                                    <li>Removed summarizer command</li>
+                            </div>
+                            <div class="patch-sub-block">
+                                <h4>Other Fixes and Updates</h4>
+                                <ul class="patch-list">
+                                    <li>Updated all error messages</li>
+                                    <li>Updated purge command (allow filters now)</li>
+                                    <li>Updated links command (removed buttons)</li>
+                                    <li>Updated info command (combined 4 subcommands - user, bot, server, role)</li>
+                                    <li>Updated role command (combined 2 subcommands - add, remove)</li>
+                                    <li>Improved ping command (with api and websocket latency)</li>
+                                    <li>Disabled calculator from user install</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="patch-community-cta">
+                <p>Have additional functional questions regarding the legacy features? Join the active <strong>Zendra Brawl Community</strong> via our global portal links.</p>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
+        </div>
+        2026 Zentral-Web | Powered by KuraWorks
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const accordionItems = document.querySelectorAll(".accordion-item");
+            const cachedAccordionData = Array.from(accordionItems).map(item => {
+                const trigger = item.querySelector(".accordion-trigger");
+                const content = item.querySelector(".accordion-content");
+                
+                trigger.addEventListener("click", () => {
+                    const isOpen = item.classList.contains("open");
+                    
+                    accordionItems.forEach(el => {
+                        if (el !== item) el.classList.remove("open");
+                    });
+                    
+                    item.classList.toggle("open", !isOpen);
+                });
+                return { element: item, contentNode: content };
+            });
+
+            const track = document.getElementById("carouselTrack");
+            const slides = Array.from(document.querySelectorAll(".carousel-slide"));
+            const nextBtn = document.getElementById("nextBtn");
+            const prevBtn = document.getElementById("prevBtn");
+            const dotsContainer = document.getElementById("carouselDots");
+            
+            let currentIndex = 0;
+
+            slides.forEach((_, index) => {
+                const dot = document.createElement("div");
+                dot.classList.add("dot");
+                if (index === 0) dot.classList.add("active");
+                dot.addEventListener("click", () => navigateCarousel(index));
+                dotsContainer.appendChild(dot);
+            });
+
+            const dots = Array.from(dotsContainer.querySelectorAll(".dot"));
+
+            function navigateCarousel(targetIndex) {
+                if (targetIndex < 0) targetIndex = slides.length - 1;
+                if (targetIndex >= slides.length) targetIndex = 0;
+                
+                currentIndex = targetIndex;
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle("active", idx === currentIndex);
+                });
+            }
+
+            nextBtn.addEventListener("click", () => navigateCarousel(currentIndex + 1));
+            prevBtn.addEventListener("click", () => navigateCarousel(currentIndex - 1));
+
+            setInterval(() => {
+                navigateCarousel(currentIndex + 1);
+            }, 5000);
+        });
+    </script>
+    <script>var path = "../../";</script>
+    <script src="../../script.js"></script>
+</body>
+</html>

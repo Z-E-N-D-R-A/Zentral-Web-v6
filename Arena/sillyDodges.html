@@ -445,7 +445,7 @@
     let comboThreshold = 100;
 
     let difficultyTimer = 0;
-    let spawnRate = 50;
+    let spawnRate = 35;
     let bulletSpeedMin = 2;
     let bulletSpeedMax = 4;
     let bulletMultiplier = 1;
@@ -466,7 +466,8 @@
     let musicGame = new Audio("../Assets/Music/OST_1.mp3");
     musicMenu.loop = true;
     musicGame.loop = true;
-    sfxCollect.volume = 0.2;
+    sfxWave.volume = 0.15;
+    sfxCollect.volume = 0.15;
 
     const menuUI = document.getElementById("menuUI");
     const gameUI = document.getElementById("gameUI");
@@ -659,8 +660,8 @@
         for (let i = 0; i < 150; i++) shotPool.push(new Shot());
         gameReady = true;
 
-        musicMenu.volume = 0.3;
-        musicGame.volume = 0.3;
+        musicMenu.volume = 0.1;
+        musicGame.volume = 0.1;
     }
 
     function loadLocalData(){
@@ -756,7 +757,7 @@
 
     function spawnShot() {
         for (let s of shotPool) {
-            if (!s.active) {
+            if (!s.active && !shots.includes(s)) {
                 s.spawn();
                 shots.push(s);
                 return;
@@ -810,7 +811,7 @@
         comboProgress = 0;
         difficultyTimer = 0;
 
-        spawnRate = 50;
+        spawnRate = 35;
         bulletSpeedMin = 2;
         bulletSpeedMax = 4;
         bulletMultiplier = 1;
@@ -823,6 +824,8 @@
         bonuses = [];
         particles = [];
         player = new Player();
+
+        for (let s of shotPool) s.active = false;
     }
 
     function draw() {
@@ -853,7 +856,6 @@
     }
 
     function drawGame() {
-        if (shots.length > 120) shots.length = 120;
         if (particles.length > 80) particles.length = 80;
 
         if (screenShake>0){
@@ -868,8 +870,8 @@
             }
         }
 
-        if (frameCount % 120 === 0) {
-            let bonusCount = max(1, floor(bulletMultiplier / 2));
+        if (frameCount % 90 === 0) {
+            let bonusCount = max(1, floor(bulletMultiplier / 1.5)); 
             for (let i = 0; i < bonusCount; i++) {
                 if (bonuses.length < 20) bonuses.push(new Bonus());
             }
@@ -913,7 +915,7 @@
             if (bonuses[i].collect(player)) {
                 score += floor(bonuses[i].value * combo);
                 bonuses.splice(i, 1);
-                comboProgress += 35 + bulletMultiplier * 5;
+                comboProgress += 30 + bulletMultiplier * 5;
                 comboProgress = Math.min(comboProgress, comboThreshold * 10);
                 sfxCollect.currentTime = 0;
                 sfxCollect.play();
@@ -921,11 +923,11 @@
         }
 
         difficultyTimer++;
-        if (difficultyTimer % 500 === 0) {
-            spawnRate = max(10, spawnRate - 5);
-            bulletSpeedMin += 0.3;
-            bulletSpeedMax += 0.4;
-            bulletMultiplier = Math.min(3, bulletMultiplier + 0.1);
+        if (difficultyTimer % 125 === 0) {
+            spawnRate = max(12, spawnRate - 1);
+            bulletSpeedMin += 0.08;
+            bulletSpeedMax += 0.12;
+            bulletMultiplier = Math.min(3.5, bulletMultiplier + 0.03);
         }
 
         comboProgress -= comboDecay;
@@ -948,10 +950,12 @@
         waveState = "warning";
         waveTimer = 0;
         waveFlash = 180;
-        
-        bulletSpeedMin = 2 + wave * 0.7;
-        bulletSpeedMax = 4 + wave * 0.9;
-        spawnQueue = 6 + wave * 5;
+    
+        bulletSpeedMin = 3 + wave * 0.8; 
+        bulletSpeedMax = 5 + wave * 1.2; 
+    
+        spawnQueue = 10 + wave * 8; 
+        spawnDelay = Math.max(4, 15 - wave); 
 
         sfxWave.currentTime = 0;
         sfxWave.play();
@@ -959,31 +963,32 @@
     
     function drawWaveWarning(){
         let t = waveTimer;
-        let alpha = constrain(t * 6, 0, 255);
-        let scalePulse = 1 + sin(frameCount * 0.08) * 0.05;
-        
+        let alpha = constrain(t * 8, 0, 255);
+    
         push();
         translate(width/2, height/2 - 10);
-        scale(scalePulse);
         textAlign(CENTER, CENTER);
-        
-        for (let i=0;i<4;i++){
-            fill(255,80,80,alpha * 0.15);
-            textSize(70 + i*6);
-            text("WAVE " + wave, 0, 0);
-        }
-        
-        fill(255,220,80,alpha);
-        textSize(70);
+
+        fill(0, 255, 255, alpha * 0.8);
+        textSize(80);
+        text("WAVE " + wave, -2, 0);
+
+        fill(255, 0, 150, alpha * 0.8);
+        text("WAVE " + wave, 2, 0);
+    
+        fill(255, 255, 255, alpha);
         text("WAVE " + wave, 0, 0);
         pop();
-        
-        let subPulse = 200 + sin(frameCount*0.12)*55;
-        fill(255,subPulse);
-        textSize(22);
-        textAlign(CENTER,CENTER);
-        text("⚠ Incoming Wave ⚠", width/2, height/2 + 50);
-    }
+    
+        push();
+        translate(width/2, height/2 + 60);
+        let subPulse = 100 + Math.abs(sin(frameCount * 0.2)) * 155;
+        fill(255, 50, 50, subPulse);
+        textSize(24);
+        textAlign(CENTER, CENTER);
+        text("▶ ▶  I N C O M I N G   T H R E A T  ◀ ◀", 0, 0);
+        pop();
+}
 
     function handleWaveSpawning(){
         spawnTick++;

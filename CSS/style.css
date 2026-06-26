@@ -644,7 +644,7 @@ footer {
 .hero-content h2 {
     letter-spacing: 5px;
     font-weight: 300;
-    color: #aaa;
+    color: #eee;
     margin-bottom: -5px;
 }
 
@@ -659,7 +659,7 @@ footer {
     display: flex;
     gap: 20px;
     justify-content: center;
-    margin-top: 70px;
+    margin-top: 20px;
 }
 
 .cta:hover {
@@ -686,9 +686,9 @@ footer {
 }
 
 .cta-secondary:hover {
-    background: #ff4d5a;
+    background: #ffffff30;
     color: white;
-    box-shadow: 0 0 30px rgba(255, 77, 90, 0.5);
+    box-shadow: 0 0 30px rgba(130, 130, 130, 0.5);
 }
 
 .particle-canvas {
@@ -795,7 +795,6 @@ section.content h2 {
 
 .lore-link {
     display: inline-block;
-    margin-top: 25px;
     color: #ff4d5a;
     text-decoration: none;
     font-weight: bold;

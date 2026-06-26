@@ -385,7 +385,14 @@ const EMOJI_DATA = {
     { "char": "😤", "name": "face with steam from nose" },
     { "char": "😡", "name": "pouting face" },
     { "char": "😠", "name": "angry face" },
-    { "char": "🤬", "name": "face with symbols on mouth" }
+    { "char": "🤬", "name": "face with symbols on mouth" },
+    { "char": "🫨", "name": "shaking face" },
+    { "char": "🙂‍↕️", "name": "head shaking vertically" },
+    { "char": "🙂‍↔️", "name": "head shaking horizontally" },
+    { "char": "🫪", "name": "distorted face" },
+    { "char": "💬", "name": "speech balloon" },
+    { "char": "💭", "name": "thought balloon" },
+    { "char": "💤", "name": "zzz" }
   ],
 
   "People": [
@@ -423,6 +430,9 @@ const EMOJI_DATA = {
     { "char": "🤲", "name": "palms up together" },
     { "char": "🤝", "name": "handshake" },
     { "char": "🙏", "name": "folded hands" },
+    { "char": "🫸", "name": "rightwards pushing hand" },
+    { "char": "🫷", "name": "leftwards pushing hand" },
+    { "char": "🫶", "name": "heart hands" },
     { "char": "💪", "name": "flexed biceps" },
     { "char": "🦾", "name": "mechanical arm" },
     { "char": "🦿", "name": "mechanical leg" },
@@ -474,6 +484,8 @@ const EMOJI_DATA = {
     { "char": "👳", "name": "person wearing turban" },
     { "char": "👲", "name": "person with skullcap" },
     { "char": "🧕", "name": "woman with headscarf" },
+    { "char": "💑", "name": "couple with heart" },
+    { "char": "👩‍❤️‍👨", "name": "couple with heart: woman, man" },
     { "char": "👓", "name": "glasses" },
     { "char": "🕶", "name": "sunglasses" },
     { "char": "🥽", "name": "goggles" },
@@ -541,7 +553,6 @@ const EMOJI_DATA = {
     { "char": "🦓", "name": "zebra" },
     { "char": "🦌", "name": "deer" },
     { "char": "🦬", "name": "bison" },
-    { "char": "🐮", "name": "cow face" },
     { "char": "🐂", "name": "ox" },
     { "char": "🐃", "name": "water buffalo" },
     { "char": "🐄", "name": "cow" },
@@ -586,6 +597,7 @@ const EMOJI_DATA = {
     { "char": "🐳", "name": "spouting whale" },
     { "char": "🐋", "name": "whale" },
     { "char": "🐬", "name": "dolphin" },
+    { "char": "🫍", "name": "orca" },
     { "char": "🦭", "name": "seal" },
     { "char": "🐟", "name": "fish" },
     { "char": "🐠", "name": "tropical fish" },
@@ -608,7 +620,25 @@ const EMOJI_DATA = {
     { "char": "🦂", "name": "scorpion" },
     { "char": "🦟", "name": "mosquito" },
     { "char": "🪰", "name": "fly" },
-    { "char": "🪱", "name": "worm" }
+    { "char": "🪱", "name": "worm" },
+    { "char": "🫏", "name": "donkey" },
+    { "char": "🫎", "name": "moose" },
+    { "char": "🪿", "name": "goose" },
+    { "char": "🪽", "name": "wing" },
+    { "char": "🪼", "name": "jellyfish" },
+    { "char": "🐦‍🔥", "name": "phoenix" },
+    { "char": "🌱", "name": "seedling" },
+    { "char": "🌲", "name": "evergreen tree" },
+    { "char": "🌳", "name": "deciduous tree" },
+    { "char": "🌴", "name": "palm tree" },
+    { "char": "🌵", "name": "cactus" },
+    { "char": "🍁", "name": "maple leaf" },
+    { "char": "🍂", "name": "fallen leaf" },
+    { "char": "🍃", "name": "leaf fluttering in wind" },
+    { "char": "🌸", "name": "cherry blossom" },
+    { "char": "🌹", "name": "rose" },
+    { "char": "🌻", "name": "sunflower" },
+    { "char": "🍀", "name": "four leaf clover" }
   ],
 
   "Food": [
@@ -659,7 +689,7 @@ const EMOJI_DATA = {
     { "char": "🍖", "name": "meat on bone" },
     { "char": "🍗", "name": "poultry leg" },
     { "char": "🥩", "name": "cut of meat" },
-    { "char": "🥓", "name": "规 bacon" },
+    { "char": "🥓", "name": "bacon" },
     { "char": "🍔", "name": "hamburger" },
     { "char": "🍟", "name": "french fries" },
     { "char": "🍕", "name": "pizza" },
@@ -724,7 +754,11 @@ const EMOJI_DATA = {
     { "char": "🧋", "name": "bubble tea" },
     { "char": "🧃", "name": "beverage box" },
     { "char": "🧉", "name": "mate" },
-    { "char": "🧊", "name": "ice" }
+    { "char": "🧊", "name": "ice" },
+    { "char": "🫛", "name": "pea pod" },
+    { "char": "🫚", "name": "ginger root" },
+    { "char": "🍋‍🟩", "name": "lime" },
+    { "char": "🍄‍🟫", "name": "brown mushroom" }
   ],
 
   "Travel": [
@@ -826,7 +860,50 @@ const EMOJI_DATA = {
     { "char": "🌌", "name": "milky way" },
     { "char": "🎠", "name": "carousel horse" },
     { "char": "🎡", "name": "ferris wheel" },
-    { "char": "🎢", "name": "roller coaster" }
+    { "char": "🎢", "name": "roller coaster" },
+    { "char": "☀️", "name": "sun" },
+    { "char": "🌤️", "name": "sun behind small cloud" },
+    { "char": "⛅", "name": "sun behind cloud" },
+    { "char": "🌥️", "name": "sun behind large cloud" },
+    { "char": "☁️", "name": "cloud" },
+    { "char": "🌦️", "name": "sun behind rain cloud" },
+    { "char": "🌧️", "name": "cloud with rain" },
+    { "char": "⛈️", "name": "cloud with lightning and rain" },
+    { "char": "🌩️", "name": "cloud with lightning" },
+    { "char": "🌨️", "name": "cloud with snow" },
+    { "char": "❄️", "name": "snowflake" },
+    { "char": "💨", "name": "dash" },
+    { "char": "🌪️", "name": "tornado" },
+    { "char": "🌫️", "name": "fog" },
+    { "char": "🌊", "name": "water wave" },
+    { "char": "💧", "name": "droplet" },
+    { "char": "💦", "name": "sweat droplets" },
+    { "char": "💢", "name": "anger symbol" },
+    { "char": "🔥", "name": "fire" },
+    { "char": "💥", "name": "collision" },
+    { "char": "✨", "name": "sparkles" },
+    { "char": "💫", "name": "dizzy" },
+    { "char": "⭐", "name": "star" },
+    { "char": "🌟", "name": "glowing star" },
+    { "char": "🌍", "name": "globe showing europe-africa" },
+    { "char": "🌎", "name": "globe showing americas" },
+    { "char": "🌏", "name": "globe showing asia-australia" },
+    { "char": "🌐", "name": "globe with meridians" },
+    { "char": "🌑", "name": "new moon" },
+    { "char": "🌒", "name": "waxing crescent moon" },
+    { "char": "🌓", "name": "first quarter moon" },
+    { "char": "🌔", "name": "waxing gibbous moon" },
+    { "char": "🌕", "name": "full moon" },
+    { "char": "🌖", "name": "waning gibbous moon" },
+    { "char": "🌗", "name": "last quarter moon" },
+    { "char": "🌘", "name": "waning crescent moon" },
+    { "char": "🌙", "name": "crescent moon" },
+    { "char": "🌚", "name": "new moon face" },
+    { "char": "🌞", "name": "sun with face" },
+    { "char": "🪐", "name": "ringed planet" },
+    { "char": "☄️", "name": "comet" },
+    { "char": "🫯", "name": "fight cloud" },
+    { "char": "🛘", "name": "landslide" }
   ],
 
   "Activities": [
@@ -951,7 +1028,8 @@ const EMOJI_DATA = {
     { "char": "💸", "name": "money with wings" },
     { "char": "💳", "name": "credit card" },
     { "char": "🧾", "name": "receipt" },
-    { "char": "✉", "name": "envelope" },
+    { "char": "🫀", "name": "anatomical heart" },
+    { "char": "💌", "name": "love letter" },
     { "char": "📧", "name": "e-mail" },
     { "char": "📨", "name": "incoming envelope" },
     { "char": "📩", "name": "envelope with arrow" },
@@ -1009,6 +1087,7 @@ const EMOJI_DATA = {
     { "char": "🎤", "name": "microphone" },
     { "char": "🎧", "name": "headphones" },
     { "char": "🎷", "name": "saxophone" },
+    { "char": "🪊", "name": "trombone" },
     { "char": "🎸", "name": "guitar" },
     { "char": "🎹", "name": "musical keyboard" },
     { "char": "🎺", "name": "trumpet" },
@@ -1025,7 +1104,15 @@ const EMOJI_DATA = {
     { "char": "🪤", "name": "mouse trap" },
     { "char": "🪣", "name": "bucket" },
     { "char": "🪥", "name": "toothbrush" },
-    { "char": "🫧", "name": "bubbles" }
+    { "char": "🫧", "name": "bubbles" },
+    { "char": "🪭", "name": "folding hand fan" },
+    { "char": "🪮", "name": "hair pick" },
+    { "char": "🪈", "name": "flute" },
+    { "char": "🫗", "name": "pouring liquid" },
+    { "char": "🛞", "name": "wheel" },
+    { "char": "🪫", "name": "low battery" },
+    { "char": "🫟", "name": "splattering liquid" },
+    { "char": "🪎", "name": "treasure chest" }
   ],
 
   "Symbols": [
@@ -1051,14 +1138,15 @@ const EMOJI_DATA = {
     { "char": "💘", "name": "heart with arrow" },
     { "char": "💝", "name": "heart with ribbon" },
     { "char": "💟", "name": "heart decoration" },
-    { "char": "💢", "name": "anger symbol" },
-    { "char": "💥", "name": "collision" },
-    { "char": "💫", "name": "dizzy" },
-    { "char": "💦", "name": "sweat droplets" },
-    { "char": "💨", "name": "dash" },
-    { "char": "💬", "name": "speech balloon" },
-    { "char": "💭", "name": "thought balloon" },
-    { "char": "💤", "name": "zzz" },
+    { "char": "❤️‍🔥", "name": "heart on fire" },
+    { "char": "❤️‍🩹", "name": "mending heart" },
+    { "char": "🔔", "name": "bell" },
+    { "char": "🔕", "name": "bell with slash" },
+    { "char": "✔️", "name": "check mark" },
+    { "char": "❌", "name": "cross mark" },
+    { "char": "❓", "name": "question mark" },
+    { "char": "❔", "name": "white question mark" },
+    { "char": "❗", "name": "exclamation mark" },
     { "char": "⚠️", "name": "warning" },
     { "char": "🚸", "name": "children crossing" },
     { "char": "⛔", "name": "no entry" },
@@ -1105,6 +1193,7 @@ const EMOJI_DATA = {
     { "char": "™️", "name": "trade mark" },
     { "char": "©️", "name": "copyright" },
     { "char": "®️", "name": "registered" },
+    { "char": "ℹ️", "name": "information" },
     { "char": "▶️", "name": "play button" },
     { "char": "⏸️", "name": "pause button" },
     { "char": "⏹️", "name": "stop button" },
@@ -1291,6 +1380,45 @@ const commandDefinitions = [
         type: "gif_picker",
         gifs: data.gifs,
         query
+      };
+    }
+  },
+  {
+    name: "+arena_invite",
+    description: "Share an invite link of your current Arena",
+    category: "Arena",
+    execute: async (args, senderId) => {
+      const userSnapshot = await usersRef.child(senderId).child("currentRoomId").get();
+      if (!userSnapshot.exists() || !userSnapshot.val()) return "❌ You are not currently in an Arena room.";
+
+      const roomId = userSnapshot.val();
+      const inviteUrl = `https://www.zendra.dedyn.io/Arena/arena.html?join=${roomId}`;
+      return {
+        type: "arena_invite",
+        roomId: roomId,
+        inviteUrl: inviteUrl,
+      };
+    }
+  },
+  {
+    name: "+arena_join",
+    description: "Join a Zentral Arena with RoomID",
+    category: "Arena",
+    execute: async (args) => {
+      const roomId = args[0];
+      if (!roomId) return `❌ Please provide a room ID.\n\`+arena_join <room-id>\``;
+
+      const roomSnapshot = await firebase.database().ref("rooms").child(roomId).get();
+      if (!roomSnapshot.exists()) return `❌ Room \`${roomId}\` does not exist.`;
+
+      const redirectUrl = `https://www.zendra.dedyn.io/Arena/arena.html?join=${roomId}`;
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1500);
+
+      return {
+        type: "arena_redirect",
+        roomId: roomId
       };
     }
   },
@@ -2998,6 +3126,26 @@ function messageEmbed(data) {
           </div>
           ${rows}
         </div>`;
+    }
+
+    case "arena_invite": {
+      const { roomId, inviteUrl } = data.embedData;
+
+      return `
+      <div class="bubble-embed arena-card">
+        <div class="arena-name">Zentral Arena</div>
+        <div class="arena-body">
+          <div class="arena-text">
+            Join room <code class="inline-code">${roomId}</code> to play together now! The battle is starting soon.
+          </div>
+          <a href="${inviteUrl}" class="arena-btn">ACCEPT INVITE</a>
+        </div>
+      </div>`;
+    }
+
+    case "arena_redirect": {
+      const { roomId } = data.embedData;
+      return `✅ Redirecting you to Arena <code class="inline-code">${roomId}</code>`;
     }
   }
 }

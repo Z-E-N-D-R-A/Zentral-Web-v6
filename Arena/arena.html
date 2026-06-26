@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zentral-Web | Arena</title>
+
+    <link href="../Assets/Icon.png" rel="icon">
+    <link rel="stylesheet" href="../CSS/style.css">
+    <link rel="stylesheet" href="../CSS/arena.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../Assets/Logo.png" alt="Logo">
+            <span>Zendra クレイジー</span>
+        </div>
+        <nav class="nav-links">
+            <div class="mobile-header">MENU</div>
+            <a href="../index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-star"></i> <b>Zentral</b></span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="../Arena/arena.html"><i class="fa-solid fa-gamepad"></i> <b>Zentral Arena</b></a>
+                    <a href="../Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
+                    <a href="../zentral.html"><i class="fa-solid fa-book-open"></i> Learn More</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> More</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="../projects.html"><i class="fa-solid fa-layer-group"></i> Projects</a>
+                    <a href="../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="../Others/membership.html"><i class="fa-solid fa-star"></i> Membership</a>
+                    <a href="../others.html"><i class="fa-solid fa-box"></i> Others</a>
+                </div>
+            </div>
+        </nav>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div id="menu-container" class="container">
+        <div class="arena-header">
+            <div class="brand">
+                <a href="faq.html" class="accent-text">ZENTRAL ARENA</a>
+            </div>
+            <div class="user-tools">
+                <div id="header-action-btn" class="btn-primary neon-border" onclick="openCreateModal()">
+                    <span id="header-btn-text">+ <span class="responsive-text">CREATE ROOM</span></span>
+                </div>
+                <div id="chat-desktop-btn" class="btn-primary neon-border" onclick="toggleChat()"><i class="fa-solid fa-comment-dots"></i></div>
+                <div id="settings-btn" class="btn-primary neon-border" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
+            </div>
+        </div>
+        
+        <div class="arena-wrapper">
+            <div class="game-content-area">
+                <div class="arena-lobby">
+                    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+                    <div class="mobile-sidebar-toggle" onclick="toggleSidebar()"><i class="fa-solid fa fa-bars"></i> LOBBIES</div>
+            
+                    <div class="glass-panel sidebar" id="lobby-sidebar">
+                        <div class="panel-header sidebar-header">
+                            <div class="header-left"><span class="dot pulse"></span> LIVE LOBBIES</div>
+                            <button class="mobile-close-btn" onclick="toggleSidebar()">✕</button>
+                        </div>
+            
+                        <div id="roomList" class="room-list custom-scrollbar"></div>
+            
+                        <div class="sidebar-footer">
+                            <div class="join-id-wrapper">
+                                <input type="text" id="direct-join-input" placeholder="ENTER ARENA ID..." spellcheck="false">
+                                <button class="btn-join-arrow" onclick="handleDirectJoin()">➔</button>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <div class="glass-panel main-view" style="padding: 20px 0 0 0;">
+                        <div class="main-view-header">
+                            <div id="roomHeader" class="panel-header">SELECT AN ARENA TO BEGIN</div>
+                            <div class="header-actions-right">
+                                <div id="room-settings-btn" class="tiny-btn" onclick="openEditModal()" style="display:none;"><i class="fas fa-pencil-alt pencil-icon"></i></div>
+                                <div id="copy-id-btn" class="tiny-btn" onclick="copyRoomID()" style="display:none;"><i class="fas fa-copy copy-icon"></i></div>
+                                <div id="link-id-btn" class="tiny-btn" onclick="copyInviteLink()" style="display:none;"><i class="fas fa-link link-icon"></i></div>
+                            </div>
+                        </div>
+                        <div class="player-grid" id="players"></div>
+            
+                        <div class="action-bar-container">
+                            <div id="action-status" class="action-status"></div>
+                            <div id="roomControls" class="action-bar" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- SHU -->
+                <div class="arena-game shu" id="shu-table" style="display:none;">
+                    <div class="shu-opponents">
+                        <div id="shu-opp-top" class="shu-opp-slot"></div>
+                        <div id="shu-opp-left" class="shu-opp-slot"></div>
+                        <div id="shu-opp-right" class="shu-opp-slot"></div>
+                    </div>
+            
+                    <div class="table-surface">
+                        <div class="deck-area">
+                            <div class="card-stack" onclick="handleShuAction('draw')">
+                                <div class="shu-card deck-back layer-3"></div>
+                                <div class="shu-card deck-back layer-2"></div>
+                                <div class="shu-card deck-back layer-1"><span>SHU</span></div>
+                            </div>
+                            <div class="deck-label" id="draw-label">DRAW</div>
+                        </div>
+            
+                        <div class="discard-area">
+                            <div id="discard-pile" class="discard-slot"></div>
+                            <div class="deck-label">DISCARD</div>
+                        </div>
+            
+                        <div class="shu-btn-area">
+                            <button id="shu-shout" class="shu-shout-btn" onclick="handleShuClick()">SHU!</button>
+                        </div>
+                    </div>
+            
+                    <div class="game-meta">
+                        <h2 id="current-turn-name">YOUR TURN</h2>
+                        <div id="shu-direction" class="meta-badge">順 CW</div>
+                        <div class="btn-skip" id="shu-skip-button" onclick="hostSkipPlayer()" style="display: none;">SKIP PLAYER
+                        </div>
+                    </div>
+
+                    <div id="tutorial-trigger" class="hud-btn-container" onclick="openTutorial()">
+                        <div class="hud-btn-inner"><i class="fa-solid fa-book-open"></i></div>
+                    </div>
+            
+                    <div class="my-shu-area">
+                        <div id="my-shu-hand" class="hand-scroll custom-scrollbar"></div>
+                    </div>
+                </div>
+            
+                <!-- BLACKJACK -->
+                <div class="arena-game blackjack" id="blackjack-table" style="display:none;">
+                    <div class="game-meta">
+                        <h2 id="bj-turn-name">YOUR TURN</h2>
+                        <div id="bj-status-msg" class="meta-badge">EYES ON THE DEALER</div>
+                        <div class="btn-skip" id="bj-skip-button" onclick="hostSkipPlayer()" style="display: none;">SKIP PLAYER</div>
+                    </div>
+
+                    <div id="tutorial-trigger" class="hud-btn-container" onclick="openTutorial()">
+                        <div class="hud-btn-inner"><i class="fa-solid fa-book-open"></i></div>
+                    </div>
+            
+                    <div class="bj-dealer-area">
+                        <div id="dealer-hand" class="bj-hand-row"></div>
+                        <div class="bj-badge">DEALER: <span id="dealer-score-val">?</span></div>
+                    </div>
+            
+                    <div class="bj-players-row">
+                        <div id="bj-opponents-left" class="opp-group"></div>
+            
+                        <div class="my-bj-area">
+                            <div id="my-bj-hand" class="bj-hand-row"></div>
+                            <div class="bj-player-info">
+                                <div class="bj-score">SCORE: <span id="my-score-val">0</span></div>
+                                <div class="bj-points" style="font-size: 12px;">WINS: <span id="my-points-val" style="font-size: large;">○ ○ ○</span></div>
+                                <div id="bj-controls" class="bj-btn-group" style="display:none;">
+                                    <div class="btn-bj hit" onclick="handleBJMove('hit')">HIT</div>
+                                    <div class="btn-bj stand" onclick="handleBJMove('stand')">STAND</div>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div id="bj-opponents-right" class="opp-group"></div>
+                    </div>
+                </div>
+
+                <!-- POKER -->
+                <div class="arena-game poker" id="poker-table" style="display:none;">
+                    <div class="game-meta">
+                        <h2 id="poker-turn-name">YOUR TURN</h2>
+                        <div id="poker-status-msg" class="meta-badge">EYES ON THE DEALER</div>
+                        <div class="btn-skip" id="poker-skip-button" onclick="hostSkipPlayer()" style="display: none;">SKIP PLAYER</div>
+                    </div>
+
+                    <div id="tutorial-trigger" class="hud-btn-container" onclick="openTutorial()">
+                        <div class="hud-btn-inner"><i class="fa-solid fa-book-open"></i></div>
+                    </div>
+
+                    <div class="poker-board">
+                        <div id="poker-pot" class="poker-pot"><i class="fa-solid fa-piggy-bank"></i> POT: <span id="poker-pot-val">0</span></div>
+                        <div id="poker-community" class="poker-community-row"></div>
+                    </div>
+                
+                    <div class="poker-players-row">
+                        <div id="poker-opps-left" class="opp-group"></div>
+                
+                        <div class="my-poker-seat">
+                            <div class="poker-hand" id="my-poker-cards"></div>
+                            <div class="poker-controls-panel">
+                                <div class="poker-stats">
+                                    <span class="chips-total"><i class="fa-solid fa-wallet"></i> <span id="my-chips-val">1000</span></span>
+                                    <span class="current-bet-tag"><i class="fa-solid fa-coins"></i> <span id="my-bet-val">0</span></span>
+                                </div>
+                                <div id="poker-actions" class="poker-btn-grid" style="display:none;">
+                                    <div class="poker-btn fold" onclick="handlePokerMove('fold')">FOLD</div>
+                                    <div class="btn-primary" id="call-btn" onclick="handlePokerMove('call')">CHECK/CALL</div>
+                                    <div class="poker-btn raise" id="raise-toggle-btn">RAISE</div>
+                                </div>
+
+                                <div id="raise-slider-container" class="poker-raise-container">
+                                    <div class="poker-raise-slider">
+                                        <span>Amount: <b id="raise-amount-label">50</b></span>
+                                        <button class="poker-btn raise-confirm" onclick="confirmRaise()">CONFIRM</button>
+                                    </div>
+                                    <input type="range" id="poker-raise-slider" style="width: 100%;" step="10">
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div id="poker-opps-right" class="opp-group"></div>
+                    </div>
+                </div>
+
+                <!-- BIG 2 -->
+                <div class="arena-game big2" id="big2-table" style="display:none;">
+                    <div class="game-meta">
+                        <h2 id="pres-turn-name">YOUR TURN</h2>
+                        <div id="pres-status-msg" class="meta-badge">WAITING FOR LEAD...</div>
+                        <div class="btn-skip" id="pres-skip-button" onclick="hostSkipPlayer()" style="display: none;">SKIP PLAYER</div>
+                    </div>
+
+                    <div id="tutorial-trigger" class="hud-btn-container" onclick="openTutorial()">
+                        <div class="hud-btn-inner"><i class="fa-solid fa-book-open"></i></div>
+                    </div>
+                
+                    <div class="pres-center">
+                        <div class="pile-container">
+                            <div id="pres-discard-pile" class="hand-display"></div>
+                            <div id="pres-pile-info" class="pile-badge">EMPTY</div>
+                        </div>
+                    </div>
+                
+                    <div class="pres-players-row">
+                        <div id="pres-opps-left" class="opp-group"></div>
+                
+                        <div class="my-pres-area">
+                            <div class="pres-score">YOU (<span id="my-pres-penalty">0</span>/18)</div>
+                            <div id="my-pres-hand" class="pres-hand custom-scrollbar"></div>
+                            <div class="pres-controls">
+                                <div id="pres-actions" class="pres-btn-grid" style="display:none;">
+                                    <button class="btn-bj hit" id="btn-play-cards" onclick="handlePresPlay()">PLAY SELECTED</button>
+                                    <button class="btn-bj stand" onclick="handlePresPass()">PASS</button>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div id="pres-opps-right" class="opp-group"></div>
+                    </div>
+                </div>
+
+                <!-- MAHJONG -->
+                <div class="arena-game mahjong" id="mahjong-table" style="display:none;">
+                    <div id="mj-mobile-opps" class="mj-opp-scroll-container"></div>
+
+                    <div class="game-meta" style="gap: 0;">
+                        <h2 id="mj-turn-name" style="font-size: 15px;">YOUR TURN</h2>
+                        <div id="mj-status-msg" class="meta-badge">EAST WIND</div>
+                        <div class="btn-skip" id="mj-skip-button" onclick="hostSkipPlayer()" style="display: none; font-size: 8px;">SKIP PLAYER</div>
+                    </div>
+
+                    <div id="tutorial-trigger" class="hud-btn-container" onclick="openTutorial()">
+                        <div class="hud-btn-inner"><i class="fa-solid fa-book-open"></i></div>
+                    </div>
+
+                    <div id="mj-opp-top" class="mj-opp-side top"></div>
+                    <div id="mj-opp-left" class="mj-opp-side left"></div>
+
+                    <div class="mj-center">
+                        <div class="mj-wall-container">
+                            <div id="mj-wall-top" class="mj-wall-side top"></div>
+                            <div id="mj-wall-bottom" class="mj-wall-side bottom"></div>
+                            <div id="mj-wall-left" class="mj-wall-side left"></div>
+                            <div id="mj-wall-right" class="mj-wall-side right"></div>
+                    
+                            <div class="mj-inner-pit">
+                                <div id="mj-discard-pile" class="mj-discard-pit"></div>
+                                <div id="wall-label" class="wall-label">Tiles Remaining: <span id="mj-wall-count">144</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="mj-opp-right" class="mj-opp-side right"></div>
+                
+                    <div class="mj-player-row bottom">
+                        <div id="my-revealed" class="mj-revealed-row" style="margin-bottom: 5px;"></div>
+                        <div id="my-mj-hand" class="mj-hand"></div>
+
+                        <div class="mj-controls">
+                            <div id="mj-chow-selector"></div>
+                            <button class="btn-mj discard" id="btn-mj-discard" onclick="handleMJAction('discard')" style="display:none;">DISCARD</button>
+                            <button class="btn-mj chow" id="btn-mj-chow" onclick="toggleChowMenu()" style="display:none;">CHOW (上)</button>
+                            <button class="btn-mj pong" id="btn-mj-pong" onclick="handleMJAction('pong')" style="display:none;">PONG (碰)</button>
+                            <button class="btn-mj kong" id="btn-mj-kong" onclick="handleMJAction('kong')" style="display:none;">KONG (杠)</button>
+                            <button class="btn-mj kong" id="btn-mj-exchange-flowers" onclick="handleMJAction('exchangeFlowers')" style="display:none;">Replace Flowers (補牌)</button>
+                            <button class="btn-mj kong" id="btn-mj-flower-done" onclick="handleMJAction('nextFlowerPlayer')" style="display:none;">Finish</button>
+                            <button class="btn-mj mahjong" id="btn-mj-mahjong" onclick="handleMJAction('mahjong')" style="display:none;">MAHJONG (麻將)</button>
+                        </div>
+
+                        <div id="mj-chow-overlay" class="mj-selection-overlay" style="display:none;">
+                            <div class="overlay-header">SELECT COMBINATION</div>
+                            <div id="mj-chow-options-list" class="options-scroll"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chat-sidebar" class="chat-content-area">
+                <div class="chat-drawer glass-panel">
+                    <div class="panel-header">ARENA CHAT</div>
+                    <iframe src="" id="chat-frame"></iframe>
+                </div>
+            </div>
+        </div>
+        <div id="chat-mobile-btn" onclick="toggleChat()"><i class="fa-solid fa-comment-dots"></i></div>
+    </div>
+    <div id="chat-overlay" class="chat-blur-overlay" onclick="toggleChat()"></div>
+    
+    <div id="result-overlay" class="game-over-overlay" style="display: none;">
+        <div class="result-card glass-panel">
+            <div class="result-header">
+                <div id="result-title">MATCH OVER</div>
+                <div class="header-line"></div>
+            </div>
+    
+            <div id="winner-display" class="winner-display">
+                <img id="result-avatar" src="" class="result-avatar" />
+                <div id="result-winner-name"></div>
+            </div>
+    
+            <div id="result-description" class="result-description"></div>
+    
+            <div class="result-actions">
+                <div id="host-result-controls" class="controls-group" style="display: none;">
+                    <button class="btn-primary glow-effect" onclick="rematch()">PROCEED</button>
+                    <button class="btn-primary leave-style" onclick="deleteEntireRoom()">LEAVE</button>
+                </div>
+    
+                <div id="player-result-controls" class="controls-group" style="display: none;">
+                    <div class="waiting-loader">
+                        <div class="dot-pulse"></div>
+                        <span class="result-msg">Waiting for host...</span>
+                    </div>
+                    <button class="btn-primary leave-style" onclick="leaveArena()">LEAVE ARENA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tutorial-overlay" class="game-over-overlay tutorial" style="display: none;" onclick="closeTutorial(event)">
+        <div class="tutorial-card glass-panel" onclick="event.stopPropagation()">
+            <div class="tutorial-header">
+                <div id="tutorial-game-title">ARENA GUIDE</div>
+                <div class="header-line"></div>
+                <button class="close-x" onclick="closeTutorial()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+    
+            <div id="tutorial-content" class="tutorial-body"></div>
+        </div>
+    </div>
+
+    <div id="color-picker-overlay" style="display: none;" onclick="closeColorPicker()">
+        <div class="result-card glass-panel" onclick="event.stopPropagation()">
+            <h2>SELECT COLOR</h2>
+            <div class="color-grid">
+                <div class="color-opt red" onclick="selectWildColor('red')"></div>
+                <div class="color-opt blue" onclick="selectWildColor('blue')"></div>
+                <div class="color-opt green" onclick="selectWildColor('green')"></div>
+                <div class="color-opt yellow" onclick="selectWildColor('yellow')"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-room-modal">
+        <div class="result-card glass-panel" style="max-width: 450px;">
+            <h2 style="color: var(--accent); margin-bottom: 20px;">ARENA SETUP</h2>
+    
+            <div class="setup-group">
+                <label>GAMEMODE</label>
+                <div class="custom-select" id="gamemode-select">
+                    <div class="select-trigger" onclick="toggleDropdown()">
+                        <span id="selected-gamemode">SHU</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="select-options" id="gamemode-options">
+                        <div class="option" onclick="selectOption('SHU')">SHU</div>
+                        <div class="option" onclick="selectOption('Mahjong')">MAHJONG</div>
+                        <div class="option" onclick="selectOption('Big2')">BIG 2</div>
+                        <div class="option" onclick="selectOption('Blackjack')">BLACKJACK</div>
+                        <div class="option" onclick="selectOption('Poker')">POKER</div>
+                    </div>
+                </div>
+                <input type="hidden" id="setup-gamemode" value="SHU">
+            </div>
+    
+            <div class="setup-group">
+                <label>VISIBILITY</label>
+                <div class="toggle-group">
+                    <button id="btn-public" class="active" onclick="setVisibility('public')">PUBLIC</button>
+                    <button id="btn-private" onclick="setVisibility('private')">PRIVATE</button>
+                </div>
+            </div>
+    
+            <div class="setup-group">
+                <label>MAX PLAYERS</label>
+                <div class="counter-group">
+                    <button class="btn-counter" onclick="adjustMaxPlayers(-1)">-</button>
+                    <span id="max-player-val">4</span>
+                    <button class="btn-counter" onclick="adjustMaxPlayers(1)">+</button>
+                </div>
+            </div>
+
+            <div class="setup-actions">
+                <button id="modal-confirm-btn" class="btn-primary" onclick="confirmCreateRoom()">CREATE</button>
+                <button class="btn-primary leave-style" onclick="closeCreateModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mj-setup-modal" class="game-over-overlay" style="display: none;">
+        <div class="result-card glass-panel" style="max-width: 400px;">
+            <div class="result-header">
+                <div id="result-title">MAHJONG SETUP</div>
+                <div class="header-line"></div>
+            </div>
+
+            <div class="setup-group">
+                <label>PREVAILING WIND (圈風)</label>
+                <div class="wind-toggle-group">
+                    <button id="btn-east" class="active" onclick="setWind('East')">EAST (東)</button>
+                    <button id="btn-south" onclick="setWind('South')">SOUTH (南)</button>
+                    <button id="btn-west" onclick="setWind('West')">WEST (西)</button>
+                    <button id="btn-north" onclick="setWind('North')">NORTH (北)</button>
+                </div>
+            </div>
+    
+            <div class="setup-group">
+                <label>MINIMUM FAN (起糊番數)</label>
+                <div class="counter-group">
+                    <button class="btn-counter" onclick="adjustMinFan(-1)">-</button>
+                    <span id="mj-min-fan-val">1</span>
+                    <button class="btn-counter" onclick="adjustMinFan(1)">+</button>
+                </div>
+            </div>
+    
+            <div class="result-actions" style="margin-top: 20px;">
+                <button class="btn-primary start neon-glow" onclick="confirmMJStart()">START MATCH</button>
+                <button class="btn-primary leave-style" onclick="closeMJSetup()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="prompt" class="prompt">
+        <div class="prompt-container">
+            <h3 class="prompt-header">Welcome to Zentral Arena</h3>
+    
+            <div class="prompt-section">
+                <div class="prompt-title"><b>Pick a Username</b></div>
+                <div class="prompt-description">
+                    Start instantly as a guest. You can secure your account later.
+                </div>
+    
+                <input id="prompt-name" placeholder="Username" maxlength="30" />
+                <div id="prompt-error" class="prompt-error"></div>
+    
+                <button id="prompt-join" class="joinBtn">Enter as Guest</button>
+            </div>
+    
+            <div class="prompt-divider"><span>OR</span></div>
+    
+            <button id="prompt-google" class="prompt-google">
+                <svg xmlns="http://www.w3.org" viewBox="0 0 48 48" width="20px" height="20px">
+                    <path fill="#EA4335"
+                        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                    <path fill="#4285F4"
+                        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                    <path fill="#FBBC05"
+                        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                    <path fill="#34A853"
+                        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    <path fill="none" d="M0 0h48v48H0z" />
+                </svg>
+                <span>Continue with Google</span>
+            </button>
+    
+            <div class="prompt-description center">
+                By continuing, you agree to the
+                <a href="../Chat/terms.html">Terms & Conditions</a>.
+            </div>
+        </div>
+    </div>
+    
+    <div id="google-username-prompt" class="prompt" style="display: none;">
+        <div class="prompt-container">
+            <h3 class="prompt-header">Almost There 🚀</h3>
+    
+            <div class="prompt-title"><b>Choose Your Display Name</b></div>
+            <div class="prompt-description">Pick the name others will see in chat.</div>
+    
+            <input id="google-username-input" maxlength="30" />
+            <div id="google-username-error" class="prompt-error"></div>
+            <button id="google-username-confirm" class="joinBtn"> Create Account </button>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="settings-modal hidden">
+        <div class="settings-modal-content">
+            <h3>User Settings</h3>
+
+            <div class="account-item">
+                <span class="account-title">Username</span>
+                <span class="account-title">@<span id="accountUsername">—</span></span>
+            </div>
+            
+            <div class="setting-item account-setting" style="padding-top: 10px;">
+                <div class="account-item badge-row">
+                    <span class="account-title">Badge</span>
+                
+                    <div class="badge-selector">
+                        <button id="badgeButton" class="badge-button">
+                            <span id="equippedBadge">None ▾</span>‎
+                        </button>
+                
+                        <div id="badgeDropdown" class="badge-dropdown hidden">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="account-item badge-row">
+                    <span class="account-title">Arena Wins</span>
+                    <span id="winText" class="account-title">0</span>
+                </div>
+            </div>
+    
+            <div class="setting-item icon-setting">
+                <span>Profile Icon</span>
+    
+                <div class="icon-carousel">
+                    <button class="carousel-arrow left" id="iconPrev">❮</button>
+    
+                    <div class="icon-viewport">
+                        <div class="icon-grid" id="iconGrid"></div>
+                    </div>
+    
+                    <button class="carousel-arrow right" id="iconNext">❯</button>
+                </div>
+    
+                <div class="google-icon-wrapper" id="googleIconWrapper"></div>
+            </div>
+    
+            <div class="setting-item" style="flex-direction: column; border-bottom: 0px;">
+                <span style="margin-bottom: 5px;">Google Account</span>
+                <div class="google-setting">
+                    <div id="googleActionBtn" class="google-btn">
+                        <svg xmlns="http://www.w3.org" viewBox="0 0 48 48" width="20px" height="20px">
+                            <path fill="#EA4335"
+                                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                            <path fill="#4285F4"
+                                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                            <path fill="#FBBC05"
+                                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                            <path fill="#34A853"
+                                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                            <path fill="none" d="M0 0h48v48H0z" />
+                        </svg>
+                        <span id="googleBtnText">Continue with Google</span>
+                    </div>
+                </div>
+    
+                <div id="googleStatus" class="google-status">Checking...</div>
+            </div>
+    
+            <button id="closeSettings" class="close-settings-btn" onclick="closeSettingsModal()">Close</button>
+        </div>
+    </div>
+
+    <div id="arenaMessage"><h3></h3><p></p></div>
+
+    <div id="banned-screen" class="hidden">
+        <div class="banned-content">
+            <div class="glitch-wrapper">
+                <h1 class="banned-glitch" data-text="ACCESS DENIED">ACCESS DENIED</h1>
+            </div>
+            <div class="banned-icon"><i class="fas fa-user-slash"></i></div>
+            <p class="banned-message">Your account has been flagged and restricted from <span>Zentralverse</span>.</p>
+        </div>
+    </div>
+    
+    <div id="intro-overlay">
+        <video id="intro-video" autoplay muted playsinline preload="auto">
+            <source src="../Assets/Intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
+        </div>
+        2026 Zentral-Web | Powered by KuraWorks
+    </footer>
+    
+    <script>
+        const overlay = document.getElementById('intro-overlay');
+        const video = document.getElementById('intro-video');
+        const mainContent = document.getElementById('menu-container');
+
+        var path = "../"; 
+
+        function revealSite() {
+            mainContent.style.display = 'block';
+            video.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 1200);
+            }, 1000);
+        }
+
+        if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
+            overlay.style.display = 'none';
+            mainContent.style.display = 'block';
+        } else {
+            video.ontimeupdate = function () {
+                if (video.duration - video.currentTime <= 1.2) {
+                    video.ontimeupdate = null;
+                    revealSite();
+                }
+            };
+
+            video.onended = () => { if (overlay.style.display !== 'none') revealSite(); };
+        }
+    </script>
+    <script src="../script.js"></script>
+    <script src="arena.js"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Zentral-Web | Terminal</title>
+    <link href="../Assets/Icon.png" rel="icon">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -256,7 +257,7 @@
         <div id="terminalWrapper">
             <div id="terminalWindow">
                 <div id="terminalBar">
-                    <span class="terminal-title">ZENTRAL TERMINAL v6.1.1</span>
+                    <span class="terminal-title">ZENTRAL TERMINAL v6.2.0</span>
                     <div class="terminal-controls">
                         <button id="minBtn">—</button>
                         <button id="fullBtn">▢</button>
@@ -301,85 +302,87 @@
         const glitchLayer = document.getElementById("glitchLayer");
 
         const bootLines = [
-            { proc: "> SYSTEM ONLINE. Preparing initialization sequence"},
-            { text: "  Zentral-Web v6.0.2  (c) Z.E.N.D.R.A" },
+            { proc: "> SYSTEM ONLINE." },
+            { text: "  Zentral-Web v6.2.0  (c) Z.E.N.D.R.A CORE" },
             { text: " " },
-            { text: "  Initializing kernel modules" },
-            { load: "  Loading C:\\zentral\\core.sys" },
-            { load: "  Loading C:\\zentral\\memory.dat" },
-            { text: "  [WARN] [MEM-123] Entropy levels exceed safe threshold", type: "warn" },
-            { text: "  Linking node: KURA" },
-            { text: "  [ERROR] [NODE-902] Unexpected response from KURA", type: "error" },
-            { text: "  Error Log at C:\\zentral\\logs\\node902.err" },
+            { text: "  Mounting encrypted drives..." },
+            { load: "  Loading C:\\zentral\\zen_bot.sys" },
+            { load: "  Loading C:\\zentral\\seismic_data.dat" },
+            { text: "  [WARN] [ANOMALY-12] Extreme tectonic instability approaching.", type: "warn" },
+            { text: "  Establishing link: Entity KURA" },
+            { text: "  [STATUS] KURA node active. Resonance: High." },
             { text: " " },
-            { proc: "  Attempting recovery" },
-            { text: "  System stabilized." },
-            { text: "> TYPE \"cmd\" TO CONTINUE" }
+            { proc: "  Calibrating temporal sensors" },
+            { text: "  System stabilized. Awaiting input." },
+            { text: "> TYPE \"help\" TO VIEW AVAILABLE ARCHIVES" }
         ];
 
         const commands = {
-            cmd() {
-                print("  AVAILABLE COMMANDS:");
-                print("  scan   status   whoami   dir     read core.log");
-                print("  kura   zendra   uptime   clear   disconnect");
+            help() {
+                print("  [ SYSTEM ARCHIVES DIRECTORY ]");
+                print("  read log_seismic     - Tectonic event logs");
+                print("  read report_143      - Official scientific investigation");
+                print("  read file_rbsc002    - View urban planning blueprints");
+                print("  play record_gem      - Classified audio transcript");
+                print("  ping zen             - Access legacy AI uplink");
+                print("  clear                - Clear terminal display");
+                print("  disconnect           - Exit system");
             },
 
-            dir() {
-                print("  C:\\zentral>");
-                print("   core.sys");
-                print("   memory.dat");
-                print("   kura.node");
-                print("   zen.node");
+            "read log_seismic"() {
+                print("  [TECTONIC EVENT LOG]");
+                print("  - OCT 25th, 1998: Minor tremors detected.");
+                print("  - MAY 31st, 2005: Localized flooding and landslides. Expected seasonal shift.");
+                print("  - JAN 23rd, 2008: Major earthquake. Volcano Eruptions.");
+                print("  - MAR 20th, 2014: Minor tremors. Stabilized instantly.");
+                print("  - JAN 23rd, 2023: Massive rupture event. Blue moon resonance recorded.");
             },
 
-            status() {
-                print("  STAGE: STELLAR IGNITION")
-                print("  ZENTRAL CORE: STABLE");
-                if (sigilUnlocked) {
-                    print("  SIGIL: ACTIVE");
-                    print("  REALITY BLEED DETECTED.");
-                } else {
-                    print("  SIGIL: INACTIVE");
-                    print("  ENTROPY: RISING");
-                }
+            "read report_143"() {
+                print("  [REPORT #143] LUNAR & SEISMIC ANOMALY");
+                print("  AGENCY: Distant City Meteorological & Anomalous Phenomenon Bureau");
+                print("  FINDINGS: The blue hue observed during the earthquake was initially theorized");
+                print("  as Rayleigh scattering combined with piezoelectric flashes. However,");
+                print("  atmospheric samples show unexplained high-density ethereal residue.");
+                print("  The earthquake's epicenter abruptly stabilized, resulting in a");
+                print("  statistically impossible dissipation of kinetic energy.");
+                print("  CONCLUSION: The locals credit a 'fox' named Kura. Science has no");
+                print("  alternative explanation. Case closed.");
             },
 
-            whoami() {
-                print("  USER: ZENTRAL");
-                print("  ROLE: VILLAGER");
+            "read file_rbsc002"() {
+                print("  [ARCHIVE: RBSC002] CITY OF DREAMS");
+                print("  AUTHOR: Zendra");
+                print("  STATUS: Concept Abandoned / Partially Integrated");
+                print("  DESCRIPTION: Massive urban planning blueprint drafted by Zendra");
+                print("  while stranded in the village following the Great Quake.");
+                print("  It featured a vibrant metropolis with airports, theme parks, and racing tracks.");
+                print("  While the full metropolis was never realized, current Zentralverse infrastructure");
+                print("  (the warehouse, plazas, and rail networks) was directly adapted from these files.");
             },
 
-            uptime() {
-                print("  SYSTEM UPTIME: 00:13:42");
-            },
-
-            scan() {
-                print("  SCANNING SYSTEM...");
+            "play record_gem"() {
+                print("  [SYSTEM] DECRYPTING AUDIO TRANSCRIPT...");
                 setTimeout(() => {
-                    print("  NODE DETECTED: KURA");
-                    print("  STATE: UNBOUND");
-                }, 600);
+                    print("  [MAISIE]: \"It was discovered in 1948. The Time Gem.\"");
+                    print("  [BROCK]: \"Man, it's just a rock. A really shiny, hex-shaped purple rock.\"");
+                    print("  [FANG]: \"You're telling me this little glowing rock controls time?\"");
+                    print("  [MAISIE]: \"Not just time, Fang. The timeline. The spirit realm. Everything.\"");
+                    print("  [MAISIE]: \"It holds a link to a realm beyond ours. If the legends are true,\"");
+                    print("  [MAISIE]: \"whoever wields it... they don't just survive disasters.\"");
+                    print("  [MAISIE]: \"They rewrite them.\"");
+                }, 1200);
             },
 
-            "read core.log"() {
-                print("  [LOG 4431] node902 response timeout at 14:32:10");
-                print("   Kura module unresponsive, split detected.");
-            },
-
-            kura() {
-                print("  Tracing KURA...");
+            "ping zen"() {
+                print("  [SYSTEM] Pinging legacy bot framework ZEN (v6.0 Rirodo)...");
                 setTimeout(() => {
-                    print("  TRACE FAILED.");
-                    print("  K.U.R.A IS OFFLINE.");
-                }, 700);
-            },
-
-            zendra() {
-                print("  Tracing ZENDRA...");
-                setTimeout(() => {
-                    print("  TRACE FAILED.");
-                    print("  Z.E.N.D.R.A IS OFFLINE.");
-                }, 700);
+                    print("  [ZEN]: Uplink established. Hello, Zendra.");
+                    print("  [ZEN]: Predictive models indicate extreme tectonic instability approaching soon.");
+                    print("  [ZEN]: I have analyzed all 1,008,143 possibilities.");
+                    print("  [ZEN]: You cannot stop it as you are now. You must find the hexagonal artifact.");
+                    print("  [ZEN]: Good luck, Z.E.N.D.R.A and KIBO...");
+                }, 1500);
             },
 
             disconnect() {
@@ -391,16 +394,7 @@
                 body.innerHTML = "";
                 history = [];
                 historyIndex = -1;
-                print(`> TYPE "cmd" TO CONTINUE`);
-            },
-
-            "sigil unlock"() {
-                sigilUnlocked = true;
-                print("  SIGIL UNLOCKED.");
-            },
-
-            "echo zentral"() {
-                print("  ZENTRAL");
+                print(`> TYPE "help" TO VIEW AVAILABLE ARCHIVES`);
             }
         };
 

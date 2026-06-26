@@ -1,31 +1,307 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zentral-Web | Membership</title>
 
     <link href="../Assets/Icon.png" rel="icon">
     <link href="../CSS/style.css" rel="stylesheet">
-    <link href="../CSS/others.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <style>
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
         }
-
+    
         body {
             font-family: 'Inter', sans-serif;
             background: #000;
             color: #fff;
             overflow-x: hidden;
         }
-
-        .section { margin-top: 80px; }
+    
+        canvas {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+        }
+    
+        .section {
+            margin-top: 100px;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    
+        .ms-bg {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 60%, #000 100%);
+            z-index: -2;
+        }
+    
+        .ms-bg::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.1;
+            z-index: -1;
+            pointer-events: none;
+        }
+    
+        .ms-container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 120px 20px 80px;
+            text-align: center;
+        }
+    
+        .ms-container h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+    
+        .ms-header {
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #a78bfa, #00f2fe);
+            background-size: 300% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+            text-shadow: 0 0 30px rgba(79, 172, 254, 0.4);
+        }
+    
+        .ms-subheader {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+    
+        .ms-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #e2e8f0;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 0;
+            display: inline-block;
+        }
+    
+        .ms-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+    
+        .ms-card {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            padding: 40px 30px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+    
+        .ms-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, #38bdf8, #a78bfa, transparent);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: -1;
+        }
+    
+        .ms-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(167, 139, 250, 0.2);
+            background: rgba(30, 41, 59, 0.8);
+        }
+    
+        .ms-card:hover::before {
+            opacity: 1;
+        }
+    
+        .ms-card i {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #38bdf8, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    
+        .ms-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+    
+        .ms-card p {
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+    
+        .ms-button {
+            display: inline-block;
+            padding: 16px 40px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #38bdf8, #a78bfa);
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            animation: pulse-glow 2s infinite;
+        }
+    
+        .ms-button:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 10px 30px rgba(167, 139, 250, 0.8);
+            color: #fff;
+        }
+    
+        .faq-section {
+            max-width: 850px;
+            margin: 140px auto 0 auto;
+        }
+    
+        .section-title {
+            text-align: center;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            font-size: 2.5rem;
+        }
+    
+        .section-title span {
+            color: #a78bfa;
+            text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+        }
+    
+        .faq-item {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+    
+        .faq-question {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #f8fafc;
+            transition: color 0.3s ease;
+        }
+    
+        .faq-question:hover {
+            color: #38bdf8;
+        }
+    
+        .faq-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.4s ease;
+            color: #a78bfa;
+        }
+    
+        .faq-item.active {
+            background: rgba(167, 139, 250, 0.05);
+            border-color: rgba(167, 139, 250, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(167, 139, 250, 0.05);
+            transform: scale(1.02);
+        }
+    
+        .faq-item.active .faq-icon {
+            transform: rotate(135deg);
+            background: #a78bfa;
+            color: white;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.8);
+        }
+    
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 30px;
+            opacity: 0;
+            text-align: left;
+        }
+    
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-bottom: 30px;
+            opacity: 1;
+        }
+    
+        .faq-answer p {
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            font-size: 1.05rem;
+        }
+    
+        @keyframes shine {
+            to { background-position: 300% center; }
+        }
+    
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(167, 139, 250, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(167, 139, 250, 0); }
+        }
     </style>
 </head>
 
@@ -46,12 +322,13 @@
                 </div>
                 <div class="dropdown-content">
                     <a href="../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="../Arena/arena.html"><i class="fa-solid fa-gamepad"></i> Zentral Arena</a>
                     <a href="../Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
                     <a href="../zentral.html"><i class="fa-solid fa-book-open"></i> Learn More</a>
                 </div>
             </div>
             <div class="dropdown">
-                <div class="dropbtn"></a>
+                <div class="dropbtn">
                     <span><i class="fa-solid fa-ellipsis"></i> <b>More</b></span>
                     <i class="fa-solid fa-chevron-down small-arrow"></i>
                 </div>
@@ -83,16 +360,19 @@
 
             <div class="ms-cards">
                 <div class="ms-card">
+                    <i class="fa-solid fa-unlock-keyhole"></i>
                     <h3>Exclusive Access</h3>
                     <p>Unlock hidden features and private content unavailable to regular users.</p>
                 </div>
 
                 <div class="ms-card">
+                    <i class="fa-solid fa-id-badge"></i>
                     <h3>Custom Badges</h3>
                     <p>Stand out with a unique identity that signals achievement and recognition.</p>
                 </div>
 
                 <div class="ms-card">
+                    <i class="fa-solid fa-clock"></i>
                     <h3>Early Releases</h3>
                     <p>Access new updates, features, and contents before everyone else.</p>
                 </div>
@@ -104,16 +384,19 @@
 
             <div class="ms-cards">
                 <div class="ms-card">
+                    <i class="fa-solid fa-trophy"></i>
                     <h3>Win Events</h3>
                     <p>Compete in special events where only top performers earn membership.</p>
                 </div>
 
                 <div class="ms-card">
+                    <i class="fa-solid fa-gift"></i>
                     <h3>Giveaways</h3>
                     <p>Participate in exclusive giveaways where membership is rewarded.</p>
                 </div>
 
                 <div class="ms-card">
+                    <i class="fa-solid fa-medal"></i>
                     <h3>Be Recognized</h3>
                     <p>Outstanding contributions and activity may earn you a spot.</p>
                 </div>
@@ -133,9 +416,9 @@
                     <div class="faq-icon"><i class="fas fa-plus"></i></div>
                 </div>
                 <div class="faq-answer">
-                    <p>Social Giveaways: Participate in recurring giveaway events hosted across all our official social channels.<br>
-                        Exclusive Events: Join our live streams or community events designed to open up new membership slots.
-                        Contribution: Boost the Zentralverse by promoting our content or providing game-changing feedback and ideas.
+                    <p><strong>Social Giveaways:</strong> Participate in recurring giveaway events hosted across all our official social channels.<br><br>
+                        <strong>Exclusive Events:</strong> Join our live streams or community events designed to open up new membership slots.<br><br>
+                        <strong>Contribution:</strong> Boost the Zentralverse by promoting our content or providing game-changing feedback and ideas.
                     </p>
                 </div>
             </div>
@@ -196,7 +479,7 @@
                     <div class="faq-icon"><i class="fas fa-plus"></i></div>
                 </div>
                 <div class="faq-answer">
-                    <p>While not strictly required, we highly recommand linking your Google account to secure the account.</p>
+                    <p>While not strictly required, we highly recommend linking your Google account to secure the account.</p>
                 </div>
             </div>
         </div>
@@ -223,19 +506,19 @@
         canvas.height = window.innerHeight;
 
         let particles = [];
-        for (let i = 0; i < 80; i++) {
+        for (let i = 0; i < 100; i++) {
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                r: Math.random() * 2,
-                dx: (Math.random() - 0.5) * 0.5,
-                dy: (Math.random() - 0.5) * 0.5
+                r: Math.random() * 2 + 0.5,
+                dx: (Math.random() - 0.5) * 0.8,
+                dy: (Math.random() - 0.5) * 0.8,
+                opacity: Math.random() * 0.5 + 0.2
             });
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'rgba(255,255,255,0.7)';
 
             particles.forEach(p => {
                 p.x += p.dx;
@@ -245,6 +528,7 @@
                 if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
 
                 ctx.beginPath();
+                ctx.fillStyle = `rgba(167, 139, 250, ${p.opacity})`;
                 ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fill();
             });
@@ -258,12 +542,16 @@
             canvas.height = window.innerHeight;
         });
 
-        const sections=document.querySelectorAll('.section');
-        window.addEventListener('scroll',()=>{
-            sections.forEach(sec=>{
-                const rect=sec.getBoundingClientRect();
-                if(rect.top<window.innerHeight-100){sec.classList.add('visible')}
-            })
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(sec => {
+            observer.observe(sec);
         });
 
         document.querySelectorAll('.faq-item').forEach(item => {
@@ -271,7 +559,6 @@
                 document.querySelectorAll('.faq-item').forEach(otherItem => {
                     if (otherItem !== item) otherItem.classList.remove('active');
                 });
-
                 item.classList.toggle('active');
             });
         });

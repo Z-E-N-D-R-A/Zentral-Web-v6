@@ -33,14 +33,31 @@
         }
     
         h1 {
-            font-size: 50px;
-            letter-spacing: 4px;
-            margin: 40px 20px 0 20px;
-            color: var(--gold);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            border-bottom: 2px solid var(--gold);
-            padding-bottom: 10px;
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            margin: 50px 20px 10px 20px;
             text-align: center;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 10%, var(--gold) 50%, #b38f2d 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+            position: relative;
+            padding-bottom: 10px;
+        }
+    
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            border-radius: 2px;
         }
     
         button {
@@ -179,24 +196,25 @@
             font-size: 14px;
             color: #888;
         }
+    
         .result-msg {
             margin-top: 15px;
             color: var(--gold);
             font-family: 'Courier New', monospace;
         }
-
+    
         #username-section {
             padding: 8px;
             border-radius: 8px;
             text-align: center;
         }
-
+    
         #username-input {
             padding: 8px;
             border-radius: 4px;
             border: none;
         }
-
+    
         .save-btn {
             padding: 8px 15px;
             cursor: pointer;
@@ -215,7 +233,7 @@
             padding: 5px 20px;
             border-radius: 5px;
             border: 1px solid #333;
-            margin: 20px 5px 0 5px;
+            margin: 5px 5px 0 5px;
         }
     
         #bonus {
@@ -262,7 +280,8 @@
             transform: none;
         }
     
-        .tab-btn.active, .tab-btn:active {
+        .tab-btn.active,
+        .tab-btn:active {
             background: linear-gradient(var(--gold), var(--dark-gold));
             color: #000;
             font-weight: bold;
@@ -318,31 +337,89 @@
         .dice-chip-extend {
             width: 60px;
             height: 60px;
-            margin: 0;
+            margin: 8px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-family: Arial, sans-serif;
+            font-weight: 800;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #ffffff;
             cursor: pointer;
-            border: 4px dashed rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
-            transition: 0.2s;
-        }
-
-        .bj-chip,
-        .bj-chip-extend {
-            width: 50px;
-            height: 50px;
+            user-select: none;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4), inset 0 4px 4px rgba(255, 255, 255, 0.3), inset 0 -4px 6px rgba(0, 0, 0, 0.4);
+            position: relative;
+            transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.15s ease, filter 0.15s ease;
         }
     
-        .red { background: #b30000; }
-        .blue { background: #003399; }
-        .green { background: #006600; }
-        .white { background: #1f1f1f; }
-        .gold { background: #aa841e; }
-        .purple { background: #701eaa; font-size: 14px; }
+        .bj-chip,
+        .bj-chip-extend {
+            width: 52px;
+            height: 52px;
+        }
+    
+        .chip::after,
+        .bj-chip::after,
+        .roulette-chip::after,
+        .dice-chip::after,
+        .chip-extend::after,
+        .bj-chip-extend::after,
+        .roulette-chip-extend::after,
+        .dice-chip-extend::after {
+            content: '';
+            position: absolute;
+            width: 72%;
+            height: 72%;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.35);
+            box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+        
+        .black {
+            background: radial-gradient(circle, #2d3135 45%, #141619 85%);
+            background-image: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.3) 66%), conic-gradient(#141619);
+        }
+    
+        .blue {
+            background: radial-gradient(circle, #1a56b3 45%, #0b2f6b 85%);
+            background-image: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.2) 66%), conic-gradient(#0b2f6b);
+        }
+    
+        .green {
+            background: radial-gradient(circle, #0d7a33 45%, #054d1f 85%);
+            background-image: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.2) 66%), conic-gradient(#054d1f);
+        }
+    
+        .maroon {
+            background: radial-gradient(circle, #801328 45%, #4a0512 85%);
+            background-image: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.2) 66%), conic-gradient(#4a0512);
+        }
+    
+        .gold {
+            background: radial-gradient(circle, #d4af37 45%, #856404 85%);
+            font-size: 13px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            background-image: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.25) 66%), conic-gradient(#856404);
+        }
+    
+        .purple {
+            background: radial-gradient(circle, #6a259c 45%, #3c105e 85%);
+            background-image: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.2) 66%), conic-gradient(#3c105e);
+        }
+    
+        .chip span,
+        .bj-chip span,
+        .roulette-chip span,
+        .dice-chip span {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        }
+    
+        .white span {
+            text-shadow: none;
+        }
     
         .chip:hover,
         .bj-chip:hover,
@@ -352,8 +429,38 @@
         .bj-chip-extend:hover,
         .roulette-chip-extend:hover,
         .dice-chip-extend:hover {
-            transform: translateY(-5px);
-            filter: brightness(1.2);
+            transform: translateY(-6px) scale(1.03);
+            filter: brightness(1.1) saturate(1.1);
+            box-shadow:
+                0 12px 16px rgba(0, 0, 0, 0.35),
+                0 8px 0 rgba(0, 0, 0, 0.4),
+                inset 0 4px 4px rgba(255, 255, 255, 0.4),
+                inset 0 -4px 6px rgba(0, 0, 0, 0.4);
+        }
+    
+        .chip:active,
+        .bj-chip:active,
+        .roulette-chip:active,
+        .dice-chip:active,
+        .chip-extend:active,
+        .bj-chip-extend:active,
+        .roulette-chip-extend:active,
+        .dice-chip-extend:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5), inset 0 4px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .chip.selected,
+        .bj-chip.selected,
+        .roulette-chip.selected,
+        .dice-chip.selected,
+        .chip-extend.selected,
+        .bj-chip-extend.selected,
+        .roulette-chip-extend.selected,
+        .dice-chip-extend.selected {
+            transform: translateY(-8px) scale(1.05);
+            filter: brightness(1.25) saturate(1.1);
+            box-shadow: 0 0 0 2px #ffffff, 0 0 15px rgba(255, 215, 0, 0.6), 0 14px 20px rgba(0, 0, 0, 0.4), 0 8px 0 rgba(0, 0, 0, 0.4), inset 0 4px 4px rgba(255, 255, 255, 0.5); 
         }
     
         #bet-display {
@@ -1271,12 +1378,12 @@
                 <div class="betting-station">
                     <div class="station-header">PLACE YOUR BETS</div>
                     <div id="chips">
-                        <div class="chip red" data-amount="25">25</div>
+                        <div class="chip green" data-amount="25">25</div>
                         <div class="chip blue" data-amount="50">50</div>
-                        <div class="chip green" data-amount="100">100</div>
-                        <div class="chip white" data-amount="500">500</div>
-                        <div class="chip gold" data-amount="1000">1000</div>
-                        <div class="chip-extend purple" id="all-in">ALL IN</div>
+                        <div class="chip black" data-amount="100">100</div>
+                        <div class="chip purple" data-amount="500">500</div>
+                        <div class="chip maroon" data-amount="1000">1000</div>
+                        <div class="chip-extend gold" id="all-in">ALL IN</div>
                     </div>
 
                     <div id="bet-display">
@@ -1319,12 +1426,12 @@
                     </div>
 
                     <div id="roulette-chips">
-                        <div class="roulette-chip red" data-amount="25">25</div>
+                        <div class="roulette-chip green" data-amount="25">25</div>
                         <div class="roulette-chip blue" data-amount="50">50</div>
-                        <div class="roulette-chip green" data-amount="100" style="border: 4px solid white">100</div>
-                        <div class="roulette-chip white" data-amount="500">500</div>
-                        <div class="roulette-chip gold" data-amount="1000">1000</div>
-                        <div class="roulette-chip-extend purple" id="roulette-all-in">ALL IN</div>
+                        <div class="roulette-chip black selected" data-amount="100">100</div>
+                        <div class="roulette-chip purple" data-amount="500">500</div>
+                        <div class="roulette-chip maroon" data-amount="1000">1000</div>
+                        <div class="roulette-chip-extend gold" id="roulette-all-in">ALL IN</div>
                     </div>
 
                     <div id="bet-display">
@@ -1394,12 +1501,12 @@
                 <div class="betting-station">
                     <div class="station-header">PLACE YOUR BETS</div>
                     <div id="dice-chips">
-                        <div class="dice-chip red" data-amount="25">25</div>
+                        <div class="dice-chip green" data-amount="25">25</div>
                         <div class="dice-chip blue" data-amount="50">50</div>
-                        <div class="dice-chip green" data-amount="100">100</div>
-                        <div class="dice-chip white" data-amount="500">500</div>
-                        <div class="dice-chip gold" data-amount="1000">1000</div>
-                        <div class="dice-chip-extend purple" id="dice-all-in">ALL IN</div>
+                        <div class="dice-chip black" data-amount="100">100</div>
+                        <div class="dice-chip purple" data-amount="500">500</div>
+                        <div class="dice-chip maroon" data-amount="1000">1000</div>
+                        <div class="dice-chip-extend gold" id="dice-all-in">ALL IN</div>
                     </div>
 
                     <div id="bet-display">
@@ -1448,12 +1555,12 @@
 
                         <div id="bj-bet-btns">
                             <div class="bj-chip-row">
-                                <div class="bj-chip red" data-amount="25">25</div>
+                                <div class="bj-chip green" data-amount="25">25</div>
                                 <div class="bj-chip blue" data-amount="50">50</div>
-                                <div class="bj-chip green" data-amount="100">100</div>
-                                <div class="bj-chip white" data-amount="500">500</div>
-                                <div class="bj-chip gold" data-amount="1000">1000</div>
-                                <div class="bj-chip-extend purple" id="bj-all-in">ALL IN</div>
+                                <div class="bj-chip black" data-amount="100">100</div>
+                                <div class="bj-chip purple" data-amount="500">500</div>
+                                <div class="bj-chip maroon" data-amount="1000">1000</div>
+                                <div class="bj-chip-extend gold" id="bj-all-in">ALL IN</div>
                             </div>
                             <div class="reset-btn" onclick="resetBJBet()" style="background: #441010">CLEAR BET</div>
                             <button id="deal-btn" onclick="startBJGame()" class="deal-btn">DEAL CARDS</button>
@@ -2331,22 +2438,28 @@
         m.style.color = color;
     }
 
+    function clearChipSelection() {
+        document.querySelectorAll(".roulette-chip, .roulette-chip-extend, #roulette-all-in").forEach(c => {
+            c.classList.remove("selected");
+        });
+    }
+
     document.getElementById('roulette-all-in').addEventListener('click', () => {
         if (balance > 0) {
-            document.querySelectorAll(".roulette-chip").forEach(c => c.style.border = "4px dashed rgba(255, 255, 255, 0.5)");
-            document.querySelectorAll(".roulette-chip-extend").forEach(c => c.style.border = "4px dashed rgba(255, 255, 255, 0.5)");
-            document.getElementById('roulette-all-in').style.border = "4px solid white";
+            clearChipSelection();
+            document.getElementById('roulette-all-in').classList.add("selected");
             selectedChip = balance;
-        }  else setRouletteMsg("Insufficient Credits!", "#f00");
+        } else {
+            setRouletteMsg("Insufficient Credits!", "#f00");
+        }
     });
 
     document.querySelectorAll('.roulette-chip').forEach(chip => {
         chip.onclick = () => {
-            document.querySelectorAll(".roulette-chip").forEach(c => c.style.border = "4px dashed rgba(255, 255, 255, 0.5)");
-            document.querySelectorAll(".roulette-chip-extend").forEach(c => c.style.border = "4px dashed rgba(255, 255, 255, 0.5)");
-            chip.style.border = "4px solid white";
+            clearChipSelection();
+            chip.classList.add("selected");
             selectedChip = parseInt(chip.dataset.amount);
-        }
+        };
     });
 
     // Dice

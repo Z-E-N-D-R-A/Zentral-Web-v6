@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width = device-width, initial-scale = 1.0" />
+  <title>Zentral-Web | City of Dreams</title>
+
+  <link href="../../Assets/Icon.png" rel="icon">
+  <link href="../../CSS/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    :root {
+        --bg-metro-asphalt: #060913;
+        --surface-metro-tile: #0f1322;
+        --surface-metro-inner: #151b30;
+        --text-neon-cyan: #00e5ff;
+        --text-industrial-amber: #ff9100;
+        --text-pure-white: #ffffff;
+        --text-muted-slate: #8fa0b8;
+        --border-grid-line: #1e2640;
+        --notice-bg: rgba(244, 63, 94, 0.04);
+        --notice-border: #f43f5e;
+        --metro-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-metro-asphalt);
+        color: var(--text-pure-white);
+        font-family: var(--metro-font);
+        letter-spacing: 0.2px;
+    }
+
+    .metro-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 80px 24px 80px 24px;
+    }
+
+    .metro-notice-card {
+        display: flex;
+        background: var(--notice-bg);
+        border: 1px solid rgba(244, 63, 94, 0.3);
+        border-radius: 4px;
+        margin-bottom: 60px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .notice-stripe {
+        width: 6px;
+        background: var(--notice-border);
+    }
+
+    .notice-body {
+        padding: 24px;
+    }
+
+    .notice-title {
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        color: var(--notice-border);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .notice-body p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #cbd5e1;
+    }
+
+    .metro-hero {
+        margin-bottom: 60px;
+        position: relative;
+    }
+
+    .project-tag {
+        font-family: monospace;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: var(--text-neon-cyan);
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .skyline-title {
+        font-size: 52px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        margin: 0 0 16px 0;
+        text-transform: uppercase;
+        background: linear-gradient(180deg, #ffffff 40%, #a2b4dc 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .blueprint-line {
+        width: 100%;
+        height: 1px;
+        background: var(--border-grid-line);
+        position: relative;
+    }
+
+    .blueprint-line::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: -3px;
+        width: 7px;
+        height: 7px;
+        background: var(--text-neon-cyan);
+    }
+
+    .metro-split-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 50px;
+        align-items: center;
+        margin-bottom: 80px;
+    }
+
+    .grid-left-images {
+        position: relative;
+        height: 420px;
+        display: flex;
+        align-items: center;
+    }
+
+    .img-frame {
+        position: absolute;
+        width: 75%;
+        height: 280px;
+        background: var(--surface-metro-tile);
+        border: 1px solid var(--border-grid-line);
+        padding: 8px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+    }
+
+    .frame-alpha {
+        top: 10px;
+        left: 0;
+        z-index: 2;
+        border-top: 2px solid var(--text-neon-cyan);
+    }
+
+    .frame-beta {
+        bottom: 10px;
+        right: 0;
+        z-index: 1;
+        border-bottom: 2px solid var(--text-industrial-amber);
+    }
+
+    .img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: var(--text-muted-slate);
+        gap: 12px;
+    }
+
+    .img-placeholder i {
+        font-size: 24px;
+    }
+
+    .grid-right-content {
+        position: relative;
+    }
+
+    .grid-right-content h2 {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0 0 20px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .lead-paragraph {
+        font-size: 16.5px;
+        line-height: 1.7;
+        color: var(--text-pure-white);
+        margin-bottom: 16px;
+    }
+
+    .grid-right-content p {
+        font-size: 14.5px;
+        line-height: 1.65;
+        color: var(--text-muted-slate);
+        margin: 0 0 24px 0;
+    }
+
+    .promo-code-box {
+        background: var(--surface-metro-tile);
+        border: 1px solid var(--border-grid-line);
+        border-left: 3px solid var(--text-neon-cyan);
+        padding: 20px;
+        box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.02);
+    }
+
+    .promo-label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--text-neon-cyan);
+        margin-bottom: 8px;
+    }
+
+    .promo-string-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--surface-metro-inner);
+        padding: 12px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        margin-bottom: 10px;
+    }
+
+    .promo-key {
+        font-family: monospace;
+        font-size: 18px;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 1px;
+    }
+
+    .cash-value {
+        font-size: 12px;
+        font-weight: 800;
+        background: rgba(0, 229, 255, 0.1);
+        color: var(--text-neon-cyan);
+        padding: 4px 8px;
+        border-radius: 2px;
+    }
+
+    .promo-footer {
+        margin: 0 !important;
+        font-size: 12px !important;
+        opacity: 0.7;
+    }
+
+    .metro-media-deck {
+        background: var(--surface-metro-tile);
+        border: 1px solid var(--border-grid-line);
+        padding: 30px;
+        margin-bottom: 60px;
+    }
+
+    .deck-header {
+        margin-bottom: 20px;
+    }
+
+    .deck-header h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 2px;
+    }
+
+    .text-neon {
+        color: var(--text-neon-cyan);
+    }
+
+    .text-amber {
+        color: var(--text-industrial-amber);
+    }
+
+    .feature-media-viewport {
+        width: 100%;
+        aspect-ratio: 2/1.1;
+        background: var(--surface-metro-inner);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        margin-bottom: 20px;
+        padding: 6px;
+        box-sizing: border-box;
+    }
+
+    .metro-carousel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface-metro-inner);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        padding: 10px 20px;
+    }
+
+    .carousel-viewport {
+        flex-grow: 1;
+        overflow: hidden;
+        margin: 0 30px;
+        width: 100%;
+        aspect-ratio: 2/1.1;
+    }
+
+    .carousel-slider {
+        display: flex;
+        height: 100%;
+        transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .carousel-slide-tile {
+        min-width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: 0.5px;
+    }
+
+    .carousel-controls {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .ctrl-btn {
+        background: none;
+        border: 1px solid var(--border-grid-line);
+        color: white;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+        background: var(--text-neon-cyan);
+        color: var(--bg-metro-asphalt);
+        border-color: var(--text-neon-cyan);
+    }
+
+    .carousel-counter {
+        font-family: monospace;
+        font-size: 12px;
+        color: var(--text-muted-slate);
+        min-width: 40px;
+        text-align: center;
+    }
+
+    .metro-accordion-section {
+        width: 100%;
+    }
+
+    .accordion-panel {
+        background: var(--surface-metro-tile);
+        border: 1px solid var(--border-grid-line);
+    }
+
+    .accordion-master-trigger {
+        width: 100%;
+        background: none;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .trigger-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .trigger-left i {
+        font-size: 24px;
+    }
+
+    .trigger-meta {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .trigger-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.2px;
+    }
+
+    .trigger-subtitle {
+        font-size: 12px;
+        color: var(--text-muted-slate);
+        margin-top: 4px;
+    }
+
+    .trigger-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .toggle-status-text {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: var(--text-neon-cyan);
+    }
+
+    .trigger-right i {
+        font-size: 14px;
+        color: var(--text-neon-cyan);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .accordion-master-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        opacity: 0;
+        will-change: grid-template-rows, opacity;
+        transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+        border-top: 1px solid transparent;
+        max-height: 0px;
+    }
+
+    .accordion-master-content.open {
+        grid-template-rows: 1fr;
+        opacity: 1;
+        border-top-color: var(--border-grid-line);
+        max-height: none;
+    }
+
+    .content-padding-box {
+        overflow: hidden;
+        padding: 40px;
+        background: #0b0f1d;
+    }
+
+    .patch-overview-header {
+        margin-bottom: 40px;
+        border-bottom: 1px dashed var(--border-grid-line);
+        padding-bottom: 24px;
+    }
+
+    .patch-overview-header h4 {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        color: var(--text-industrial-amber);
+    }
+
+    .patch-overview-header p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--text-muted-slate);
+        max-width: 800px;
+    }
+
+    .patch-log-masonry {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .log-card {
+        background: var(--surface-metro-tile);
+        border: 1px solid var(--border-grid-line);
+        padding: 24px;
+    }
+
+    .log-card.border-neon {
+        border-left: 2px solid var(--text-neon-cyan);
+    }
+
+    .log-card.border-amber {
+        border-left: 2px solid var(--text-industrial-amber);
+    }
+
+    .log-card h5 {
+        margin: 0 0 16px 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .log-card h5 i {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .log-block-intro {
+        font-size: 13.5px;
+        color: var(--text-muted-slate);
+        margin: 0 0 12px 0;
+    }
+
+    .log-bullets {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .log-bullets li {
+        font-size: 14px;
+        line-height: 1.7;
+        color: #cbd5e1;
+        margin-bottom: 8px;
+    }
+
+    .log-bullets li:last-child {
+        margin-bottom: 0;
+    }
+
+    .log-bullets li strong {
+        color: #ffffff;
+    }
+
+    .log-compact-tags {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+    }
+
+    .log-compact-tags li {
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--surface-metro-inner);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        padding: 6px 12px;
+        color: #e2e8f0;
+    }
+
+    .road-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+    }
+
+    .road-grid span {
+        font-size: 13px;
+        font-family: monospace;
+        color: var(--text-neon-cyan);
+        background: rgba(0, 229, 255, 0.03);
+        padding: 8px;
+        border: 1px solid rgba(0, 229, 255, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .road-grid span i {
+        font-size: 11px;
+        opacity: 0.6;
+    }
+
+    .deprecated-card {
+        background: rgba(244, 63, 94, 0.02);
+        border-color: rgba(244, 63, 94, 0.15);
+    }
+
+    .deprecated-card h5 {
+        color: #f43f5e;
+    }
+
+    .depr-bullets li::marker {
+        color: #f43f5e;
+    }
+
+    .accordion-master-trigger:hover .status-icon-spin {
+        transform: rotate(90deg);
+    }
+
+    .status-icon-spin {
+        transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 900px) {
+        .metro-split-grid { grid-template-columns: 1fr; gap: 40px; }
+        .grid-left-images { height: 340px; }
+        .img-frame { height: 240px; }
+        .skyline-title { font-size: 40px; }
+    }
+
+    @media (max-width: 600px) {
+        .metro-container { padding: 30px 16px 60px 16px; }
+        .content-padding-box { padding: 20px; }
+        .accordion-master-trigger { padding: 20px; }
+        .trigger-title { font-size: 15px; }
+        .toggle-status-text { display: none; }
+        .feature-media-viewport { height: 220px; }
+    }
+</style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="../../Assets/Logo.png" alt="Logo">
+            <span>Zendra クレイジー</span>
+        </div>
+        <nav class="nav-links">
+            <div class="mobile-header">MENU</div>
+            <a href="../../index.html"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="../../videos.html"><i class="fa-solid fa-play"></i> Videos</a>
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-star"></i> Zentral</span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="../../Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="../../Arena/arena.html"><i class="fa-solid fa-gamepad"></i> Zentral Arena</a>
+                    <a href="../../Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
+                    <a href="../../zentral.html"><i class="fa-solid fa-book-open"></i> Learn More</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="dropbtn">
+                    <span><i class="fa-solid fa-ellipsis"></i> <b>More</b></span>
+                    <i class="fa-solid fa-chevron-down small-arrow"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a href="../../projects.html"><i class="fa-solid fa-layer-group"></i> <b>Projects</b></a>
+                    <a href="../../newsletter.html"><i class="fa-solid fa-envelope"></i> Newsletter</a>
+                    <a href="../membership.html"><i class="fa-solid fa-star"></i> Membership</a>
+                    <a href="../../others.html"><i class="fa-solid fa-box"></i> Others</a>
+                </div>
+            </div>
+        </nav>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="metro-container">
+        <div class="metro-notice-card">
+            <div class="notice-stripe"></div>
+            <div class="notice-body">
+                <div class="notice-title">
+                    <i class="fa-solid fa-ban"></i> SECURITY LOG: DEVELOPMENT TERMINATED
+                </div>
+                <p>Project City of Dreams development officially came to an end on <strong>April 17th, 2024</strong> due to unforeseen circumstances. All metropolitan database instances will remain offline and will not return until further notice. Thank you for your support across this journey.</p>
+            </div>
+        </div>
+
+        <header class="metro-hero">
+            <h1 class="skyline-title">CITY OF DREAMS</h1>
+            <div class="project-tag">ZENDRA PROJECT RBSC002</div>
+        </header>
+
+        <section class="metro-split-grid">
+            <div class="grid-left-images">
+                <div class="img-frame frame-alpha">
+                    <div class="img-placeholder" style="background: url('../../Assets/CityofDreams/CityofDreams_3.png') center/cover no-repeat;"></div>
+                </div>
+                <div class="img-frame frame-beta">
+                    <div class="img-placeholder" style="background: url('../../Assets/CityofDreams/CityofDreams_4.png') center/cover no-repeat;"></div>
+                </div>
+            </div>
+
+            <div class="grid-right-content">
+                <div class="content-block-decoration"></div>
+                <h2>Welcome to City of Dreams</h2>
+                <p class="lead-paragraph">Welcome to City of Dreams! A vibrant metropolis city with skyscrapers, airports, theme park, railways, racing track and endless wonders. Complete quests and search for the 40 hidden coins scattered around the city to earn cash, and purchase special weapons and abilities.</p>
+                
+                <div class="promo-code-box">
+                    <div class="promo-label">LAUNCH BONUS REDEEM KEY</div>
+                    <div class="promo-string-wrapper">
+                        <span class="promo-key">DREAMSCOMETRUE</span>
+                        <span class="cash-value">+$500 CASH</span>
+                    </div>
+                    <p class="promo-footer">Enter this key into the standard in-game promo matrix window to claim currency assets.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="metro-media-deck">
+            <div class="deck-header">
+                <h3><i class="fa-solid fa-layer-group text-neon"></i> City of Dreams Map</h3>
+            </div>
+            
+            <div class="feature-media-viewport">
+                <div class="img-placeholder" style="background: url('../../Assets/CityofDreams/CityofDreams_1.png') center/cover no-repeat;"></div>
+            </div>
+        </section>
+
+        <section class="metro-media-deck">
+            <div class="deck-header">
+                <h3><i class="fa-solid fa-layer-group text-neon"></i> Zendra Station</h3>
+            </div>
+            
+            <div class="feature-media-viewport">
+                <div class="img-placeholder" style="background: url('../../Assets/CityofDreams/CityofDreams_2.png') center/cover no-repeat;"></div>
+            </div>
+        </section>
+
+        <section class="metro-accordion-section">
+            <div class="accordion-panel">
+                <button class="accordion-master-trigger" id="patchNotesToggle">
+                    <div class="trigger-left">
+                        <i class="fa-solid fa-folder-open text-amber status-icon-spin"></i>
+                        <div class="trigger-meta">
+                            <span class="trigger-title">City of Dreams Update 4.1 Patch Notes</span>
+                            <span class="trigger-subtitle">Version Build 4.1 • Released 14/03/24</span>
+                        </div>
+                    </div>
+                    <div class="trigger-right">
+                        <span class="toggle-status-text">EXPAND LOG</span>
+                        <i class="fa-solid fa-plus chevron-icon"></i>
+                    </div>
+                </button>
+                
+                <div class="accordion-master-content" id="patchContent">
+                    <div class="content-padding-box">
+                        <div class="patch-log-masonry">
+                            <div class="log-card border-neon">
+                                <h5><i class="fa-solid fa-wallet"></i> Cash, Shop & Progression Mechanics</h5>
+                                <ul class="log-bullets">
+                                    <li><strong>Daily Quests:</strong> Implemented a 24-hour resetting tier layout: Easy (Rewards $100 Cash), Medium (Rewards $250 Cash), and Hard (Rewards $500 Cash).</li>
+                                    <li><strong>Shop System:</strong> 7 new utility assets: Pizza ($100), Burger ($100), Fireworks ($250), Hammer ($500), SpeedCoil ($750), GravityCoil ($750), and Glider ($1000).</li>
+                                    <li><strong>Warehouse Leaderboards:</strong> Added a competitive network-wide Cash Leaderboard visualization matrix inside the central warehouse node.</li>
+                                </ul>
+                            </div>
+
+                            <div class="log-card border-neon">
+                                <h5><i class="fa-solid fa-circle-dollar-to-slot"></i> Coin and Redeem Codes</h5>
+                                <ul class="log-bullets">
+                                    <li><strong>Coin System:</strong> New Coin system is here! There will be 37 coins scattered around the map, picking each of them up will give you 250 Cash. Apart from that, there will also be 3 purple color special hidden coins that will give you 1000 Cash.</li>
+                                    <li><strong>Redeem Codes:</strong> 10 new secret codes in the game that can give you 100-1000 coins. These codes will be hidden across all ZendraCrazy social platforms!</li>
+                                </ul>
+                            </div>
+
+                            <div class="log-card border-amber">
+                                <h5><i class="fa-solid fa-train"></i> Zendra Railway Network Overhaul</h5>
+                                <p class="log-block-intro">Implemented 4 high-velocity transit networks syncing city districts:</p>
+                                <ul class="log-bullets">
+                                    <li><strong>Zendraland Line:</strong> Runs localized routing between Zendraland and the Airport.</li>
+                                    <li><strong>Sakumo Line:</strong> Establishes transit linkage between City of Zendra and Island of Sakumo.</li>
+                                    <li><strong>Walmart Line:</strong> Direct transit connection linking Zendraland and Island of Walmartbag.</li>
+                                    <li><strong>Bunny Line:</strong> Establishes rapid transit between City of Zendra and Island of Bunny.</li>
+                                </ul>
+                            </div>
+
+                            <div class="log-card border-amber">
+                                <h5><i class="fa-solid fa-map-location-dot"></i> Rework & Relocations</h5>
+                                <p class="log-block-intro">To expand layout efficiency, the following structural nodes have been relocated across the coordinates plane:</p>
+                                <ul class="log-compact-tags">
+                                    <li>Zendra Warehouse</li>
+                                    <li>Statue of Zendra</li>
+                                    <li>Zendra Store</li>
+                                    <li>Sky Tower</li>
+                                    <li>Zendra HQ</li>
+                                    <li>Zendra Plaza</li>
+                                    <li>Zendra Fire Dept</li>
+                                    <li>Zendra Police Office</li>
+                                    <li>Basketball Stadium</li>
+                                </ul>
+                            </div>
+
+                            <div class="log-card border-amber">
+                                <h5><i class="fa-solid fa-building-flag"></i> New Structural Infrastructures</h5>
+                                <ul class="log-bullets">
+                                    <li>Constructed high-altitude entertainment nodes: <strong>Zendra Coaster</strong>, <strong>Sky Drop</strong>, and the signature <strong>Ferris Wheel</strong>.</li>
+                                    <li>Opened the competitive high-velocity closed-circuit <strong>Zendra Racing Track</strong>.</li>
+                                    <li>Constructed the regional sports hub stadium arena: <strong>Sakumo Soccer Stadium</strong>, accompanied by the <strong>Sakumo Soccer Trophy</strong> monument.</li>
+                                </ul>
+                            </div>
+
+                            <div class="log-card">
+                                <h5><i class="fa-solid fa-sliders"></i> Interface Systems & Survival Rules</h5>
+                                <ul class="log-bullets">
+                                    <li><strong>Minimap System:</strong> Launched a native localized interface HUD tracker to mitigate player pathing loss across outer zones.</li>
+                                    <li><strong>Hunger Rate Balancer:</strong> Extended structural survival rules. Moving continuously for over 15 minutes without calorie ingestion reduces character movement speed by half (Dropped from 16 to 8).</li>
+                                    <li><strong>Cut Screen System:</strong> Injected customized narrative cinematic sequences for Zendra, Walmartbag, Oat, Sakumo, and Kuromii instances.</li>
+                                    <li><strong>Teleportation GUI:</strong> Reconfigured menu interfaces to support instant routing points to Zendraland, Island of Walmartbag, and Island of Bunny. *(Note: Mechanics block operations if structural distance threshold is exceeded).*</li>
+                                </ul>
+                            </div>
+
+                            <div class="log-card">
+                                <h5><i class="fa-solid fa-road"></i> Comprehensive Roadway Re-Mapping</h5>
+                                <p class="log-block-intro">All municipal transit pathways have been systematically renamed and geographically re-paved:</p>
+                                <div class="road-grid">
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> Biluex Road</span>
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> Ian Road</span>
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> OAT Road</span>
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> Friendship Road</span>
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> Twobags Road</span>
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> Walmart Road</span>
+                                    <span><i class="fa-solid fa-diamond-turn-right"></i> Swardrix Road</span>
+                                </div>
+                            </div>
+
+                            <div class="log-card deprecated-card">
+                                <h5><i class="fa-solid fa-trash-can"></i> Removed Code Elements</h5>
+                                <ul class="log-bullets depr-bullets">
+                                    <li>Removed physical coaster node dependencies (Cart Rides asset files).</li>
+                                    <li>Cleaned out obsolete launch scripts (Main Menu GUI logic).</li>
+                                    <li>Dismantled and removed secondary aviation nodes (Sakumo Airport environment).</li>
+                                    <li>Completely scrubbed external corporate building instances (Roblox HQ asset blocks).</li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="footer-socials">
+            <a href="https://www.youtube.com/@zendra_brawl" target="_blank"><i class="fab fa-youtube yt-hover"></i></a>
+            <a href="https://www.instagram.com/zendra_brawl/" target="_blank"><i class="fab fa-instagram ig-hover"></i></a>
+            <a href="http://www.tiktok.com/@zendra_brawl" target="_blank"><i class="fab fa-tiktok tk-hover"></i></a>
+            <a href="https://discord.gg/VbUFdhEjNq" target="_blank"><i class="fab fa-discord dc-hover"></i></a>
+            <a href="https://www.twitch.tv/zendra_brawl" target="_blank"><i class="fab fa-twitch tw-hover"></i></a>
+            <a href="https://twitter.com/zendra_brawl" target="_blank"><i class="fab fa-x-twitter x-hover"></i></a>
+        </div>
+        2026 Zentral-Web | Powered by KuraWorks
+    </footer>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const patchToggle = document.getElementById("patchNotesToggle");
+            const patchContent = document.getElementById("patchContent");
+            const toggleStatusText = patchToggle.querySelector(".toggle-status-text");
+            const chevronIcon = patchToggle.querySelector(".chevron-icon");
+
+            patchToggle.addEventListener("click", () => {
+                const isNowOpen = patchContent.classList.toggle("open");
+
+                if (isNowOpen) {
+                    toggleStatusText.textContent = "COLLAPSE LOG";
+                    chevronIcon.className = "fa-solid fa-minus chevron-icon";
+                } else {
+                    toggleStatusText.textContent = "EXPAND LOG";
+                    chevronIcon.className = "fa-solid fa-plus chevron-icon";
+                }
+            });
+
+            const slider = document.getElementById("metroSlider");
+            const prevBtn = document.getElementById("slidePrev");
+            const nextBtn = document.getElementById("slideNext");
+            const counter = document.getElementById("slideCounter");
+
+            let currentSlide = 0;
+            const totalSlides = slider.children.length;
+
+            function updateSliderPosition() {
+                slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+                counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            }
+
+            nextBtn.addEventListener("click", () => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateSliderPosition();
+            });
+
+            prevBtn.addEventListener("click", () => {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateSliderPosition();
+            });
+        });
+    </script>
+    <script>var path = "../../";</script>
+    <script src="../../script.js"></script>
+</body>
+</html>

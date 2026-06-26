@@ -28,6 +28,7 @@
                 </div>
                 <div class="dropdown-content">
                     <a href="Chat/chat.html"><i class="fa-solid fa-comment"></i> Zentral Chat</a>
+                    <a href="Arena/arena.html"><i class="fa-solid fa-gamepad"></i> Zentral Arena</a>
                     <a href="Core/core.html"><i class="fa-solid fa-fire-alt"></i> Zentral Core</a>
                     <a href="zentral.html"><i class="fa-solid fa-book-open"></i> <b>Learn More</b></a>
                 </div>
@@ -65,12 +66,12 @@
                 <a href="Chat/chat.html" class="fancy-btn">Chat Now</a>
             </div>
         
-            <div class="fancy-card arcade-card">
+            <div class="fancy-card" onclick="window.location.href='Arena/arena.html'">
                 <div class="glow"></div>
                 <i class="fa-solid fa-gamepad"></i>
                 <h2>Zentral Arena</h2>
                 <p>Challenge your friends in Zentral Arena with various classic minigames!</p>
-                <a class="fancy-btn">Coming Soon</a>
+                <a href="Arena/arena.html" class="fancy-btn">Play Now</a>
             </div>
         
             <div class="fancy-card wide" onclick="window.location.href='Core/core.html'">
@@ -169,8 +170,8 @@
     </div>
 
     <section class="story end-section reveal">
-        <h2 class="story-title chapter1">Chapter II — The Red Giant</h2>
-        <p id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">expansion begins in</p>
+        <h2 class="story-title chapter1">Chapter II - Great Anomaly</h2>
+        <p id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">instability begins in</p>
         <div class="countdown-container">
             <div class="countdown-timer" id="countdown">
                 <div class="time-box">
@@ -191,7 +192,7 @@
                 </div>
             </div>
         </div>
-        <p style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; margin-bottom: 50px;">July 23 2026 • 10:00 AM JST</p>
+        <p style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; margin-bottom: 50px;">December 23 2026 • 10:00 AM JST</p>
         <div class="quote flash">“Be crazy. Stay crazy.”</div>
     </section>
     
@@ -209,7 +210,7 @@
     
     <script>
         (function () {
-            const targetDate = new Date("2026-07-23T10:00:00+09:00");
+            const targetDate = new Date("2026-12-23T10:00:00+09:00");
             const els = {
                 days: document.getElementById("days"),
                 hours: document.getElementById("hours"),
@@ -288,7 +289,11 @@
         const sequences = {
             message: {
                 code: ["z", "e", "n", "d", "r", "a"],
-                action: () => showMessage("⚠ SYSTEM BREACH DETECTED", "Z.E.N.D.R.A IS OFFLINE.") // Z.E.N.D.R.A IS WATCHING THE ZENTRALS.
+                action: () => showMessage("⚠ SYSTEM BREACH DETECTED", "Z.E.N.D.R.A IS INACTIVE.")
+            },
+            kura: {
+                code: ["k", "u", "r", "a"],
+                action: () => showMessage("⚠ SYSTEM BREACH DETECTED", "KIBO IS INACTIVE.")
             },
             countdown: {
                 code: ["ArrowDown", "ArrowDown", "ArrowDown"],
