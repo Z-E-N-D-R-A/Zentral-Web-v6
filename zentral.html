@@ -170,7 +170,7 @@
     </div>
 
     <section class="story end-section reveal">
-        <h2 class="story-title chapter1">Chapter II - Great Anomaly</h2>
+        <!-- <h2 class="story-title chapter1">Chapter II - Great Anomaly</h2>
         <p id="countdown-message" style="font-size: 15px; letter-spacing: 3px; margin-top: 35px; opacity: 0.8;">instability begins in</p>
         <div class="countdown-container">
             <div class="countdown-timer" id="countdown">
@@ -192,7 +192,7 @@
                 </div>
             </div>
         </div>
-        <p style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; margin-bottom: 50px;">December 23 2026 • 10:00 AM JST</p>
+        <p style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; margin-bottom: 50px;">December 23 2026 • 10:00 AM JST</p>  -->
         <div class="quote flash">“Be crazy. Stay crazy.”</div>
     </section>
     
@@ -209,7 +209,7 @@
     </footer>
     
     <script>
-        (function () {
+        /* (function () {
             const targetDate = new Date("2026-12-23T10:00:00+09:00");
             const els = {
                 days: document.getElementById("days"),
@@ -266,7 +266,7 @@
 
             const timer = setInterval(updateCountdown, 1000);
             updateCountdown();
-        })();
+        })(); */
 
         const sigil = document.getElementById("sigil");
         const terminalBtn = document.getElementById("terminalBtn");
@@ -295,10 +295,10 @@
                 code: ["k", "u", "r", "a"],
                 action: () => showMessage("⚠ SYSTEM BREACH DETECTED", "KIBO IS INACTIVE.")
             },
-            countdown: {
+            /* countdown: {
                 code: ["ArrowDown", "ArrowDown", "ArrowDown"],
                 action: () => location.href = "./Others/countdown.html"
-            },
+            }, */
             ignition: {
                 code: ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"],
                 action: () => showIgnition()
