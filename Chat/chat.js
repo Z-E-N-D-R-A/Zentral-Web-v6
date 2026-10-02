@@ -1476,6 +1476,9 @@ const commandDefinitions = [
           tag: tag,
           iconId: data.icon?.id,
           trophies: data.trophies,
+          fameTierName: data.fameTierName || "N/A",
+          rankedRankName: data.rankedRankName || "N/A",
+          highestAllTimeRankedRankName: data.highestAllTimeRankedRankName || "N/A",
           club: data.club,
           soloVictories: data.soloVictories,
           duoVictories: data.duoVictories,
@@ -1746,7 +1749,7 @@ const gameModes = {
   payload: 'Payload',
   tokenRun: 'Token Run',
   brawlArena: 'Brawl Arena',
-  brawlHockey: 'Brawl Hockey',
+  airHockey: 'Brawl Hockey',
   brawlBall5V5: 'Brawl Ball 5v5',
   gemGrab5V5: 'Gem Grab 5v5',
   knockout5V5: 'Knockout 5v5',
@@ -2917,8 +2920,20 @@ function messageEmbed(data) {
     }
 
     case "brawl_profile": {
-      const { name, tag, iconId, trophies, club, soloVictories, duoVictories, victories, brawlers, total, totalPrestigeLevel } = data.embedData;
+      const { name, tag, iconId, trophies, fameTierName, rankedRankName, highestAllTimeRankedRankName, club, soloVictories, duoVictories, victories, brawlers, total, totalPrestigeLevel } = data.embedData;
       const iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
+
+      function getRankEmojiPath(rankString) {
+        if (!rankString || rankString === "N/A") {
+          return "../Assets/Emoji/Ranked.png";
+        }
+        
+        const baseRank = rankString.split(" ")[0]; 
+        return `../Assets/Emoji/${baseRank}.png`;
+      }
+      
+      const currentRankEmoji = getRankEmojiPath(rankedRankName);
+      const highestRankEmoji = getRankEmojiPath(highestAllTimeRankedRankName);
 
       return `<div class="bubble-embed">
           <div class="brawl-header">
@@ -2934,6 +2949,12 @@ function messageEmbed(data) {
             <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Brawlers.png"> <strong>Brawlers:</strong> ${brawlers} / ${total}</div>
             <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Brawler.png"> <strong>Prestiges:</strong> ${totalPrestigeLevel} / ${total}</div>
             <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Club.png"> <strong>Club:</strong> ${club?.name ? `${escapeHtml(club.name)} (${escapeHtml(club.tag)})` : "No Club"}</div>
+          </div>
+
+          <div class="brawl-stats">
+            <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/fame.png"> <strong>Fame:</strong> ${fameTierName}</div>
+            <div class="brawl-stat"><img class="brawl-emoji" src="${currentRankEmoji}"> <strong>Current Ranked:</strong> ${rankedRankName}</div>
+            <div class="brawl-stat"><img class="brawl-emoji" src="${highestRankEmoji}"> <strong>Highest Ranked:</strong> ${highestAllTimeRankedRankName}</div>
           </div>
 
           <div class="brawl-stats">
@@ -3053,14 +3074,16 @@ function messageEmbed(data) {
 
     case "brawl_events": {
       const totalSlots = 12;
-      const activeEvents = data.embedData.modes;
+      const rawEvents = data.embedData.modes || [];
+      const activeEvents = rawEvents.filter(e => e.event.mode !== 'duoShowdown' && e.event.mode !== 'trioShowdown');
       let eventsHTML = "";
 
       for (let i = 0; i < totalSlots; i++) {
         const e = activeEvents[i];
 
         if (e) {
-          const displayMode = gameModes[e.event.mode] || e.event.mode;
+          const displayMode = e.event.mode === 'soloShowdown' ? 'Showdown' : (gameModes[e.event.mode] || e.event.mode);
+
           const mapId = e.event.id;
           const mapName = e.event.map;
 
