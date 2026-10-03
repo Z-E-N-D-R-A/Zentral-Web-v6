@@ -1384,45 +1384,6 @@ const commandDefinitions = [
     }
   },
   {
-    name: "+arena_invite",
-    description: "Share an invite link of your current Arena",
-    category: "Arena",
-    execute: async (args, senderId) => {
-      const userSnapshot = await usersRef.child(senderId).child("currentRoomId").get();
-      if (!userSnapshot.exists() || !userSnapshot.val()) return "❌ You are not currently in an Arena room.";
-
-      const roomId = userSnapshot.val();
-      const inviteUrl = `https://www.zendra.dedyn.io/Arena/arena.html?join=${roomId}`;
-      return {
-        type: "arena_invite",
-        roomId: roomId,
-        inviteUrl: inviteUrl,
-      };
-    }
-  },
-  {
-    name: "+arena_join",
-    description: "Join a Zentral Arena with RoomID",
-    category: "Arena",
-    execute: async (args) => {
-      const roomId = args[0];
-      if (!roomId) return `❌ Please provide a room ID.\n\`+arena_join <room-id>\``;
-
-      const roomSnapshot = await firebase.database().ref("rooms").child(roomId).get();
-      if (!roomSnapshot.exists()) return `❌ Room \`${roomId}\` does not exist.`;
-
-      const redirectUrl = `https://www.zendra.dedyn.io/Arena/arena.html?join=${roomId}`;
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 1500);
-
-      return {
-        type: "arena_redirect",
-        roomId: roomId
-      };
-    }
-  },
-  {
     name: "+brawl_tag",
     description: "Save your Brawl Stars player tag",
     category: "Brawl",
@@ -1494,6 +1455,77 @@ const commandDefinitions = [
     }
   },
   {
+    name: "+brawl_brawlers",
+    description: "View a player's Brawlers progress",
+    category: "Brawl",
+    execute: async (args, senderId) => {
+      let tag = null;
+
+      if (!args[0]) {
+        const snapshot = await usersRef.child(senderId).child("brawlTag").get();
+        if (!snapshot.exists()) return `❌ Please provide a player tag.\n\`+brawl_brawlers <player-tag>\``;
+        tag = snapshot.val();
+      } else {
+        tag = args[0];
+      }
+
+      tag = tag.replace("#", "").trim();
+
+      try {
+        const resPlayer = await fetch(`https://zentral-web-backend.onrender.com/player/${tag}`);
+        const resBrawler = await fetch(`https://zentral-web-backend.onrender.com/brawlers`);
+
+        if (!resPlayer.ok) return "❌ Player not found.";
+        if (!resBrawler.ok) return "❌ Failed to fetch global brawlers data.";
+
+        const data = await resPlayer.json();
+        const globalBrawlers = await resBrawler.json();
+
+        const brawlers = data.brawlers || [];
+
+        let totalGadgets = 0;
+        let totalStarPowers = 0;
+        let totalGears = 0;
+        let totalHypercharges = 0;
+        let totalBuffies = 0;
+
+        brawlers.forEach(b => {
+          if (b.gadgets) totalGadgets += b.gadgets.length;
+          if (b.starPowers) totalStarPowers += b.starPowers.length;
+          if (b.gears) totalGears += b.gears.length;
+
+          if (b.hyperCharges) totalHypercharges += b.hyperCharges.length;
+
+          if (b.buffies) {
+            if (b.buffies.gadget) totalBuffies++;
+            if (b.buffies.starPower) totalBuffies++;
+            if (b.buffies.hyperCharge) totalBuffies++;
+          }
+        });
+
+        return {
+          type: "brawl_brawlers",
+          name: data.name,
+          tag: tag,
+          iconId: data.icon?.id,
+          totalGlobalBrawlers: globalBrawlers.items?.length || 0,
+          stats: {
+            brawlers: brawlers.length,
+            gadgets: totalGadgets,
+            starPowers: totalStarPowers,
+            gears: totalGears,
+            hypercharges: totalHypercharges,
+            buffies: totalBuffies
+          },
+          brawlers: brawlers.sort((a, b) => b.trophies - a.trophies)
+        };
+      } catch (err) {
+        console.log(err);
+        return "❌ Failed to fetch player brawlers.";
+      }
+    }
+  },
+  {
     name: "+brawl_log",
     description: "Get the most recent game log",
     category: "Brawl",
@@ -1511,19 +1543,34 @@ const commandDefinitions = [
       tag = tag.replace("#", "").trim();
 
       try {
-        const res = await fetch(`https://zentral-web-backend.onrender.com/battlelog/${tag}`);
+        const [logRes, gamemodesRes] = await Promise.all([
+          fetch(`https://zentral-web-backend.onrender.com/battlelog/${tag}`),
+          fetch("https://zentral-web-backend.onrender.com/gamemodes")
+        ]);
 
-        if (!res.ok) return "❌ Failed to fetch log.";
-        const data = await res.json();
+        if (!logRes.ok) return "❌ Failed to fetch log.";
 
-        const validBattles = data.items
-         .filter(b => b.battle && b.battle.mode && gameModes[b.battle.mode])
-         .slice(0, 1);
+        const logData = await logRes.json();
+        let gameModesMap = {};
+
+        if (gamemodesRes.ok) {
+          const gamemodesData = await gamemodesRes.json();
+          if (gamemodesData.items && Array.isArray(gamemodesData.items)) {
+            gamemodesData.items.forEach(gm => {
+              gameModesMap[gm.id] = gm.name;
+            });
+          }
+        }
+
+        const validBattles = (logData.items || [])
+          .filter(b => b.battle)
+          .slice(0, 10);
 
         return {
           type: "brawl_log",
           tag,
-          battles: validBattles
+          battles: validBattles,
+          gameModesMap
         };
       } catch (err) {
         console.log(err);
@@ -1564,9 +1611,10 @@ const commandDefinitions = [
           name: data.name,
           tag,
           iconId: data.badgeId,
-          members: data.members.length,
+          memberCount: data.members.length,
           trophies: data.trophies,
-          description: data.description
+          description: data.description,
+          members: data.members || []
         };
       } catch (err) {
         console.log(err);
@@ -1580,15 +1628,29 @@ const commandDefinitions = [
     category: "Brawl",
     execute: async () => {
       try {
-        const res = await fetch("https://zentral-web-backend.onrender.com/events");
-        if (!res.ok) return "❌ Failed to fetch events.";
+        const [eventsRes, gamemodesRes] = await Promise.all([
+          fetch("https://zentral-web-backend.onrender.com/events"),
+          fetch("https://zentral-web-backend.onrender.com/gamemodes")
+        ]);
 
-        const data = await res.json();
-        const validModes = data.filter(e => e.event && e.event.mode && gameModes[e.event.mode]);
+        if (!eventsRes.ok || !gamemodesRes.ok) return "❌ Failed to fetch events.";
+
+        const eventsData = await eventsRes.json();
+        const gamemodesData = await gamemodesRes.json();
+
+        const gameModesMap = {};
+        if (gamemodesData.items && Array.isArray(gamemodesData.items)) {
+          gamemodesData.items.forEach(gm => {
+            gameModesMap[gm.id] = gm.name;
+          });
+        }
+
+        const validModes = (eventsData || []).filter(e => e.event && e.event.modeId !== undefined);
 
         return {
           type: "brawl_events",
-          modes: validModes
+          modes: validModes,
+          gameModesMap
         };
       } catch (err) {
         console.log(err);
@@ -1606,50 +1668,11 @@ const commandDefinitions = [
         if (!res.ok) return "❌ Failed to fetch leaderboard.";
 
         const data = await res.json();
+        const topPlayers = (data.items || []).slice(0, 40);
 
         return {
           type: "brawl_players_lb",
-          players: data.items.slice(0, 10)
-        };
-      } catch (err) {
-        console.log(err);
-        return "❌ Failed to fetch leaderboard.";
-      }
-    }
-  },
-  {
-    name: "+brawl_brawlers",
-    description: "View the leaderboard for a brawler",
-    category: "Brawl",
-    execute: async (args) => {
-      if (!args.length) return `❌ Please provide a brawler name.\n\`+brawl_brawlers <brawler-name>\``;
-      let userInput = args.join(" ").toUpperCase().trim();
-
-      try {
-        const resBrawler = await fetch("https://zentral-web-backend.onrender.com/brawlers");
-        if (!resBrawler.ok) return "❌ Failed to fetch leaderboard.";
-        const brawlerData = await resBrawler.json();
-
-        if (userInput === "RT") userInput = "R-T";
-        else if (userInput === "8BIT") userInput = "8-BIT";
-        else if (userInput === "ELPRIMO") userInput = "EL PRIMO";
-        else if (userInput === "MRP" || userInput === "MR.P") userInput = "MR. P";
-        else if (userInput === "L&L" || userInput === "LARRY & LAWRIE") userInput = "LARRY & LAWRIE";
-        else if (userInput === "JAEYONG") userInput = "JAE-YONG";
-
-        const found = brawlerData.items.find(b => b.name.toUpperCase() === userInput);
-        if (!found) return `❌ Brawler "${userInput}" not found.`;
-
-        const brawlerId = found.id;
-        const resLB = await fetch(`https://zentral-web-backend.onrender.com/rankings/brawlers/${brawlerId}`);
-        if (!resLB.ok) return "❌ Failed to fetch leaderboard.";
-
-        const leaderboardData = await resLB.json();
-
-        return {
-          type: "brawl_brawler_lb",
-          brawlerName: found.name,
-          players: leaderboardData.items.slice(0, 10)
+          players: topPlayers
         };
       } catch (err) {
         console.log(err);
@@ -1723,39 +1746,155 @@ const commandDefinitions = [
         return "🌍 Failed to fetch ISS location.";
       }
     }
+  },
+  {
+    name: "+arena_invite",
+    description: "Share an invite link of your current Arena",
+    category: "Arena",
+    execute: async (args, senderId) => {
+      const userSnapshot = await usersRef.child(senderId).child("currentRoomId").get();
+      if (!userSnapshot.exists() || !userSnapshot.val()) return "❌ You are not currently in an Arena room.";
+
+      const roomId = userSnapshot.val();
+      const inviteUrl = `https://www.zendra.dedyn.io/Arena/arena.html?join=${roomId}`;
+      return {
+        type: "arena_invite",
+        roomId: roomId,
+        inviteUrl: inviteUrl,
+      };
+    }
+  },
+  {
+    name: "+arena_join",
+    description: "Join a Zentral Arena with RoomID",
+    category: "Arena",
+    execute: async (args) => {
+      const roomId = args[0];
+      if (!roomId) return `❌ Please provide a room ID.\n\`+arena_join <room-id>\``;
+
+      const roomSnapshot = await firebase.database().ref("rooms").child(roomId).get();
+      if (!roomSnapshot.exists()) return `❌ Room \`${roomId}\` does not exist.`;
+
+      const redirectUrl = `https://www.zendra.dedyn.io/Arena/arena.html?join=${roomId}`;
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1500);
+
+      return {
+        type: "arena_redirect",
+        roomId: roomId
+      };
+    }
+  },
+  {
+    name: "+movie",
+    description: "Search for movie details and ratings",
+    category: "Others",
+    execute: async (args) => {
+      if (!args.length) return "❌ Please specify a movie title.\nUsage: `+movie <title>`";
+
+      const query = args.join(" ");
+      const OMDB_API_KEY = "761530e7";
+
+      try {
+        const res = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(query)}&plot=short&apikey=${OMDB_API_KEY}`);
+        const data = await res.json();
+
+        if (data.Response === "False") return `❌ Movie "${query}" not found.`;
+
+        return {
+          type: "movie",
+          title: data.Title,
+          year: data.Year,
+          rated: data.Rated,
+          runtime: data.Runtime,
+          genre: data.Genre,
+          director: data.Director,
+          actors: data.Actors,
+          plot: data.Plot,
+          poster: data.Poster !== "N/A" ? data.Poster : "../Assets/Icons/no-poster.png",
+          imdbRating: data.imdbRating
+        };
+      } catch (err) {
+        console.error(err);
+        return "❌ Failed to fetch movie details.";
+      }
+    }
+  },
+  {
+    name: "+trivia",
+    description: "Start a random trivia quiz in the chat",
+    category: "Others",
+    execute: async () => {
+      try {
+        const res = await fetch("https://opentdb.com/api.php?amount=1&type=multiple");
+        const data = await res.json();
+
+        if (!data.results || !data.results.length) {
+          return "❌ Failed to load trivia question. Please try again.";
+        }
+
+        const q = data.results[0];
+        const allAnswers = [...q.incorrect_answers, q.correct_answer];
+        for (let i = allAnswers.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
+        }
+
+        return {
+          type: "trivia",
+          category: q.category,
+          difficulty: q.difficulty,
+          question: q.question,
+          correctAnswer: q.correct_answer,
+          options: allAnswers
+        };
+      } catch (err) {
+        console.error(err);
+        return "❌ Error fetching trivia question.";
+      }
+    }
+  },
+  {
+    name: "+convert",
+    description: "Convert currencies using live exchange rates",
+    category: "Others",
+    execute: async (args) => {
+      if (args.length < 3) return "❌ Usage: `+convert <amount> <from> <to>`\nExample: `+convert 100 USD EUR`";
+
+      const amount = parseFloat(args[0]);
+      const from = args[1].toUpperCase();
+      const to = args[2].toUpperCase();
+
+      if (isNaN(amount) || amount <= 0) return "❌ Please enter a valid positive number for the amount.";
+
+      try {
+        const res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+        const data = await res.json();
+
+        if (data.result !== "success" || !data.rates[to]) {
+          return `❌ Invalid currency code. Check symbols (e.g. USD, EUR, GBP, JPY, CAD, AUD).`;
+        }
+
+        const rate = data.rates[to];
+        const result = amount * rate;
+
+        return {
+          type: "convert",
+          amount: amount,
+          from: from,
+          to: to,
+          rate: rate,
+          result: result,
+          lastUpdate: data.time_last_update_utc ? new Date(data.time_last_update_utc).toLocaleDateString() : "Today"
+        };
+      } catch (err) {
+        console.error(err);
+        return "❌ Failed to fetch currency rates.";
+      }
+    }
   }
 ];
-
-const gameModes = {
-  soloShowdown: 'Solo Showdown',
-  duoShowdown: 'Duo Showdown',
-  trioShowdown: 'Trio Showdown',
-  heist: 'Heist',
-  bounty: 'Bounty',
-  siege: 'Siege',
-  gemGrab: 'Gem Grab',
-  brawlBall: 'Brawl Ball',
-  bigGame: 'Big Game',
-  bossFight: 'Boss Fight',
-  roboRumble: 'Robo Rumble',
-  hotZone: 'Hot Zone',
-  knockout: 'Knockout',
-  volleyBrawl: 'Volley Brawl',
-  basketBrawl: 'Basket Brawl',
-  dodgeBrawl: 'Dodge Brawl',
-  trophyThieves: 'Trophy Thieves',
-  duels: 'Duels',
-  wipeout: 'Wipeout',
-  payload: 'Payload',
-  tokenRun: 'Token Run',
-  brawlArena: 'Brawl Arena',
-  airHockey: 'Brawl Hockey',
-  brawlBall5V5: 'Brawl Ball 5v5',
-  gemGrab5V5: 'Gem Grab 5v5',
-  knockout5V5: 'Knockout 5v5',
-  wipeout5V5: 'Wipeout 5v5',
-  brawlHockey5V5: 'Brawl Hockey 5v5'
-};
 
 const firebaseConfig = {
   apiKey: "AIzaSyAmI86EcG9Zvln4n4s39tcPNlCYfPjO16s",
@@ -2500,6 +2639,37 @@ function escapeHtml(s) {
   return String(s || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
 
+function renderMediaLinkEmbed(text) {
+  if (!text) return "";
+
+  const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i;
+  const ytMatch = text.match(ytRegex);
+
+  if (ytMatch) {
+    const videoId = ytMatch[1];
+    return `
+    <div class="media-link-embed youtube-embed" style="margin-top: 8px; width: 100%; border-radius: 12px; overflow: hidden; background: #0f0f0f; border: 1px solid rgba(255, 255, 255, 0.1);">
+      <iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display: block; border: 0;"></iframe>
+    </div>`;
+  }
+
+  const spotifyRegex = /https:\/\/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/i;
+  const spotifyMatch = text.match(spotifyRegex);
+
+  if (spotifyMatch) {
+    const type = spotifyMatch[1];
+    const id = spotifyMatch[2];
+    const height = type === "track" ? "152" : "350";
+
+    return `
+    <div class="media-link-embed spotify-embed" style="margin-top: 8px; width: 100%;">
+      <iframe src="https://open.spotify.com/embed/${type}/${id}?utm_source=generator" width="100%" height="${height}" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" style="border-radius: 12px; border: 0; display: block;"></iframe>
+    </div>`;
+  }
+
+  return "";
+}
+
 function formatMessageText(text, mentions = []) {
   let escaped = escapeHtml(text);
   escaped = escaped.replace(/\n/g, "<br>");
@@ -2738,6 +2908,7 @@ function createMessageElement(data) {
       <div class="bubble-content">
         ${data.replyToId ? `<div class="reply-bubble loading"></div>` : ""}
         ${formatMessageText(text, data.mentions)}
+        ${!data.embedData ? renderMediaLinkEmbed(text) : ""}
         </div>
       </div>
     </div>
@@ -2783,6 +2954,8 @@ function createMessageElement(data) {
   if (data.embedData) {
     const bubbleContent = el.querySelector(".bubble-content");
     bubbleContent.innerHTML = messageEmbed(data);
+
+    if (["brawl_brawlers", "brawl_log", "brawl_club", "brawl_events", "brawl_players_lb"].includes(data.embedData.type)) setupBrawlPagination(el);
   }
 
   if (data.badges && typeof data.badges === "object") {
@@ -2873,6 +3046,40 @@ function updateMessageElement(data) {
   });
 }
 
+function setupBrawlPagination(msgElement) {
+  const prevBtn = msgElement.querySelector(".brawl-page-btn.prev-btn");
+  const nextBtn = msgElement.querySelector(".brawl-page-btn.next-btn");
+  const pageIndicator = msgElement.querySelector(".current-page");
+  const pages = msgElement.querySelectorAll(".brawl-embed-page, .brawl-log-page");
+
+  if (!pages.length || !prevBtn || !nextBtn) return;
+
+  let currentPage = 0;
+  const totalPages = pages.length;
+
+  function updatePage(newPage) {
+    if (newPage < 0 || newPage >= totalPages) return;
+
+    pages[currentPage].style.display = "none";
+    currentPage = newPage;
+    pages[currentPage].style.display = "block";
+
+    if (pageIndicator) pageIndicator.textContent = currentPage + 1;
+    prevBtn.disabled = currentPage === 0;
+    nextBtn.disabled = currentPage === totalPages - 1;
+  }
+
+  prevBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    updatePage(currentPage - 1);
+  });
+
+  nextBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    updatePage(currentPage + 1);
+  });
+}
+
 function messageEmbed(data) {
   switch (data.embedData.type) {
     case "gif": {
@@ -2922,10 +3129,18 @@ function messageEmbed(data) {
     case "brawl_profile": {
       const { name, tag, iconId, trophies, fameTierName, rankedRankName, highestAllTimeRankedRankName, club, soloVictories, duoVictories, victories, brawlers, total, totalPrestigeLevel } = data.embedData;
       const iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
-
+      
       function formatTitleCase(str) {
         if (!str || str === "N/A" || str === "NONE") return "N/A";
-        return str.toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+        
+        const isRoman = (word) => /^(?=[MDCLXVI])M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i.test(word);
+        return str.split(" ").map(word => {
+          const upper = word.toUpperCase();
+          if (isRoman(upper)) {
+            return upper;
+          }
+          return upper.charAt(0) + upper.slice(1).toLowerCase();
+        }).join(" ");
       }
 
       function getRankEmojiPath(rankString) {
@@ -2970,8 +3185,163 @@ function messageEmbed(data) {
         </div>`;
     }
 
+    case "brawl_brawlers": {
+      const { name, tag, iconId, totalGlobalBrawlers, stats, brawlers } = data.embedData;
+      const iconUrl = iconId ? `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png` : "../Assets/Emoji/Brawler.png";
+      
+      const totalSpAndGadgets = totalGlobalBrawlers * 2;
+      const totalGears = totalGlobalBrawlers * 5;
+      const totalBuffies = totalGlobalBrawlers * 3;
+
+      const page0Html = `
+      <div class="brawl-embed-page bbrawlers-page bbrawlers-summary" data-page="0">
+        <div class="bbrawlers-stat-card">
+          <div class="bbrawlers-stat-label">
+            <img class="brawl-emoji" src="../Assets/Emoji/Brawlers.png"> Brawlers Unlocked
+          </div>
+          <div class="bbrawlers-stat-value" style="color: #ffffff;">${stats.brawlers} <span class="sub">/ ${totalGlobalBrawlers}</span></div>
+        </div>
+
+        <div class="bbrawlers-stat-card">
+          <div class="bbrawlers-stat-label">
+            <img class="brawl-emoji" src="../Assets/Emoji/Buffies.png"> Buffies
+          </div>
+          <div class="bbrawlers-stat-value" style="color: #ff55bb;">${stats.buffies} <span class="sub">/ ${totalBuffies}</span></div>
+        </div>
+
+        <div class="bbrawlers-stat-card">
+          <div class="bbrawlers-stat-label">
+            <img class="brawl-emoji" src="../Assets/Emoji/Hypercharge.png"> Hypercharges
+          </div>
+          <div class="bbrawlers-stat-value" style="color: #a855f7;">${stats.hypercharges} <span class="sub">/ ${totalGlobalBrawlers}</span></div>
+        </div>
+
+        <div class="bbrawlers-stat-card">
+         <div class="bbrawlers-stat-label">
+          <img class="brawl-emoji" src="../Assets/Emoji/StarPower.png"> Star Powers
+        </div>
+         <div class="bbrawlers-stat-value" style="color: #eab308;">${stats.starPowers} <span class="sub">/ ${totalSpAndGadgets}</span></div>
+       </div>
+
+       <div class="bbrawlers-stat-card">
+         <div class="bbrawlers-stat-label">
+          <img class="brawl-emoji" src="../Assets/Emoji/Gadget.png"> Gadgets
+        </div>
+         <div class="bbrawlers-stat-value" style="color: #22c55e;">${stats.gadgets} <span class="sub">/ ${totalSpAndGadgets}</span></div>
+       </div>
+
+        <div class="bbrawlers-stat-card">
+          <div class="bbrawlers-stat-label">
+            <img class="brawl-emoji" src="../Assets/Emoji/Gears.png"> Gears
+          </div>
+            <div class="bbrawlers-stat-value" style="color: #3b82f6;">${stats.gears} <span class="sub">/ ${totalGears}</span></div>
+          </div>
+      </div>`;
+
+      const pageSize = 18;
+      const pages = [];
+      for (let i = 0; i < brawlers.length; i += pageSize) {
+        pages.push(brawlers.slice(i, i + pageSize));
+      }
+
+      const brawlerPagesHtml = pages.map((chunk, pageIdx) => {
+        const pageNum = pageIdx + 1;
+        const rows = chunk.map((b) => {
+          const gadgetsCount = b.gadgets?.length || 0;
+          const spsCount = b.starPowers?.length || 0;
+          const gearsCount = b.gears?.length || 0;
+
+          const spIcon = b.buffies?.starPower ? "BStarPower.png" : "StarPower.png";
+          const gadgetIcon = b.buffies?.gadget ? "BGadget.png" : "Gadget.png";
+          const hasHypercharge = b.hyperCharges && b.hyperCharges.length > 0;
+
+          let powerHtml = "";
+          if (hasHypercharge) {
+            const hcIcon = b.buffies?.hyperCharge ? "BHypercharge.png" : "Hypercharge.png";
+            powerHtml = `<div class="bbrawlers-hc-badge"><img src="../Assets/Emoji/${hcIcon}"><span>${b.power}</span></div>`;
+          } else {
+            powerHtml = `<div class="bbrawlers-power-badge">${b.power}</div>`;
+          }
+
+          return `<div class="bbrawlers-card">
+            <div class="bbrawlers-info">
+              <div class="bbrawlers-portrait-wrap">
+                <img src="https://cdn.brawlify.com/brawlers/portraits/${b.id}.png" class="bbrawlers-portrait" onerror="this.src='../Assets/Emoji/Brawler.png'">
+                ${powerHtml}
+              </div>
+
+              <div class="bbrawlers-details">
+                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                  <span class="bbrawlers-name">${escapeHtml(b.name)}</span>
+                  <div style="display: flex; align-items: center; gap: 2px; flex-shrink: 0;">
+                    <img src="../Assets/Emoji/Trophy.png" style="width: 10px; height: 10px;">
+                    <span style="font-weight: 700; font-size: 10px; color: #ffcc00;">${b.trophies}</span>
+                  </div>
+                </div>
+
+                <div class="bbrawlers-icons">
+                  <span class="bbrawlers-icon-item"><img src="../Assets/Emoji/${spIcon}"> ${spsCount}</span>
+                  <span class="bbrawlers-icon-item"><img src="../Assets/Emoji/${gadgetIcon}"> ${gadgetsCount}</span>
+                  <span class="bbrawlers-icon-item"><img src="../Assets/Emoji/Gears.png"> ${gearsCount}</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }).join("");
+
+        return `
+        <div class="brawl-embed-page bbrawlers-page" data-page="${pageNum}" style="display: none;">
+          <div style="margin-bottom: 8px; font-size: 11px; color: #a0a0a0; font-weight: 600;">
+            Brawlers (${pageIdx * pageSize + 1}–${Math.min((pageIdx + 1) * pageSize, brawlers.length)})
+          </div>
+          
+          <div class="bbrawlers-grid">${rows}</div>
+        </div>`;
+      }).join("");
+
+      const totalPages = 1 + pages.length;
+      const paginationControls = totalPages > 1 ? `
+      <div class="brawl-pagination">
+        <button class="brawl-page-btn prev-btn" disabled>&#10094;</button>
+        <span class="brawl-page-indicator"><span class="current-page">1</span> / ${totalPages}</span>
+        <button class="brawl-page-btn next-btn">&#10095;</button>
+      </div>` : '';
+
+      return `<div class="bubble-embed bbrawlers-embed">
+        <div class="brawl-header">
+          <div class="brawl-name">
+            ${escapeHtml(name)}
+            <div class="brawl-tag"><img class="brawl-emoji" src="../Assets/Emoji/ID.png"> #${escapeHtml(tag)}</div>
+          </div>
+          <img src="${iconUrl}" class="brawl-profile-icon" onerror="this.src='../Assets/Emoji/Brawler.png'">
+        </div>
+
+        <div class="brawl-pages">
+          ${page0Html}
+          ${brawlerPagesHtml}
+        </div>
+
+        ${paginationControls}
+      </div>`;
+    }
+
     case "brawl_log": {
-      const { tag, battles } = data.embedData;
+      const { tag, battles, gameModesMap = {} } = data.embedData;
+
+      if (!battles || battles.length === 0) {
+        return `<div class="bubble-embed">
+          <div class="brawl-header"> 
+            <div class="brawl-name">Battle Log <div class="brawl-tag">#${escapeHtml(tag)}</div></div>
+            <img src="../Assets/Emoji/Quests.png" class="brawl-profile-icon">
+          </div>
+          <div style="padding: 10px; text-align: center;">No battles found.</div>
+          </div>`;
+      }
+
+      const formatModeName = (nameStr) => {
+        if (!nameStr) return "Unknown Mode";
+        return nameStr.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      };
 
       const getResultText = (battle) => {
         if (battle.result) return battle.result.charAt(0).toUpperCase() + battle.result.slice(1);
@@ -2997,50 +3367,55 @@ function messageEmbed(data) {
 
       function renderPlayerRow(p, starPlayer = null) {
         const isStar = starPlayer && p.tag === starPlayer.tag;
-        return `
-        <div class="brawl-player ${isStar ? 'star-player' : ''}">
-          <img src="https://cdn.brawlify.com/brawlers/portraits/${p.brawler.id}.png" class="brawl-mini-portraits" onerror="this.src='../Assets/Emoji/Brawler.png'">
-          <span class="player-name">${escapeHtml(p.name)}</span>
-          <span class="brawler-info">(${p.tag})</span>
-        </div>`;
+        return `<div class="brawl-player ${isStar ? 'star-player' : ''}">
+            <img src="https://cdn.brawlify.com/brawlers/portraits/${p.brawler.id}.png" class="brawl-mini-portraits" onerror="this.src='../Assets/Emoji/Brawler.png'">
+            <span class="player-name">${escapeHtml(p.name)}</span>
+            <span class="brawler-info">(${p.tag})</span>
+          </div>`;
       }
 
-      const rows = battles.map(b => {
+      const pagesHtml = battles.map((b, index) => {
         let teamsHtml = "";
 
         if (b.battle.teams) {
-          teamsHtml = `<div class="brawl-teams">` +
-            b.battle.teams.map((team, index) => `
-              <div class="brawl-team">
-                <div class="team-label">Team ${index + 1}</div>
-                ${team.map(p => renderPlayerRow(p, b.battle.starPlayer)).join("")}
-              </div>
-            `).join("") +
-          `</div>`;
+          teamsHtml = `<div class="brawl-teams">` + b.battle.teams.map((team, tIdx) => `
+          <div class="brawl-team">
+            <div class="team-label">Team ${tIdx + 1}</div>
+            ${team.map(p => renderPlayerRow(p, b.battle.starPlayer)).join("")}
+          </div>`).join("") + `</div>`;
         } else if (b.battle.players) {
-          teamsHtml = `<div class="brawl-teams">
-            <div class="team-label">Players</div>
-            ${b.battle.players.map(p => renderPlayerRow(p)).join("")}
-          </div>`;
+          teamsHtml = `<div class="brawl-teams"> <div class="team-label">Players</div> ${b.battle.players.map(p => renderPlayerRow(p)).join("")} </div>`;
         }
 
-        return `
-        <div class="brawl-stats">
-        <div class="brawl-stat-header">
-          <img src="../Assets/Emoji/Modes/${b.battle.mode}.png" class="brawl-emoji"> 
-          <b>${gameModes[b.battle.mode] || b.battle.mode}</b> 
-          ${b.event.map ? `| <small>${b.event.map}</small>` : ''}
-        </div>
-        
-        <div class="brawl-grid">
-           <div class="brawl-stat"><img src="../Assets/Emoji/Result.png" class="brawl-emoji">${getResultText(b.battle)}</div>
-           <div class="brawl-stat"><img src="../Assets/Emoji/Trophy.png" class="brawl-emoji">${b.battle.trophyChange >= 0 ? '+' : ''}${b.battle.trophyChange || 0}</div>
-           <div class="brawl-stat"><img src="../Assets/Emoji/Calendar.png" class="brawl-emoji">${formatBrawlTime(b.battleTime)}</div>
-        </div>
+        const rawMode = (b.event && b.event.modeId !== undefined && gameModesMap[b.event.modeId]) || b.battle.mode || "Unknown Mode";
+        const displayModeName = formatModeName(rawMode);
 
-        ${teamsHtml}
-      </div>`;
-      }).join("<hr class='brawl-divider'>");
+        return `
+        <div class="brawl-log-page" data-page="${index}" style="${index === 0 ? '' : 'display: none;'}">
+          <div class="brawl-stats">
+            <div class="brawl-stat-header">
+              <img src="../Assets/Emoji/Modes/${b.battle.mode || 'Default'}.png" class="brawl-emoji" onerror="this.src='../Assets/Emoji/Brawler.png'"> 
+              <b>${displayModeName}</b> 
+              ${b.event?.map ? `| <small>${b.event.map}</small>` : ''}
+            </div>
+        
+            <div class="brawl-grid">
+              <div class="brawl-stat"><img src="../Assets/Emoji/Result.png" class="brawl-emoji">${getResultText(b.battle)}</div>
+              <div class="brawl-stat"><img src="../Assets/Emoji/Trophy.png" class="brawl-emoji">${b.battle.trophyChange >= 0 ? '+' : ''}${b.battle.trophyChange || 0}</div>
+              <div class="brawl-stat"><img src="../Assets/Emoji/Calendar.png" class="brawl-emoji">${formatBrawlTime(b.battleTime)}</div>
+            </div>
+        
+            ${teamsHtml}
+          </div>
+        </div>`;
+      }).join("");
+
+      const paginationControls = battles.length > 1 ? `
+      <div class="brawl-pagination">
+        <button class="brawl-page-btn prev-btn" disabled>&#10094;</button>
+        <span class="brawl-page-indicator"><span class="current-page">1</span> / ${battles.length}</span>
+        <button class="brawl-page-btn next-btn">&#10095;</button>
+      </div>` : '';
 
       return `
       <div class="bubble-embed">
@@ -3048,112 +3423,271 @@ function messageEmbed(data) {
           <div class="brawl-name">Battle Log <div class="brawl-tag">#${escapeHtml(tag)}</div></div>
           <img src="../Assets/Emoji/Quests.png" class="brawl-profile-icon">
         </div>
-        ${rows}
+    
+        <div class="brawl-log-pages">${pagesHtml}</div>
+        ${paginationControls}
       </div>`;
     }
 
     case "brawl_club": {
-      const { name, tag, iconId, members, trophies, description } = data.embedData;
+      const { name, tag, iconId, memberCount, trophies, description, members = [] } = data.embedData;
       const iconUrl = `https://cdn.brawlify.com/club-badges/regular/${iconId}.png`;
 
-      return `<div class="bubble-embed">
-          <div class="brawl-header">
-            <div class="brawl-name">
-              ${escapeHtml(name)}
-              <div class="brawl-tag"><img class="brawl-emoji" src="../Assets/Emoji/ID.png"> #${escapeHtml(tag)}</div>
-            </div>
-            <img src="${iconUrl}" class="brawl-profile-icon">
-          </div>
-          
-          <div class="brawl-stats">
-            <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Trophy.png"> <strong>Trophies:</strong> ${trophies}</div>
-            <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Brawlers.png"> <strong>Members:</strong> ${members} / 30</div>
-          </div>
+      function formatRole(role) {
+        const roles = { president: "President", vicePresident: "Vice President", senior: "Senior", member: "Member" };
+        return roles[role] || role;
+      }
 
+      const cleanDescription = (description || "No description provided.").replace(/<c[^>]*>/gi, '').replace(/<\/c>/gi, '');
+
+      const page1Html = `<div class="brawl-embed-page" data-page="0" style="display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box;">
+        <div style="background: rgba(0, 0, 0, 0.25); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="font-size: 11px; color: #a0a0a0; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+            <img class="brawl-emoji" src="../Assets/Emoji/Trophy.png"> Total Trophies
+          </div>
+          <div style="font-size: 16px; font-weight: 700; color: #ffffff;">${trophies.toLocaleString()}</div>
+        </div>
+
+        <div style="background: rgba(0, 0, 0, 0.25); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <div style="font-size: 11px; color: #a0a0a0; display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+            <img class="brawl-emoji" src="../Assets/Emoji/Brawlers.png"> Members
+          </div>
+          <div style="font-size: 16px; font-weight: 700; color: #ffffff;">${memberCount || members.length} / 30</div>
+        </div>
+
+        <div style="background: rgba(0, 0, 0, 0.25); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255, 255, 255, 0.08); min-height: 250px; flex-grow: 1;">
+          <div style="font-size: 11px; color: #a0a0a0; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            <img class="brawl-emoji" src="../Assets/Emoji/Quests.png"> Description
+          </div>
+          <div style="font-size: 12px; line-height: 1.4; color: #e0e0e0; word-break: break-word; white-space: pre-wrap;">${escapeHtml(cleanDescription)}</div>
+        </div>
+
+      </div>`;
+
+      const chunkSize = 10;
+      const memberPages = [];
+      for (let i = 0; i < members.length; i += chunkSize) {
+        memberPages.push(members.slice(i, i + chunkSize));
+      }
+
+      const memberPagesHtml = memberPages.map((chunk, pageIdx) => {
+        const pageNum = pageIdx + 1;
+        const rows = chunk.map((m, idx) => {
+          const globalIndex = pageIdx * chunkSize + idx + 1;
+          const iconId = m.icon?.id || 28000000;
+
+          return `
+          <div class="brawl-member-row">
+            <span class="member-index">#${globalIndex}</span>
+            <img src="https://cdn.brawlify.com/profile-icons/regular/${iconId}.png" class="brawl-mini-portraits" onerror="this.src='../Assets/Emoji/Brawler.png'">
+            <div class="member-info">
+              <div class="member-name">${escapeHtml(m.name)}</div>
+              <div class="member-role">${formatRole(m.role)}</div>
+            </div>
+            <div class="member-trophies"><img src="../Assets/Emoji/Trophy.png" class="brawl-emoji"> ${m.trophies.toLocaleString()}</div>
+          </div>`;
+        }).join("");
+
+        return `
+        <div class="brawl-embed-page" data-page="${pageNum}" style="display: none;">
           <div class="brawl-stats">
-            <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Quests.png"> <strong>Description</strong></div>
-            <div style="max-width: 400px;" class="embed-desc">${escapeHtml(description || "No description")}</div>
+            <div class="brawl-stat-header">
+              <b>Club Members (${pageIdx * chunkSize + 1}–${Math.min((pageIdx + 1) * chunkSize, members.length)})</b>
+            </div>
+
+            <div class="brawl-members-list">
+              ${rows}
+            </div>
           </div>
         </div>`;
+      }).join("");
+
+      const totalPages = 1 + memberPages.length;
+      const paginationControls = totalPages > 1 ? `
+        <div class="brawl-pagination">
+          <button class="brawl-page-btn prev-btn" disabled>&#10094;</button>
+          <span class="brawl-page-indicator"><span class="current-page">1</span> / ${totalPages}</span>
+          <button class="brawl-page-btn next-btn">&#10095;</button>
+        </div>` : '';
+
+      return `
+      <div class="bubble-embed" style="max-width: 260px; width: 100%; box-sizing: border-box;">
+        <div class="brawl-header">
+          <div class="brawl-name">
+            ${escapeHtml(name)}
+            <div class="brawl-tag"><img class="brawl-emoji" src="../Assets/Emoji/ID.png"> #${escapeHtml(tag)}</div>
+          </div>
+          <img src="${iconUrl}" class="brawl-profile-icon">
+        </div>
+  
+        <div class="brawl-pages">
+          ${page1Html}
+          ${memberPagesHtml}
+        </div>
+
+        ${paginationControls}
+      </div>`;
     }
 
     case "brawl_events": {
       const totalSlots = 12;
+      const cardsPerPage = 4;
       const rawEvents = data.embedData.modes || [];
-      const activeEvents = rawEvents.filter(e => e.event.mode !== 'duoShowdown' && e.event.mode !== 'trioShowdown');
-      let eventsHTML = "";
+      const gameModesMap = data.embedData.gameModesMap || {};
 
+      const activeEvents = rawEvents.filter(e => e.event.mode !== 'duoShowdown' && e.event.mode !== 'trioShowdown');
+
+      const allCards = [];
       for (let i = 0; i < totalSlots; i++) {
         const e = activeEvents[i];
-
         if (e) {
-          const displayMode = e.event.mode === 'soloShowdown' ? 'Showdown' : (gameModes[e.event.mode] || e.event.mode);
-
+          const rawModeName = gameModesMap[e.event.modeId] || e.event.mode || `Mode ${e.event.modeId}`;
+          const displayMode = e.event.mode === 'soloShowdown' ? 'Showdown' : rawModeName.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
           const mapId = e.event.id;
           const mapName = e.event.map;
 
-          eventsHTML += `
-            <div class="event-card">
-              <div class="event-info">
-                <div class="event-mode-name">${displayMode}</div>
-                <div class="event-map-name">${mapName}</div>
-              </div>
-              <img src="https://cdn.brawlify.com/maps/regular/${mapId}.png" class="event-map-img" onerror="this.src='../Assets/Emoji/Empty.png'">
-            </div>`;
+          allCards.push(`<div class="event-card">
+            <div class="event-info">
+              <div class="event-mode-name">${escapeHtml(displayMode)}</div>
+              <div class="event-map-name">${escapeHtml(mapName)}</div>
+            </div>
+            <img src="https://cdn.brawlify.com/maps/regular/${mapId}.png" class="event-map-img" onerror="this.src='../Assets/Emoji/Empty.png'">
+          </div>`);
         } else {
-          eventsHTML += `
-            <div class="event-card empty-slot">
+          allCards.push(`<div class="event-card empty-slot">
+            <div class="event-info">
               <div class="event-mode-name">Upcoming</div>
               <div class="event-map-name">TBA</div>
-            </div>`;
+            </div>
+          </div>`);
         }
       }
 
+      const eventPages = [];
+      for (let i = 0; i < allCards.length; i += cardsPerPage) {
+        eventPages.push(allCards.slice(i, i + cardsPerPage));
+      }
+
+      const pagesHtml = eventPages.map((pageCards, pageIdx) => `
+        <div class="brawl-embed-page" data-page="${pageIdx}" style="${pageIdx === 0 ? '' : 'display: none;'}">
+          <div class="events-grid">
+            ${pageCards.join("")}
+          </div>
+        </div>`).join("");
+
+      const totalPages = eventPages.length;
+      const paginationControls = totalPages > 1 ? `
+        <div class="brawl-pagination">
+          <button class="brawl-page-btn prev-btn" disabled>&#10094;</button>
+          <span class="brawl-page-indicator"><span class="current-page">1</span> / ${totalPages}</span>
+          <button class="brawl-page-btn next-btn">&#10095;</button>
+        </div>` : '';
+
       return `<div class="bubble-embed">
+        <div class="brawl-header">
           <div class="brawl-name">Current Map Rotation</div>
-          <div class="events-grid">${eventsHTML}</div>
-        </div>`;
+          <img src="../Assets/Emoji/Quests.png" class="brawl-profile-icon">
+        </div>
+
+        <div class="brawl-pages">
+          ${pagesHtml}
+        </div>
+
+        ${paginationControls}
+      </div>`;
     }
 
     case "brawl_players_lb": {
-      const rows = data.embedData.players.map((p, i) =>
-        `<div class="lb-row">
-            <span>#${i + 1}</span>
-            <span>${escapeHtml(p.name)}</span>
-            <span><code class="inline-code">🏆 ${p.trophies}</code></span>
-          </div>`).join("");
+      const players = data.embedData.players || [];
 
-      return `<div class="bubble-embed leaderboard">
+      if (players.length === 0) {
+        return `
+        <div class="bubble-embed" style="max-width: 320px; width: 100%; box-sizing: border-box;">
           <div class="brawl-header">
-            <div class="brawl-name">
-              Global Leaderboard
-            </div>
+            <div class="brawl-name">Global Leaderboard</div>
             <img src="../Assets/Emoji/Leaderboards.png" class="brawl-profile-icon">
           </div>
-          ${rows}
+          <div style="padding: 12px; text-align: center; color: #a0a0a0;">No leaderboard data available.</div>
         </div>`;
-    }
+      }
 
-    case "brawl_brawler_lb": {
-      const { brawlerName, players } = data.embedData;
-      const formattedName = escapeHtml(brawlerName).toLowerCase().replace(/(?:^|[\s-])\S/g, (match) => match.toUpperCase());
+      const pageSize = 8;
+      const pages = [];
+      for (let i = 0; i < players.length; i += pageSize) {
+        pages.push(players.slice(i, i + pageSize));
+      }
 
-      const rows = players.map((p, i) => `
-        <div class="lb-row">
-          <span>#${i + 1}</span>
-          <span>${escapeHtml(p.name)}</span>
-          <span><code class="inline-code">🏆 ${p.trophies}</code></span>
-        </div>`).join("");
+      const getRankBadge = (rank) => {
+        if (rank === 1) return `<span style="background: linear-gradient(135deg, #ffe066, #f59f00); color: #000; font-weight: 800; border-radius: 4px; padding: 2px 6px; font-size: 11px;">#1</span>`;
+        if (rank === 2) return `<span style="background: linear-gradient(135deg, #e9ecef, #adb5bd); color: #000; font-weight: 800; border-radius: 4px; padding: 2px 6px; font-size: 11px;">#2</span>`;
+        if (rank === 3) return `<span style="background: linear-gradient(135deg, #f08c00, #d9480f); color: #fff; font-weight: 800; border-radius: 4px; padding: 2px 6px; font-size: 11px;">#3</span>`;
+        return `<span style="color: #888; font-weight: 600; font-size: 11px; min-width: 20px; text-align: center;">#${rank}</span>`;
+      };
 
-      return `<div class="bubble-embed leaderboard">
-          <div class="brawl-header">
-            <div class="brawl-name">
-            ${formattedName} Leaderboard
+      const pagesHtml = pages.map((chunk, pageIdx) => {
+        const rows = chunk.map((p, idx) => {
+          const rank = pageIdx * pageSize + idx + 1;
+          const iconId = p.icon?.id || 28000000;
+          const clubName = p.club?.name ? escapeHtml(p.club.name) : "No Club";
+
+          let rowBg = "background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.05);";
+          if (rank === 1) rowBg = "background: rgba(255, 224, 102, 0.12); border: 1px solid rgba(255, 224, 102, 0.3);";
+          if (rank === 2) rowBg = "background: rgba(233, 236, 239, 0.1); border: 1px solid rgba(233, 236, 239, 0.25);";
+          if (rank === 3) rowBg = "background: rgba(240, 140, 0, 0.1); border: 1px solid rgba(240, 140, 0, 0.25);";
+
+          return `
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; ${rowBg}">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+              ${getRankBadge(rank)}
+              <img src="https://cdn.brawlify.com/profile-icons/regular/${iconId}.png" class="brawl-mini-portraits" onerror="this.src='../Assets/Emoji/Brawler.png'" style="width: 26px; height: 26px; border-radius: 4px; flex-shrink: 0;">
+              <div style="display: flex; flex-direction: column; min-width: 0;">
+                <span style="font-weight: 700; font-size: 12px; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${escapeHtml(p.name)}</span>
+                <span style="font-size: 9px; color: #999; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${clubName}</span>
+              </div>
             </div>
-            <img src="../Assets/Emoji/Brawler.png" class="brawl-profile-icon">
+
+            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 8px;">
+              <img src="../Assets/Emoji/Trophy.png" class="brawl-emoji" style="width: 14px; height: 14px;">
+              <span style="font-weight: 700; font-size: 12px; color: #ffcc00;">${p.trophies.toLocaleString()}</span>
+            </div>
+          </div>`;
+        }).join("");
+
+        return `
+        <div class="brawl-embed-page" data-page="${pageIdx}" style="${pageIdx === 0 ? '' : 'display: none;'} min-height: 350px;">
+          <div style="margin-bottom: 8px; font-size: 11px; color: #a0a0a0; font-weight: 600;">
+            Top Players (${pageIdx * pageSize + 1}–${Math.min((pageIdx + 1) * pageSize, players.length)})
           </div>
-          ${rows}
+
+          <div>
+            ${rows}
+          </div>
         </div>`;
+      }).join("");
+
+      const totalPages = pages.length;
+      const paginationControls = totalPages > 1 ? `
+        <div class="brawl-pagination">
+          <button class="brawl-page-btn prev-btn" disabled>&#10094;</button>
+          <span class="brawl-page-indicator"><span class="current-page">1</span> / ${totalPages}</span>
+          <button class="brawl-page-btn next-btn">&#10095;</button>
+        </div>` : '';
+
+      return `<div class="bubble-embed" style="max-width: 320px; width: 100%; box-sizing: border-box;">
+        <div class="brawl-header">
+          <div class="brawl-name">
+            Global Leaderboard
+            <div class="brawl-tag"><img class="brawl-emoji" src="../Assets/Emoji/Leaderboards.png"> Top 50</div>
+          </div>
+          <img src="../Assets/Emoji/Leaderboards.png" class="brawl-profile-icon">
+        </div>
+
+        <div class="brawl-pages">
+          ${pagesHtml}
+        </div>
+
+        ${paginationControls}
+      </div>`;
     }
 
     case "arena_invite": {
@@ -3174,6 +3708,101 @@ function messageEmbed(data) {
     case "arena_redirect": {
       const { roomId } = data.embedData;
       return `✅ Redirecting you to Arena <code class="inline-code">${roomId}</code>`;
+    }
+
+    case "movie": {
+      const { title, year, rated, runtime, genre, director, actors, plot, poster, imdbRating } = data.embedData;
+
+      return `
+      <div class="bubble-embed bmovie-embed">
+        <img src="${poster}" class="bmovie-poster" onerror="this.style.display='none'">
+        <div class="bmovie-body">
+          <div class="bmovie-header">
+            <div class="bmovie-title">${escapeHtml(title)}</div>
+            <div class="bmovie-rating-badge">★ ${imdbRating || "N/A"}</div>
+          </div>
+
+          <div class="bmovie-meta-row">
+            <span class="bmovie-tag">${escapeHtml(year)}</span>
+            <span class="bmovie-tag">${escapeHtml(rated)}</span>
+            <span class="bmovie-tag">${escapeHtml(runtime)}</span>
+          </div>
+
+          <div class="bmovie-plot">${escapeHtml(genre)} • ${escapeHtml(plot)}</div>
+
+          <div class="bmovie-cast">
+            <strong>Director:</strong> ${escapeHtml(director)}<br>
+            <strong>Cast:</strong> ${escapeHtml(actors)}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    case "convert": {
+      const { amount, from, to, rate, result, lastUpdate } = data.embedData;
+
+      const formattedAmount = amount.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      const formattedResult = result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const formattedRate = rate < 0.01 ? rate.toFixed(6) : rate.toFixed(4);
+
+      return `
+      <div class="bubble-embed bconvert-embed">
+        <div class="bconvert-header">
+          <span>Currency Exchange (${escapeHtml(lastUpdate)})</span>
+        </div>
+
+        <div class="bconvert-card">
+          <div>
+            <div style="font-size: 10px; color: #888;">From</div>
+            <div style="font-size: 15px; font-weight: 700; color: #fff;">${formattedAmount}</div>
+          </div>
+          <span class="bconvert-symbol">${escapeHtml(from)}</span>
+        </div>
+
+        <div style="text-align: center; font-size: 12px; color: #555;">↓</div>
+        <div class="bconvert-card" style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.2);">
+          <div>
+            <div style="font-size: 10px; color: #888;">To</div>
+            <div class="bconvert-value">${formattedResult}</div>
+          </div>
+          <span class="bconvert-symbol" style="color: #22c55e; background: rgba(34, 197, 94, 0.15);">${escapeHtml(to)}</span>
+        </div>
+
+        <div class="bconvert-rate-info"> 1 ${escapeHtml(from)} = ${formattedRate} ${escapeHtml(to)} </div>
+      </div>`;
+    }
+
+    case "trivia": {
+      const { category, difficulty, question, correctAnswer, options } = data.embedData;
+      const decodeHtml = (str) => {
+        const txt = document.createElement("textarea");
+        txt.innerHTML = str;
+        return txt.value;
+      };
+
+      const decodedQuestion = decodeHtml(question);
+      const decodedCorrect = decodeHtml(correctAnswer);
+
+      const optionsHtml = options.map((opt) => {
+        const decodedOpt = decodeHtml(opt);
+        return `<button class="btrivia-btn" data-answer="${escapeHtml(decodedOpt)}">${escapeHtml(decodedOpt)}</button>`;
+      }).join("");
+
+      return `
+      <div class="bubble-embed btrivia-embed" data-correct="${escapeHtml(decodedCorrect)}">
+        <div class="btrivia-header">
+          <span>🎯 ${escapeHtml(category)}</span>
+          <span class="btrivia-badge ${difficulty}">${escapeHtml(difficulty)}</span>
+       </div>
+
+       <div class="btrivia-question">${escapeHtml(decodedQuestion)}</div>
+
+       <div class="btrivia-options">
+          ${optionsHtml}
+        </div>
+
+        <div class="btrivia-result"></div>
+      </div>`;
     }
   }
 }
@@ -5816,6 +6445,33 @@ document.addEventListener("touchstart", (e) => {
 
 document.addEventListener("click", (e) => {
   const target = e.target;
+  const triviaBtn = target.closest(".btrivia-btn");
+
+  if (triviaBtn) {
+    const embed = triviaBtn.closest(".btrivia-embed");
+    if (!embed) return;
+
+    const correctAnswer = embed.dataset.correct;
+    const selectedAnswer = triviaBtn.dataset.answer;
+    const resultDiv = embed.querySelector(".btrivia-result");
+    const allBtns = embed.querySelectorAll(".btrivia-btn");
+
+    allBtns.forEach((b) => (b.disabled = true));
+
+    if (selectedAnswer === correctAnswer) {
+      triviaBtn.classList.add("correct");
+      resultDiv.style.color = "#22c55e";
+      resultDiv.textContent = "🎉 Correct!";
+    } else {
+      triviaBtn.classList.add("wrong");
+      resultDiv.style.color = "#ef4444";
+      resultDiv.textContent = `❌ Incorrect! Answer: ${correctAnswer}`;
+
+      allBtns.forEach((b) => {
+        if (b.dataset.answer === correctAnswer) b.classList.add("correct");
+      });
+    }
+  }
 
   if (isDesktop()) {
     const reaction = target.closest(".reaction-badge");

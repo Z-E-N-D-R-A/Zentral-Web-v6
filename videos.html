@@ -101,7 +101,33 @@
 
       const EN = () => atob(Channel_Code.split('').reverse().join(''));
       const Channel_ID = EN();
+      const loadingTimers = {};
+
+      function startLoadingAnimation(id, baseValue = 1500) {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        loadingTimers[id] = setInterval(() => {
+          const delta = Math.floor(Math.random() * 80) - 40;
+          const currentDisplay = Math.max(0, baseValue + delta);
+          el.textContent = currentDisplay.toLocaleString();
+        }, 75);
+      }
+
+      function stopLoadingAnimation(id) {
+        if (loadingTimers[id]) {
+          clearInterval(loadingTimers[id]);
+          delete loadingTimers[id];
+        }
+      }
+
       async function followerCounts() {
+        startLoadingAnimation("igCount", 2093);
+        startLoadingAnimation("tiktokCount", 1780);
+        startLoadingAnimation("ytCount", 1330);
+
+        updateYouTubeStats();
+
         const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR16SGHQq6zDLzf-1t4m5TN8b7ePx4e5yZROR-k45ClZYW3wdA_7IL5_GQFIsoddc_27TEeQnB-HGLv/pub?gid=272102271&single=true&output=csv";
         let igFollowers = 2100;
         let tiktokFollowers = 1750;
@@ -121,8 +147,10 @@
           console.warn("[ERROR]", error.message);
         }
         
-        updateYouTubeStats();
+        stopLoadingAnimation("igCount");
         animateCount("igCount", igFollowers);
+
+        stopLoadingAnimation("tiktokCount");
         animateCount("tiktokCount", tiktokFollowers);
       }
 
@@ -130,7 +158,7 @@
         const el = document.getElementById(id);
         if (!el) return;
 
-        let count = 0;
+        let count = 1000;
         const increment = target / 50;
         
         const timer = setInterval(() => {
@@ -157,6 +185,9 @@
           animateCount("ytCount", Number(stats.subscriberCount));
         } catch (err) {
           console.log("YouTube Stats Loading Error: " + err);
+        } finally {
+          stopLoadingAnimation("ytCount");
+          animateCount("ytCount", ytSubs);
         }
       }
       
