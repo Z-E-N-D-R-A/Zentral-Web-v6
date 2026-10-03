@@ -2923,6 +2923,11 @@ function messageEmbed(data) {
       const { name, tag, iconId, trophies, fameTierName, rankedRankName, highestAllTimeRankedRankName, club, soloVictories, duoVictories, victories, brawlers, total, totalPrestigeLevel } = data.embedData;
       const iconUrl = `https://cdn.brawlify.com/profile-icons/regular/${iconId}.png`;
 
+      function formatTitleCase(str) {
+        if (!str || str === "N/A" || str === "NONE") return "N/A";
+        return str.toLowerCase().split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+      }
+
       function getRankEmojiPath(rankString) {
         if (!rankString || rankString === "N/A") {
           return "../Assets/Emoji/Ranked.png";
@@ -2932,8 +2937,8 @@ function messageEmbed(data) {
         return `../Assets/Emoji/${baseRank}.png`;
       }
       
-      const currentRankEmoji = getRankEmojiPath(rankedRankName);
-      const highestRankEmoji = getRankEmojiPath(highestAllTimeRankedRankName);
+      const currentRankEmoji = getRankEmojiPath(formatTitleCase(rankedRankName));
+      const highestRankEmoji = getRankEmojiPath(formatTitleCase(highestAllTimeRankedRankName));
 
       return `<div class="bubble-embed">
           <div class="brawl-header">
@@ -2952,9 +2957,9 @@ function messageEmbed(data) {
           </div>
 
           <div class="brawl-stats">
-            <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/fame.png"> <strong>Fame:</strong> ${fameTierName}</div>
-            <div class="brawl-stat"><img class="brawl-emoji" src="${currentRankEmoji}"> <strong>Current Ranked:</strong> ${rankedRankName}</div>
-            <div class="brawl-stat"><img class="brawl-emoji" src="${highestRankEmoji}"> <strong>Highest Ranked:</strong> ${highestAllTimeRankedRankName}</div>
+            <div class="brawl-stat"><img class="brawl-emoji" src="../Assets/Emoji/Fame.png"> <strong>Fame:</strong> ${formatTitleCase(fameTierName)}</div>
+            <div class="brawl-stat"><img class="brawl-emoji" src="${currentRankEmoji}"> <strong>Current Ranked:</strong> ${formatTitleCase(rankedRankName)}</div>
+            <div class="brawl-stat"><img class="brawl-emoji" src="${highestRankEmoji}"> <strong>Highest Ranked:</strong> ${formatTitleCase(highestAllTimeRankedRankName)}</div>
           </div>
 
           <div class="brawl-stats">
