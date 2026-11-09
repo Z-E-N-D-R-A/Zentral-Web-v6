@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>2026  Silly Group</title>
+<link rel="icon" type="image/png" href="../Assets/Icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="recap.css">
+</head>
+<body>
+<div id="bg-stage" aria-hidden="true">
+  <div class="aurora-base"></div>
+  <div class="aurora-blobs">
+    <i class="b1"></i>
+    <i class="b2"></i>
+    <i class="b3"></i>
+    <i class="b4"></i>
+  </div>
+  <div class="aurora-ribbon"></div>
+  <div class="spatial-grid"></div>
+</div>
+<canvas id="ambient"></canvas>
+
+<main id="gate">
+  <div id="gin"></div>
+</main>
+
+<div id="intro-overlay" hidden>
+  <video id="intro-vid" playsinline preload="auto"></video>
+  <button type="button" id="skip-intro" aria-label="Skip intro video">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+    <span>Skip Intro</span>
+  </button>
+</div>
+
+<div id="prog" hidden></div>
+
+<header id="hud" hidden>
+  <div class="hud-left">
+    <span class="hud-pill group-pill"><span class="chip-dot"></span><span id="hud-user">2026 Silly Recap</span></span>
+    <span class="hud-pill hud-counter" id="hud-counter">01 / 24</span>
+  </div>
+  <div class="hud-right">
+    <button type="button" class="hud-btn" id="pause-btn" aria-label="Pause or play story"></button>
+    <button type="button" class="hud-btn" id="mute-btn" aria-label="Toggle sound"></button>
+  </div>
+</header>
+
+<div id="stage"></div>
+
+<nav id="nav-dock" aria-label="Slide navigation" hidden>
+  <button type="button" class="dock-btn" id="prev-btn" aria-label="Previous slide"></button>
+  <span class="dock-label" id="dock-label">Overview</span>
+  <button type="button" class="dock-btn" id="next-btn" aria-label="Next slide"></button>
+</nav>
+
+<canvas id="fx"></canvas>
+
+<script src="config.js"></script>
+<script src="stats.js"></script>
+<script src="gate.js"></script>
+<script src="recap.js"></script>
+</body>
+</html>
